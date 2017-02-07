@@ -1,3 +1,16 @@
+#PROPIOS
+*.pyc
+build/
+dist/
+SQL/
+Pruebas.py
+sync.cnf
+id.conf
+ui/*.py*
+geany_run_script.bat
+
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

@@ -1,0 +1,10 @@
+beautifulsoup4
+feedparser
+imdbpie
+requests
+#mechanize
+pushbullet.py
+mailer
+#pyqt5
+rarfile
+pyTelegramBotAPI

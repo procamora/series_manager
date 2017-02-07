@@ -1,0 +1,25 @@
+<RCC>
+  <qresource prefix="Iconos">
+    <file>Icons/fatcow/Principal.png</file>
+    <file>Icons/fatcow/add.png</file>
+    <file>Icons/fatcow/accept_button.png</file>
+    <file>Icons/fatcow/application_edit.png</file>
+    <file>Icons/fatcow/arrow_refresh.png</file>
+    <file>Icons/fatcow/arrow_refresh_small.png</file>
+    <file>Icons/fatcow/box_search.png</file>
+    <file>Icons/fatcow/cancel.png</file>
+    <file>Icons/fatcow/cross.png</file>
+    <file>Icons/fatcow/database_refresh.png</file>
+    <file>Icons/fatcow/delete.png</file>
+    <file>Icons/fatcow/edit_button.png</file>
+    <file>Icons/fatcow/file_save_as.png</file>
+    <file>Icons/fatcow/find.png</file>
+    <file>Icons/fatcow/folder_search.png</file>
+    <file>Icons/fatcow/google_custom_search.png</file>
+    <file>Icons/fatcow/page_edit.png</file>
+    <file>Icons/fatcow/page_refresh.png</file>
+    <file>Icons/fatcow/page_save.png</file>
+    <file>Icons/fatcow/refresh_all.png</file>
+    <file>Icons/fatcow/table_refresh.png</file>
+  </qresource>
+</RCC>
