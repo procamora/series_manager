@@ -66,10 +66,12 @@ class MiFormulario(QtWidgets.QMainWindow):
         text = self.listadoFinal
 
         for texto, i in zip(text, list(range(0, len(text)))):# el encabezado lo tengo encima
+            self.__creaListaSerie(i, texto)
             if modo_debug:
                 print((i, texto))
-        self.__creaListaSerie(i, texto)
 
+        self.ui.pushButtonAceptar.setVisible(False)
+        self.ui.pushButtonAplicar.setText("Guardar")
         self.ui.pushButtonAplicar.clicked.connect(self.__aplicaDatos)
         self.ui.pushButtonCerrar.clicked.connect(self.__cancela)
         self.ui.pushButtonAceptar.clicked.connect(self.__aceptaDatos)
