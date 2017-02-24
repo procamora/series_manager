@@ -42,12 +42,12 @@ def formatea(texto):
     return texto
 
 
-def checkError(codigo, stderr, message):
+def checkError(codigo, stderr):
     if codigo.returncode and stderr:
         if modo_debug:
             print("Error:")
-        bot.reply_to(message, formatea(stderr))
-
+        return True
+    return False
 
 # Handle always first "/start" message when new chat with your bot is created
 @bot.message_handler(commands=["start"])
@@ -193,7 +193,7 @@ def handle_magnet(message):
     ejecucion = subprocess.Popen(comando, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = ejecucion.communicate()
     
-    checkError(ejecucion, stderr)
+    checkError(ejecucion, stderr, message)
     if modo_debug:
         bot.reply_to(message, 'Exito: {}'.format(formatea(stdout)))
         bot.reply_to(message, 'Error: {}'.format(checkError(ejecucion, stderr, message)))
