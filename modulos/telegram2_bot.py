@@ -13,12 +13,11 @@ import requests
 import telebot              # Importamos la librería
 from telebot import types   # Y los tipos especiales de esta
 from bs4 import BeautifulSoup
-from modulos.settings import modo_debug
 
 try: #Ejecucion desde Series.py
-    from .settings import api_telegram
+    from .settings import api_telegram, modo_debug
 except: #Ejecucion local
-    from settings import api_telegram
+    from settings import api_telegram, modo_debug
 
 
 administrador = 33063767
