@@ -11,6 +11,7 @@ import re
 import requests
 import telebot              # Importamos la librería
 from telebot import types   # Y los tipos especiales de esta
+from bs4 import BeautifulSoup
 
 try: #Ejecucion desde Series.py
     from .settings import api_telegram
@@ -168,14 +169,15 @@ def handle_cmd(message):
 
 @bot.message_handler(func=lambda message: message.chat.id == administrador, regexp="^magnet:\?xt=urn.*")
 def handle_magnet(message):
-    comando = 'transmission-remote 127.0.0.1:9091 --auth=pi:{} --add {}'.format(pass_transmission, message.text)
+    
+    comando = 'transmission-remote 127.0.0.1:9091 --auth=pi:{} --add "{}"'.format(pass_transmission, message.text)
     os.popen(comando)
-    #now = f.read()
+
     bot.reply_to(message, 'Ejecutado add torrent')
     send_show_torrent(message)
 
 
-@bot.message_handler(regexp="^(http://)?www.newpct1.com/.*")
+@bot.message_handler(regexp="^(http://)?www.(newpct1|tumejortorrent).com/.*")
 def handle_newpct1(message):
 
     def descargaTorrent(direcc): #PARA NEWPCT1
@@ -186,19 +188,25 @@ def handle_newpct1(message):
 
         :return str: Nos devuelve el string con la url del torrent
         '''
+        if re.search("newpct1", direcc):
+            session = requests.session()
+            page = session.get(direcc, verify=False).text
+            sopa = BeautifulSoup(page, 'html.parser')
+            return sopa.find('div', {"id": "tab1"}).a['href']
 
-        session = requests.session()
-        page = session.get(direcc, verify=False).text
-        #page = urllib.urlopen(direcc).read()
-        sopa = BeautifulSoup(page, 'html.parser')
-        return sopa.find('div', {"id": "tab1"}).a['href']
+        elif re.search("tumejortorrent", direcc):
+            session = requests.session()
+            page = session.get(direcc, verify=False).text
+            sopa = BeautifulSoup(page, 'html.parser')
+            #print(sopa.findAll('div', {"id": "tab1"}))
+            print(sopa.find_all("a", class_="btn-torrent")[0]['href'])
+            return sopa.find('div', {"id": "tab1"}).a['href']          
 
     def descargaFichero(url, destino):
         r = requests.get(url)
         with open(destino, "wb") as code:
             code.write(r.content)
 
-    from bs4 import BeautifulSoup
 
     bot.reply_to(message, 'Buscando torrent en newpct1')
 
@@ -247,10 +255,7 @@ def my_text(message):
 @bot.message_handler(func=lambda message: message.chat.id == administrador, content_types=["photo"])
 def my_photo(message):
     if message.reply_to_message:
-        who_to_send_id = dbhelper.get_user_id(message.reply_to_message.message_id)
-        if who_to_send_id:
-            # Send the largest available (last item in photos array)
-            bot.send_photo(who_to_send_id, list(message.photo)[-1].file_id)
+        bot.send_photo(message.chat.id, list(message.photo)[-1].file_id)
     else:
         bot.send_message(message.chat.id, "No one to reply photo!")
 
@@ -258,10 +263,7 @@ def my_photo(message):
 @bot.message_handler(func=lambda message: message.chat.id == administrador, content_types=["voice"])
 def my_voice(message):
     if message.reply_to_message:
-        who_to_send_id = dbhelper.get_user_id(message.reply_to_message.message_id)
-        if who_to_send_id:
-            # bot.send_chat_action(who_to_send_id, "record_audio")
-            bot.send_voice(who_to_send_id, message.voice.file_id, duration=message.voice.duration)
+        bot.send_voice(message.chat.id, message.voice.file_id, duration=message.voice.duration)
     else:
         bot.send_message(message.chat.id, "No one to reply voice!")
 

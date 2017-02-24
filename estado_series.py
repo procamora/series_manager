@@ -67,7 +67,7 @@ class MiFormulario(QtWidgets.QDialog):
         self.ui.radioButtonFinalizada.setChecked(True)
         self.__serieFinalizada() # lo ejecuto al principio ya que es el activado por defecto
 
-        #self.actuales = conectTviso()
+        self.actuales = conectTviso()
 
 
     def __botonSiguiendo(self, seriesTest):

@@ -23,16 +23,26 @@ def descargaTorrent(direcc):  # PARA NEWPCT1
     :return str: Nos devuelve el string con la url del torrent
     '''
 
-    session = requests.session()
-    page = session.get(direcc, verify=False).text
-    # page = urllib.urlopen(direcc).read()
-    sopa = BeautifulSoup(page, 'html.parser')
-    #print(sopa.findAll('div', {"id": "tab1"}))
-    print(sopa.find_all("a", class_="btn-torrent")[0]['href'])
-    return sopa.find('div', {"id": "tab1"}).a['href']
+    if re.search("newpct1", direcc):
+        print("newpct1")
+        session = requests.session()
+        page = session.get(direcc, verify=False).text
+        #page = urllib.urlopen(direcc).read()
+        sopa = BeautifulSoup(page, 'html.parser')
+        return sopa.find('div', {"id": "tab1"}).a['href']
+
+    elif re.search("tumejortorrent", direcc):
+        print("tumejortorrent")
+        session = requests.session()
+        page = session.get(direcc, verify=False).text
+        # page = urllib.urlopen(direcc).read()
+        sopa = BeautifulSoup(page, 'html.parser')
+        #print(sopa.findAll('div', {"id": "tab1"}))
+        print(sopa.find_all("a", class_="btn-torrent")[0]['href'])
+        return sopa.find('div', {"id": "tab1"}).a['href']    
 
 
 
-url = "http://tumejortorrent.com/descargar-seriehd/arrow/capitulo-58/hdtv-720p-ac3-5-1/"
+url = "http://www.tumejortorrent.com/descargar-pelicula/contratiempo/bluray-microhd/"
 
 descargaTorrent(url)
