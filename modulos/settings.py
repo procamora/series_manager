@@ -8,13 +8,16 @@ gdrive = 0
 sistema = platform.system()
 nombre_db = 'Series.db'
 
+opcion1 = '{}/sync.cnf'.format(os.path.dirname(os.path.realpath(__file__)))
+opcion2 = '{}/../sync.cnf'.format(os.path.dirname(os.path.realpath(__file__)))
 
-if os.path.exists('sync.cnf'):
-    with open('sync.cnf', 'r') as f:
+os.path.dirname(os.path.realpath(__file__))
+if os.path.exists(opcion1):
+    with open(opcion1, 'r') as f:
         lineas_fich = f.readlines()
         gdrive = int(lineas_fich[0].replace('\n', ''))
-elif os.path.exists('../sync.cnf'):
-    with open('../sync.cnf', 'r') as f:
+elif os.path.exists(opcion2):
+    with open(opcion2, 'r') as f:
         lineas_fich = f.readlines()
         gdrive = int(lineas_fich[0].replace('\n', ''))
 
