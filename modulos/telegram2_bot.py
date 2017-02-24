@@ -245,11 +245,11 @@ def handle_magnet(message):
         comando, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = ejecucion.communicate()
 
-    checkError(ejecucion, stderr, message)
+    checkError(ejecucion, stderr)
     if modo_debug:
         bot.reply_to(message, 'Exito: {}'.format(formatea(stdout)))
         bot.reply_to(message, 'Error: {}'.format(
-            checkError(ejecucion, stderr, message)))
+            checkError(ejecucion, stderr)))
 
     bot.reply_to(message, 'Ejecutado add torrent')
     send_show_torrent(message)
