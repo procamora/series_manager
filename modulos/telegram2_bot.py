@@ -15,10 +15,10 @@ from telebot import types   # Y los tipos especiales de esta
 from bs4 import BeautifulSoup
 
 try:  # Ejecucion desde Series.py
-    from .settings import modo_debug, ruta_db, directorio_local
+    from .settings import modo_debug, ruta_db, directorio_local, directorio_trabajo
     from .connect_sqlite import conectionSQLite, ejecutaScriptSqlite
 except:  # Ejecucion local
-    from settings import modo_debug, ruta_db, directorio_local
+    from settings import modo_debug, ruta_db, directorio_local, directorio_trabajo
     from connect_sqlite import conectionSQLite, ejecutaScriptSqlite
 
 
@@ -40,7 +40,7 @@ pass_transmission = credenciales['pass_transmission']
 
 dicc_botones = {
     'cgs': 'cron Gestor Series',
-    'crs': 'cron Rsync Samba',
+    'log': 'vaciar log series',
     'mount': 'mount -a',
     'sys': 'reboot system',
     'ts': 'reboot transmission',
@@ -113,7 +113,7 @@ def command_system(message):
     bot.send_message(message.chat.id, "Lista de comandos disponibles")
 
     markup = types.ReplyKeyboardMarkup(one_time_keyboard=True)
-    markup.row(dicc_botones['cgs'], dicc_botones['crs'], dicc_botones['mount'])
+    markup.row(dicc_botones['cgs'], dicc_botones['log'], dicc_botones['mount'])
     markup.row(dicc_botones['ts'], dicc_botones['sys'])
     markup.row(dicc_botones['exit'])
 
@@ -129,7 +129,7 @@ def send_cgs(message):
     ejecucion = subprocess.Popen(
         comando, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = ejecucion.communicate()
-    stdout = formatea(stdout) # sino stdout esta en bytes
+    #stdout = formatea(stdout) # sino stdout esta en bytes
 
     if checkError(ejecucion, stderr):
         bot.reply_to(message, 'Error: {}'.format(stderr))
@@ -141,21 +141,15 @@ def send_cgs(message):
         bot.reply_to(message, stdout)
 
 
-@bot.message_handler(func=lambda message: message.chat.id == administrador, commands=['cron_rsync_samba'])
-def send_crs(message):
-    comando = 'cd /home/pi/scripts && /usr/bin/python3 /home/pi/scripts/rsync_samba.py'
-    ejecucion = subprocess.Popen(
-        comando, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    stdout, stderr = ejecucion.communicate()
-    stdout = formatea(stdout) # sino stdout esta en bytes
+@bot.message_handler(func=lambda message: message.chat.id == administrador, commands=['variar_log'])
+def send_log(message):
 
-    if checkError(ejecucion, stderr):
-        bot.reply_to(message, 'Error: {}'.format(stderr))
-        return
-    elif len(stdout) == 0:
-        bot.reply_to(message, 'Ejecutado rsync')
-    else:
-        bot.reply_to(message, stdout)
+    fichero = '{}/log/{}'.format(directorio_trabajo, credenciales['FicheroFeedNewpct'])
+
+    with open(fichero, 'w'):
+        pass
+    
+    bot.reply_to(message, 'Log vaciado')
 
 
 @bot.message_handler(func=lambda message: message.chat.id == administrador, commands=['mount_a'])
@@ -357,8 +351,8 @@ def my_text(message):
     if message.text in dicc_botones.values():
         if message.text == dicc_botones['cgs']:
             send_cgs(message)
-        elif message.text == dicc_botones['crs']:
-            send_crs(message)
+        elif message.text == dicc_botones['log']:
+            send_log(message)
         elif message.text == dicc_botones['mount']:
             send_mount(message)
         elif message.text == dicc_botones['ts']:
