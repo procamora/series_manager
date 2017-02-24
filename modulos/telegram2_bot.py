@@ -7,11 +7,13 @@
 
 import os
 import re
+import subprocess
 
 import requests
 import telebot              # Importamos la librería
 from telebot import types   # Y los tipos especiales de esta
 from bs4 import BeautifulSoup
+from modulos.settings import modo_debug
 
 try: #Ejecucion desde Series.py
     from .settings import api_telegram
@@ -33,6 +35,19 @@ dicc_botones = {
     'ts': 'reboot transmission',
     'exit': 'exit',
 }
+
+def formatea(texto):
+    if texto is not None:
+        text = texto.decode('utf-8')
+        return text.replace('\n','')
+    return texto
+
+
+def checkError(codigo, stderr, message):
+    if codigo.returncode and stderr:
+        if modo_debug:
+            print("Error:")
+        bot.reply_to(message, formatea(stderr))
 
 
 # Handle always first "/start" message when new chat with your bot is created
@@ -169,9 +184,20 @@ def handle_cmd(message):
 
 @bot.message_handler(func=lambda message: message.chat.id == administrador, regexp="^magnet:\?xt=urn.*")
 def handle_magnet(message):
-    
+
     comando = 'transmission-remote 127.0.0.1:9091 --auth=pi:{} --add "{}"'.format(pass_transmission, message.text)
+    if modo_debug:
+        print(comando)
     os.popen(comando)
+
+
+    ejecucion = subprocess.Popen(comando, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = ejecucion.communicate()
+    
+    checkError(ejecucion, stderr)
+    if modo_debug:
+        bot.reply_to(message, 'Exito: {}'.format(formatea(stdout)))
+        bot.reply_to(message, 'Error: {}'.format(checkError(ejecucion, stderr, message)))
 
     bot.reply_to(message, 'Ejecutado add torrent')
     send_show_torrent(message)
@@ -189,12 +215,14 @@ def handle_newpct1(message):
         :return str: Nos devuelve el string con la url del torrent
         '''
         if re.search("newpct1", direcc):
+            bot.reply_to(message, 'Buscando torrent en newpct1')
             session = requests.session()
             page = session.get(direcc, verify=False).text
             sopa = BeautifulSoup(page, 'html.parser')
             return sopa.find('div', {"id": "tab1"}).a['href']
 
         elif re.search("tumejortorrent", direcc):
+            bot.reply_to(message, 'Buscando torrent en tumejortorrent')
             session = requests.session()
             page = session.get(direcc, verify=False).text
             sopa = BeautifulSoup(page, 'html.parser')
@@ -202,16 +230,15 @@ def handle_newpct1(message):
             print(sopa.find_all("a", class_="btn-torrent")[0]['href'])
             return sopa.find('div', {"id": "tab1"}).a['href']          
 
+
     def descargaFichero(url, destino):
         r = requests.get(url)
         with open(destino, "wb") as code:
             code.write(r.content)
 
 
-    bot.reply_to(message, 'Buscando torrent en newpct1')
-
-    regexGenero = re.search('descarga-torrent', message.text)                   # buscamos el genero
-    if regexGenero:                                                 # si hay find continua, sino retorno None el re.search
+    regexGenero = re.search('descarga-torrent', message.text) # buscamos el genero
+    if regexGenero: # si hay find continua, sino retorno None el re.search
         urlPeli = message.text
     else:
         urlPeli = re.sub('(http://)?www.newpct1.com/', 'http://www.newpct1.com/descarga-torrent/', message.text)
