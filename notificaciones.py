@@ -8,40 +8,41 @@ from ui.notificaciones_ui import Ui_Dialog
 from modulos.connect_sqlite import conectionSQLite, ejecutaScriptSqlite
 from modulos.settings import modo_debug, ruta_db
 
+
 class MiFormulario(QtWidgets.QDialog):
+
     def __init__(self, parent=None, dbSeries=None):
         QtWidgets.QWidget.__init__(self, parent)
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
         self.Otra = 'Otra'  # campo otra del formulario
-        self.EstadoI = 'Ok' # estado inicial
-        self.EstadoF = 'Cancelado' #final
-        self.EstadoA = self.EstadoI #actual
+        self.EstadoI = 'Ok'  # estado inicial
+        self.EstadoF = 'Cancelado'  # final
+        self.EstadoA = self.EstadoI  # actual
         self.db = dbSeries
         self.setWindowTitle('Notificaciones de la aplicacion')
 
         self.__operacionesIniciales()
 
         self.ui.checkBox_Telegram.clicked.connect(lambda
-            x=self.ui.checkBox_Telegram,
-            y=self.ui.lineEdit_Telegram: self.__compruebaCheck(x, y))
+                                                  x=self.ui.checkBox_Telegram,
+                                                  y=self.ui.lineEdit_Telegram: self.__compruebaCheck(x, y))
 
         self.ui.checkBox_PushBullet.clicked.connect(lambda
-            x=self.ui.checkBox_PushBullet,
-            y=self.ui.lineEdit_PushBullet: self.__compruebaCheck(x, y))
+                                                    x=self.ui.checkBox_PushBullet,
+                                                    y=self.ui.lineEdit_PushBullet: self.__compruebaCheck(x, y))
 
         self.ui.checkBox_Email.clicked.connect(lambda
-            x=self.ui.checkBox_Email,
-            y=self.ui.lineEdit_Email: self.__compruebaCheck(x, y))
+                                               x=self.ui.checkBox_Email,
+                                               y=self.ui.lineEdit_Email: self.__compruebaCheck(x, y))
 
         self.ui.checkBox_Hangouts.clicked.connect(lambda
-            x=self.ui.checkBox_Hangouts,
-            y=self.ui.lineEdit_Hangouts: self.__compruebaCheck(x, y))
+                                                  x=self.ui.checkBox_Hangouts,
+                                                  y=self.ui.lineEdit_Hangouts: self.__compruebaCheck(x, y))
 
         self.ui.pushButtonAplicar.clicked.connect(self.__aplicaDatos)
         self.ui.pushButtonCerrar.clicked.connect(self.__cancela)
         self.ui.pushButtonAceptar.clicked.connect(self.__aceptaDatos)
-
 
     def __compruebaCheck(self, a, b):
         '''
@@ -53,7 +54,6 @@ class MiFormulario(QtWidgets.QDialog):
         else:
             b.setDisabled(True)
 
-
     def __operacionesIniciales(self):
         '''
         Ejecuta las 2 funciones necesarias para que funcione el programa,
@@ -62,7 +62,6 @@ class MiFormulario(QtWidgets.QDialog):
         self.__sacaDatos()
         self.__averiguaConf()
 
-
     def __sacaDatos(self):
         '''
         Ejecuta la consulta
@@ -70,7 +69,6 @@ class MiFormulario(QtWidgets.QDialog):
 
         query = 'SELECT * FROM Notificaciones'
         self.DatodDb = conectionSQLite(self.db, query, True)
-
 
     def __averiguaConf(self):
         '''
@@ -98,9 +96,9 @@ class MiFormulario(QtWidgets.QDialog):
                 self.ui.lineEdit_PushBullet.setText(api)
                 if i['Activo'] == 'True':
                     self.ui.checkBox_PushBullet.setChecked(True)
-                    #self.lineEdit_PushBullet.setDisabled(False)
+                    # self.lineEdit_PushBullet.setDisabled(False)
                 else:
-                    #self.checkBox_PushBullet.setChecked(False)
+                    # self.checkBox_PushBullet.setChecked(False)
                     self.ui.lineEdit_PushBullet.setDisabled(True)
 
             elif i['Nombre'] == 'Email':
@@ -116,7 +114,6 @@ class MiFormulario(QtWidgets.QDialog):
                     self.ui.checkBox_Hangouts.setChecked(True)
                 else:
                     self.ui.lineEdit_Hangouts.setDisabled(True)
-
 
     def __aplicaDatos(self):
         '''
@@ -149,7 +146,6 @@ class MiFormulario(QtWidgets.QDialog):
         ejecutaScriptSqlite(self.db, query)
         return True
 
-
     def __cancela(self):
         '''
         Establece el estado actual en cancelado para retornar None y ejecuta reject
@@ -158,7 +154,6 @@ class MiFormulario(QtWidgets.QDialog):
         self.EstadoA = self.EstadoF
         self.reject()
 
-
     def __aceptaDatos(self):
         """
         Boton Aceptar, primero aplicas los datos, si retorna True, cierra la ventana
@@ -166,7 +161,6 @@ class MiFormulario(QtWidgets.QDialog):
 
         if self.__aplicaDatos():
             self.accept()
-
 
     @staticmethod
     def getDatos(parent=None, dbSeries=None):

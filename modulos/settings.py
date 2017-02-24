@@ -3,15 +3,15 @@
 import os
 import platform
 
-modo_debug = False
+modo_debug = True
 gdrive = 0
 sistema = platform.system()
 nombre_db = 'Series.db'
 
-api_telegram = '143504303:AAF5JHesA5WGnc9VWrG9EotCqtMtaZfdEVE'
+#api_telegram = '143504303:AAF5JHesA5WGnc9VWrG9EotCqtMtaZfdEVE'
 
-user_tviso  = 'NotSer'
-pass_tviso  = 'i(!f!Boz_A&YLY]q'
+#user_tviso  = 'NotSer'
+#pass_tviso  = 'i(!f!Boz_A&YLY]q'
 
 if os.path.exists('sync.cnf'):
     with open('sync.cnf', 'r') as f:
@@ -27,21 +27,29 @@ if gdrive:
 
     if sistema == "Windows":
         directorio_trabajo = '{}/{}'.format(dir_drive, 'Gestor-Series')
-        directorio_local = os.path.dirname(os.path.realpath(__file__)).replace('\\', '/').replace('/modulos', '')#tengo que eliminar /modulos para que coga ../ y no este directorio
-        if directorio_local.split('/')[-1] == 'library.zip': # para cuando lo ejecuto con el exe
+        directorio_local = os.path.dirname(os.path.realpath(__file__)).replace(
+            '\\', '/').replace('/modulos', '')  # tengo que eliminar /modulos para que coga ../ y no este directorio
+        # para cuando lo ejecuto con el exe
+        if directorio_local.split('/')[-1] == 'library.zip':
             directorio_local += '/..'
     elif sistema == "Linux":
         directorio_trabajo = '{}/{}'.format(dir_drive, 'Gestor-Series')
-        directorio_local = os.path.dirname(os.path.realpath(__file__)).replace('/modulos', '')
+        directorio_local = os.path.dirname(
+            os.path.realpath(__file__)).replace('/modulos', '')
 else:
     if sistema == "Windows":
-        directorio_trabajo = '{}/{}'.format((os.environ['LOCALAPPDATA']).replace('\\', '/'), 'Gestor-Series')
-        directorio_local = os.path.dirname(os.path.realpath(__file__)).replace('\\', '/').replace('/modulos', '')
-        if directorio_local.split('/')[-1] == 'library.zip': # para cuando lo ejecuto con el exe
+        directorio_trabajo = '{}/{}'.format(
+            (os.environ['LOCALAPPDATA']).replace('\\', '/'), 'Gestor-Series')
+        directorio_local = os.path.dirname(os.path.realpath(__file__)).replace(
+            '\\', '/').replace('/modulos', '')
+        # para cuando lo ejecuto con el exe
+        if directorio_local.split('/')[-1] == 'library.zip':
             directorio_local += '/.2.'
     elif sistema == "Linux":
-        directorio_trabajo = '{}/.{}'.format(os.environ['HOME'], 'Gestor-Series')
-        directorio_local = os.path.dirname(os.path.realpath(__file__)).replace('/modulos', '')
+        directorio_trabajo = '{}/.{}'.format(
+            os.environ['HOME'], 'Gestor-Series')
+        directorio_local = os.path.dirname(
+            os.path.realpath(__file__)).replace('/modulos', '')
 
 ruta_db = '{}/{}'.format(directorio_trabajo, nombre_db)
 

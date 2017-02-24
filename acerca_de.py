@@ -8,6 +8,7 @@ from ui.acerca_de_ui import Ui_Dialog
 
 
 class MiFormulario(QtWidgets.QDialog):
+
     def __init__(self, parent=None):
         #super(MiFormulario, self).__init__()
         #uic.loadUi('ui/AcercaDe.ui', self)
@@ -43,9 +44,8 @@ class MiFormulario(QtWidgets.QDialog):
 
         self.ui.pushButtonClose.clicked.connect(self.close)
 
-
     @staticmethod
-    def getDatos(parent = None):
+    def getDatos(parent=None):
         dialog = MiFormulario(parent)
         dialog.exec_()
 

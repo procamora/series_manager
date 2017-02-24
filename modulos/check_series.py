@@ -1,14 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-try: #Ejecucion desde Series.py
+try:  # Ejecucion desde Series.py
     from .connect_sqlite import conectionSQLite, ejecutaScriptSqlite
     from .settings import modo_debug, ruta_db
-except: #Ejecucion local
+except:  # Ejecucion local
     from connect_sqlite import conectionSQLite, ejecutaScriptSqlite
     from settings import modo_debug, ruta_db
-
-
 
 
 def acabada(write=False):
@@ -46,13 +44,11 @@ def makeUpdate(query, update, write=False):
     if modo_debug:
         print(queryUpdate)
 
-    if write and len(queryUpdate)!=0:
+    if write and len(queryUpdate) != 0:
         print('ejecutar script')
         ejecutaScriptSqlite(ruta_db, queryUpdate)
 
     return queryUpdate
-
-
 
 
 if __name__ == '__main__':

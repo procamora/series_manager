@@ -8,6 +8,7 @@ from ui.msgbox_ui import Ui_Dialog
 
 
 class MiFormulario(QtWidgets.QDialog,):
+
     def __init__(self, parent=None, datos=None):
         QtWidgets.QWidget.__init__(self, parent)
         self.ui = Ui_Dialog()
@@ -16,19 +17,19 @@ class MiFormulario(QtWidgets.QDialog,):
         if datos is not None:
             self.datos = datos
         else:
-            self.datos = {'title':'titulo para cambiar', 'text': 'Texto a cambiar'}
+            self.datos = {
+                'title': 'titulo para cambiar', 'text': 'Texto a cambiar'}
 
         self.setWindowTitle(self.datos['title'])
 
-        self.ui.plainTextEdit.insertPlainText(self.datos['text'])			#self.plainTextEdit.appendPlainText(self.datos['text'])
-        #self.ui.ButtonOk.clicked.connect(self.retornaDatos)
-
+        # self.plainTextEdit.appendPlainText(self.datos['text'])
+        self.ui.plainTextEdit.insertPlainText(self.datos['text'])
+        # self.ui.ButtonOk.clicked.connect(self.retornaDatos)
 
     @staticmethod
     def getData(parent=None, datos=None):
         dialog = MiFormulario(parent, datos)
         dialog.exec_()
-
 
 
 def main():
@@ -43,7 +44,7 @@ Nunc fermentum sed quam a ullamcorper. Pellentesque posuere nec lacus nec ultric
 Sed in ante at urna luctus varius. Ut purus ipsum, sollicitudin eu facilisis vel, blandit at leo. Ut vestibulum tincidunt tempus.
     '''
 
-    res = {'title':'titulo de prueba', 'text': a}
+    res = {'title': 'titulo de prueba', 'text': a}
     #MiFormulario.getData(parent=None, datos=res)
     MiFormulario.getData(datos=res)
     return app

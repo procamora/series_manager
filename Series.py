@@ -48,8 +48,9 @@ class MiFormulario(QtWidgets.QMainWindow):
         self.Otra = 'Otra'  # campo otra del formulario
         self.EstadoI = 'Ok' # estado inicial
         self.EstadoF = 'Cancelado' #final
-        self.EstadoA = self.EstadoI #actual
-        self.db = self.database						############################################## CUIADO REVISAR ESTO Y UNIFICADO TODOS LOS NOMBRE DE LA DB
+        self.EstadoA = self.EstadoI  # actual
+        # CUIADO REVISAR ESTO Y UNIFICADO TODOS LOS NOMBRE DE LA DB
+        self.db = self.database
 
         self.QueryCompleta = str()   # lista de consultas que se ejecutaran al final
 
@@ -453,7 +454,7 @@ class MiFormulario(QtWidgets.QMainWindow):
         with open(r'{}/id.conf'.format(directorio_local), 'r') as f:
             id_fich = f.readline().replace('/n', '')
 
-        query = 'SELECT * FROM Configuraciones WHERE ID LIKE {} LIMIT 1'.format(id_fich)
+        query = 'SELECT * FROM Configuraciones, Credenciales WHERE ID LIKE {} LIMIT 1'.format(id_fich)
         ser = conectionSQLite(self.database, query, True)[0]
 
         if num == 'newpct1':

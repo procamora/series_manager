@@ -12,6 +12,7 @@ from abrt_exception_handler3 import send
 from bs4 import BeautifulSoup
 from PyQt5 import QtWidgets, QtCore
 
+
 from ui.descarga_completa_ui import Ui_Dialog
 from modulos.settings import modo_debug
 from modulos.telegram2 import TG2
@@ -26,6 +27,7 @@ class mythread(QtCore.QThread):
 
     def __init__(self, parent, serie, capitulo, temporada, textEdit, sendTg):
         super(mythread, self).__init__(parent)
+
         self.conf = funciones.dbConfiguarion()
         self.serie = serie
         self.cap = capitulo
@@ -43,27 +45,33 @@ class mythread(QtCore.QThread):
         self.total.emit(int(self.cap))
         for i in range(1, self.cap + 1):
             self.update.emit()
-            #if len(str(i)) != 2:
+            # if len(str(i)) != 2:
             #    i = '0{}'.format(i)
-            #else:
+            # else:
             i = str(i)
             time.sleep(0.2)
             try:
-                fichero = '{}/{}_{}x{}.torrent'.format(ruta, self.serie, self.temp, i)
+                fichero = '{}/{}_{}x{}.torrent'.format(
+                    ruta, self.serie, self.temp, i)
                 try:  # si falla la primera url probamos con la segunda
                     if modo_debug:
                         print(self.url.format(self.serie, self.temp, i))
-                        print(i, "Bien: ", self.descargaTorrent(self.url.format(self.serie, self.temp, i)))
-                    funciones.descargaFichero(self.descargaTorrent(self.url.format(self.serie, self.temp, i)), fichero)
+                        print(i, "Bien: ", self.descargaTorrent(
+                            self.url.format(self.serie, self.temp, i)))
+                    funciones.descargaFichero(
+                        self.descargaTorrent(self.url.format(self.serie, self.temp, i)), fichero)
                 except:
                     if modo_debug:
-                       print(i, "Mal: ", self.descargaTorrent(self.url2.format(self.serie, self.temp, i)))
-                    funciones.descargaFichero(self.descargaTorrent(self.url2.format(self.serie,self.temp, i)), fichero)
+                        print(i, "Mal: ", self.descargaTorrent(
+                            self.url2.format(self.serie, self.temp, i)))
+                    funciones.descargaFichero(
+                        self.descargaTorrent(self.url2.format(self.serie, self.temp, i)), fichero)
 
                 if self.sendTg:
                     self.telegram.sendFile(fichero)
                     # fichero = '{}/{}x{}.torrent'.format(ruta, self.serie, i)
-                self.textEdit.append('{} {}x{}'.format(self.serie, self.temp, i))
+                self.textEdit.append(
+                    '{} {}x{}'.format(self.serie, self.temp, i))
 
             except Exception as e:
                 print(e)
@@ -87,6 +95,7 @@ class mythread(QtCore.QThread):
 
 
 class MiFormulario(QtWidgets.QDialog):
+
     def __init__(self, parent=None):
         QtWidgets.QWidget.__init__(self, parent)
         self.ui = Ui_Dialog()
@@ -199,7 +208,8 @@ class MiFormulario(QtWidgets.QDialog):
             capitulo = int(self.ui.lineCap.text())
             temporada = int(self.ui.lineTemp.text())
 
-            self.thread = mythread(self.ui.progressBar, serie, capitulo, temporada, self.ui.textEdit, self.envioTg)
+            self.thread = mythread(
+                self.ui.progressBar, serie, capitulo, temporada, self.ui.textEdit, self.envioTg)
             self.thread.total.connect(self.ui.progressBar.setMaximum)
             self.thread.update.connect(self.update)
             # self.thread.finished.connect(self.close)

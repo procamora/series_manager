@@ -11,13 +11,14 @@ from modulos.settings import modo_debug, ruta_db
 
 
 class MiFormulario(QtWidgets.QDialog):
+
     def __init__(self, parent=None, dbSeries=None):
         QtWidgets.QWidget.__init__(self, parent)
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
-        self.EstadoI = 'Ok' # estado inicial
-        self.EstadoF = 'Cancelado' #final
-        self.EstadoA = self.EstadoI #actual
+        self.EstadoI = 'Ok'  # estado inicial
+        self.EstadoF = 'Cancelado'  # final
+        self.EstadoA = self.EstadoI  # actual
         self.db = dbSeries
 
         self.setWindowTitle('Buscador de series')
@@ -25,7 +26,6 @@ class MiFormulario(QtWidgets.QDialog):
         self.ui.pushButtonBuscar.clicked.connect(self.__operacionesIniciales)
         self.ui.pushButtonAplicar.clicked.connect(self.__actualizaSerie)
         self.ui.pushButtonCerrar.clicked.connect(self.__cancela)
-
 
     def __operacionesIniciales(self):
         '''
@@ -36,20 +36,20 @@ class MiFormulario(QtWidgets.QDialog):
 
         self.ui.listWidget.clear()
 
-        query = 'SELECT Nombre FROM Series WHERE Nombre LIKE "%%{}%%"'.format(self.ui.lineEdit.text())
-        self.seriesTest =  conectionSQLite(self.db, query, True)
+        query = 'SELECT Nombre FROM Series WHERE Nombre LIKE "%%{}%%"'.format(
+            self.ui.lineEdit.text())
+        self.seriesTest = conectionSQLite(self.db, query, True)
 
         if len(self.seriesTest) == 0:
-            item=QtWidgets.QListWidgetItem()
+            item = QtWidgets.QListWidgetItem()
             item.setText('Serie no encontrada')
             self.ui.listWidget.addItem(item)
 
         else:
             for i in self.seriesTest:
-                item=QtWidgets.QListWidgetItem()
+                item = QtWidgets.QListWidgetItem()
                 item.setText(i['Nombre'])
                 self.ui.listWidget.addItem(item)
-
 
     def __actualizaSerie(self):
         '''
@@ -61,11 +61,12 @@ class MiFormulario(QtWidgets.QDialog):
             if modo_debug:
                 print((i.text()))
 
-            query = 'SELECT * FROM Series WHERE Nombre LIKE "{}"'.format(i.text())
+            query = 'SELECT * FROM Series WHERE Nombre LIKE "{}"'.format(
+                i.text())
             ser = conectionSQLite(self.db, query, True)[0]
 
-            actualizar_insertar.MiFormulario.getDatos(datSerie=ser, dbSeries=self.db)
-
+            actualizar_insertar.MiFormulario.getDatos(
+                datSerie=ser, dbSeries=self.db)
 
     def __cancela(self):
         '''
@@ -74,7 +75,6 @@ class MiFormulario(QtWidgets.QDialog):
 
         self.EstadoA = self.EstadoF
         self.reject()
-
 
     @staticmethod
     def getDatos(parent=None, dbSeries=None):

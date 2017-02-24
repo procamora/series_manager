@@ -11,14 +11,15 @@ import funciones
 
 
 class MiFormulario(QtWidgets.QDialog):
+
     def __init__(self, parent=None, dbSeries=None):
         QtWidgets.QWidget.__init__(self, parent)
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
         self.Otra = 'Otra'  # campo otra del formulario
-        self.EstadoI = 'Ok' # estado inicial
-        self.EstadoF = 'Cancelado' #final
-        self.EstadoA = self.EstadoI #actual
+        self.EstadoI = 'Ok'  # estado inicial
+        self.EstadoF = 'Cancelado'  # final
+        self.EstadoA = self.EstadoI  # actual
         self.db = dbSeries
         self.ruta = directorio_local
         funciones.creaDirectorioTrabajo()
@@ -27,14 +28,18 @@ class MiFormulario(QtWidgets.QDialog):
 
         self.__operacionesIniciales()
 
-        AllItems = [self.ui.BoxId.itemText(i) for i in range(self.ui.BoxId.count())]   # recogo todos los dias de la caja y le paso el indice del dia en el que sale
+        # recogo todos los dias de la caja y le paso el indice del dia en el
+        # que sale
+        AllItems = [self.ui.BoxId.itemText(i)
+                    for i in range(self.ui.BoxId.count())]
         with open(r'{}/id.conf'.format(self.ruta), 'r') as f:
-            id_fich = f.readline().replace('/n','')
+            id_fich = f.readline().replace('/n', '')
 
         try:
             self.ui.BoxId.setCurrentIndex(AllItems.index(id_fich))
         except:
-            self.ui.BoxId.setCurrentIndex(AllItems.index('1')) # si da error por algun motivo pongo el primero
+            # si da error por algun motivo pongo el primero
+            self.ui.BoxId.setCurrentIndex(AllItems.index('1'))
 
         self.__procesosComunes()
 
@@ -45,11 +50,9 @@ class MiFormulario(QtWidgets.QDialog):
         self.ui.pushButtonCerrar.clicked.connect(self.__cancela)
         self.ui.pushButtonAceptar.clicked.connect(self.__aceptaDatos)
 
-
     def __operacionesIniciales(self):
         self.__sacaDatos()
         self.__listaId()
-
 
     def __buscarDirectorio(self):
         """
@@ -59,13 +62,14 @@ class MiFormulario(QtWidgets.QDialog):
 
         #filenames = QtGui.QFileDialog.getOpenFileName()
         filenames = QtWidgets.QFileDialog.getExistingDirectory(self, "Open Directory",
-            str(self.ui.lineRuta.text()),
-            QtWidgets.QFileDialog.ShowDirsOnly | QtWidgets.QFileDialog.DontResolveSymlinks)
+                                                               str(self.ui.lineRuta.text(
+                                                               )),
+                                                               QtWidgets.QFileDialog.ShowDirsOnly | QtWidgets.QFileDialog.DontResolveSymlinks)
 
         if filenames is not None:
-        #if not (filenames.isNull()): en python 3 filenames ya no es un QString sino str
+            # if not (filenames.isNull()): en python 3 filenames ya no es un
+            # QString sino str
             self.ui.lineRuta.setText(filenames)
-
 
     def __sacaDatos(self):
         '''
@@ -75,7 +79,6 @@ class MiFormulario(QtWidgets.QDialog):
         query = 'SELECT * FROM Configuraciones'
         self.ser = conectionSQLite(self.db, query, True)
         self.DatodDb = self.ser[0]
-
 
     def __listaId(self):
         '''
@@ -90,7 +93,6 @@ class MiFormulario(QtWidgets.QDialog):
         self.ui.BoxId.addItems(lista)
         self.ui.BoxId.addItem(self.Otra)
 
-
     def __averiguaConf(self):
         '''
 
@@ -102,12 +104,11 @@ class MiFormulario(QtWidgets.QDialog):
                     print((self.ui.BoxId.currentText()))
                     print(i)
                 self.DatodDb = i
-        if  self.ui.BoxId.currentText() == self.Otra:
+        if self.ui.BoxId.currentText() == self.Otra:
             self.DatodDb = {'UrlFeedShowrss': '',
-                'RutaDescargas': '',
-                'UrlFeedNewpct': '',
-                'id': ''}
-
+                            'RutaDescargas': '',
+                            'UrlFeedNewpct': '',
+                            'id': ''}
 
     def __procesosComunes(self):
         '''
@@ -116,7 +117,6 @@ class MiFormulario(QtWidgets.QDialog):
 
         self.__averiguaConf()
         self.__insertarSerie()
-
 
     def __aplicaDatos(self):
         datos = {
@@ -152,7 +152,6 @@ VALUES ("{}", "{}", "{}", "{}", "{}", "{}", "{}")'''.format(datos['Newpct'], dat
 
         return True
 
-
     def __insertarSerie(self):
         '''
 
@@ -162,7 +161,6 @@ VALUES ("{}", "{}", "{}", "{}", "{}", "{}", "{}")'''.format(datos['Newpct'], dat
         self.ui.lineShowrss.setText(self.DatodDb['UrlFeedShowrss'])
         self.ui.lineRuta.setText(str(self.DatodDb['RutaDescargas']))
 
-
     def __cancela(self):
         '''
         Establece el estado actual en cancelado para retornar None y ejecuta reject
@@ -171,7 +169,6 @@ VALUES ("{}", "{}", "{}", "{}", "{}", "{}", "{}")'''.format(datos['Newpct'], dat
         self.EstadoA = self.EstadoF
         self.reject()
 
-
     def __aceptaDatos(self):
         """
         Boton Aceptar, primero aplicas los datos, si retorna True, cierra la ventana
@@ -179,7 +176,6 @@ VALUES ("{}", "{}", "{}", "{}", "{}", "{}", "{}")'''.format(datos['Newpct'], dat
 
         if self.__aplicaDatos():
             self.accept()
-
 
     @staticmethod
     def getDatos(parent=None, dbSeries=None):

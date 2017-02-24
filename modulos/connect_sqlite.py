@@ -2,8 +2,9 @@
 # -*- coding: utf-8 -*-
 import sqlite3
 
+
 def conectionSQLite(db, query, dict=False):
-    conn=sqlite3.connect(db)
+    conn = sqlite3.connect(db)
     if dict:
         conn.row_factory = __dictFactory
     cursor = conn.cursor()
@@ -30,7 +31,7 @@ def __dictFactory(cursor, row):
 
 def ejecutaScriptSqlite(db, script):
     conn = sqlite3.connect(db)
-    cursor=conn.cursor()
+    cursor = conn.cursor()
     cursor.executescript(script)
     conn.commit()
     cursor.close()

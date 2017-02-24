@@ -172,7 +172,8 @@ def calculaDiaSemana():
     try:
         a = dicdias[fecha.strftime('%A').upper()]
         return eliminaTildes(a)
-    # en linux sale el dia en castellano, por eso lo paso directamente poniendo la primera letra en mayusculas
+    # en linux sale el dia en castellano, por eso lo paso directamente
+    # poniendo la primera letra en mayusculas
     except KeyError:
         a = fecha.strftime('%A').capitalize()
         return eliminaTildes(a)
@@ -184,10 +185,12 @@ def fechaToNumero(dia):
     de los dias de la semana de mas cerca a menos cerca
     '''
 
-    DiaNombre = ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado", "Domingo"]
+    DiaNombre = ["Lunes", "Martes", "Miercoles",
+                 "Jueves", "Viernes", "Sabado", "Domingo"]
     lista = list()
     num = DiaNombre.index(dia)  # localizo en indice del dia en el que estoy
-    lista.extend(DiaNombre[num:])  # guardo la parte de la derecha de la semana y luego la izq
+    # guardo la parte de la derecha de la semana y luego la izq
+    lista.extend(DiaNombre[num:])
     lista.extend(DiaNombre[:num])
     return lista
 

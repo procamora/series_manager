@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-#https://geekytheory.com/telegram-programando-un-bot-en-python/
-#https://bitbucket.org/master_groosha/telegram-proxy-bot/src/07a6b57372603acae7bdb78f771be132d063b899/proxy_bot.py?at=master&fileviewer=file-view-default
+# https://geekytheory.com/telegram-programando-un-bot-en-python/
+# https://bitbucket.org/master_groosha/telegram-proxy-bot/src/07a6b57372603acae7bdb78f771be132d063b899/proxy_bot.py?at=master&fileviewer=file-view-default
 
-#https://github.com/eternnoir/pyTelegramBotAPI/blob/master/telebot/types.py
+# https://github.com/eternnoir/pyTelegramBotAPI/blob/master/telebot/types.py
 
 import os
 import re
@@ -14,16 +14,27 @@ import telebot              # Importamos la librería
 from telebot import types   # Y los tipos especiales de esta
 from bs4 import BeautifulSoup
 
-try: #Ejecucion desde Series.py
-    from .settings import api_telegram, modo_debug
-except: #Ejecucion local
-    from settings import api_telegram, modo_debug
+try:  # Ejecucion desde Series.py
+    from .settings import modo_debug, ruta_db, directorio_local
+    from .connect_sqlite import conectionSQLite, ejecutaScriptSqlite
+except:  # Ejecucion local
+    from settings import modo_debug, ruta_db, directorio_local
+    from connect_sqlite import conectionSQLite, ejecutaScriptSqlite
 
 
+def datosIniciales():
+    with open(r'{}/id.conf'.format(directorio_local), 'r') as f:
+        id_fich = f.readline().replace('/n', '')
+
+    query = 'SELECT * FROM Credenciales'.format(id_fich)
+    return conectionSQLite(ruta_db, query, True)[0]
+
+
+credenciales = datosIniciales()
 administrador = 33063767
 usuariosPermitidos = [33063767, 40522670]
-bot = telebot.TeleBot(api_telegram)    # Cambiad este Token
-pass_transmission = 'PASSWORD'
+bot = telebot.TeleBot(credenciales['api_telegram'])
+pass_transmission = credenciales['pass_transmission']
 
 
 dicc_botones = {
@@ -35,10 +46,11 @@ dicc_botones = {
     'exit': 'exit',
 }
 
+
 def formatea(texto):
     if texto is not None:
         text = texto.decode('utf-8')
-        return text.replace('\n','')
+        return text.replace('\n', '')
     return texto
 
 
@@ -50,9 +62,12 @@ def checkError(codigo, stderr):
     return False
 
 # Handle always first "/start" message when new chat with your bot is created
+
+
 @bot.message_handler(commands=["start"])
 def command_start(message):
-    bot.send_message(message.chat.id, "Bienvenido al bot\nTu id es: {}".format(message.chat.id))
+    bot.send_message(
+        message.chat.id, "Bienvenido al bot\nTu id es: {}".format(message.chat.id))
     command_system(message)
 
 
@@ -70,23 +85,27 @@ def command_system(message):
     markup.row(dicc_botones['ts'], dicc_botones['sys'])
     markup.row(dicc_botones['exit'])
 
-    bot.send_message(message.chat.id, "Escoge una opcion: ", reply_markup=markup)
+    bot.send_message(
+        message.chat.id, "Escoge una opcion: ", reply_markup=markup)
 
 
 @bot.message_handler(func=lambda message: message.chat.id == administrador, commands=['cron_gestor_series'])
 def send_cgs(message):
     bot.reply_to(message, 'Ejecutado con gs')
-    f = os.popen('cd /home/pi/Gestor-de-Series/ && /usr/bin/python3 /home/pi/Gestor-de-Series/descarga_automatica_cli.py')
+    f = os.popen(
+        'cd /home/pi/Gestor-de-Series/ && /usr/bin/python3 /home/pi/Gestor-de-Series/descarga_automatica_cli.py')
     now = f.read()
     if len(now) == 0:
-        bot.reply_to(message, 'Ejecutado, puede que haya fallado o sea muy largo el resultado')
+        bot.reply_to(
+            message, 'Ejecutado, puede que haya fallado o sea muy largo el resultado')
     else:
         bot.reply_to(message, now)
 
 
 @bot.message_handler(func=lambda message: message.chat.id == administrador, commands=['cron_rsync_samba'])
 def send_crs(message):
-    f = os.popen('cd /home/pi/scripts && /usr/bin/python3 /home/pi/scripts/rsync_samba.py')
+    f = os.popen(
+        'cd /home/pi/scripts && /usr/bin/python3 /home/pi/scripts/rsync_samba.py')
     now = f.read()
     if len(now) == 0:
         bot.reply_to(message, 'Ejecutado rsync')
@@ -132,7 +151,7 @@ def send_df(message):
 
 @bot.message_handler(func=lambda message: message.chat.id == administrador, commands=['info'])
 def send_info(message):
-    #uptime, cpu, ram, disk, speed download/upload
+    # uptime, cpu, ram, disk, speed download/upload
     f = os.popen('pwd')
     now = f.read()
     if len(now) == 0:
@@ -144,11 +163,13 @@ def send_info(message):
 @bot.message_handler(func=lambda message: message.chat.id == administrador, commands=['show_torrent'])
 def send_show_torrent(message):
     #f = os.popen('transmission-remote --auth=pi:{} -l | egrep -v "Finished|Stopped|Seeding|ID|Sum:" |  awk \'{print $2}{for(i=13; i<=NF; i++) printf "%s",$i (i==NF?ORS:OFS)}\''.format(pass_transmission))
-    f = os.popen('transmission-remote 127.0.0.1:9091 --auth=pi:{} -l | egrep -v "Finished|Stopped|Seeding|ID|Sum:"'.format(pass_transmission))
+    f = os.popen(
+        'transmission-remote 127.0.0.1:9091 --auth=pi:{} -l | egrep -v "Finished|Stopped|Seeding|ID|Sum:"'.format(pass_transmission))
     now = f.read()
     if len(now) != 0:
         for line in now:
-            line = re.sub('\[AC3 5\.1-Castellano-AC3 5.1 Ingles\+Subs\]|\[ES-EN\]|\[AC3 5.1 Español Castellano\]|\[HDTV 720p?\]|(\d+\.?\d+|None)( )+(MB|GB|kB|Unknown).*(Up & Down|Downloading|Queued|Idle|Uploading)( )*| - Temporada \d+ |(\d+\.\d+)( )+(\d+\.\d+)', '', now)
+            line = re.sub(
+                '\[AC3 5\.1-Castellano-AC3 5.1 Ingles\+Subs\]|\[ES-EN\]|\[AC3 5.1 Español Castellano\]|\[HDTV 720p?\]|(\d+\.?\d+|None)( )+(MB|GB|kB|Unknown).*(Up & Down|Downloading|Queued|Idle|Uploading)( )*| - Temporada \d+ |(\d+\.\d+)( )+(\d+\.\d+)', '', now)
         bot.reply_to(message, line)
         #bot.reply_to(message, now)
     else:
@@ -184,19 +205,21 @@ def handle_cmd(message):
 @bot.message_handler(func=lambda message: message.chat.id == administrador, regexp="^magnet:\?xt=urn.*")
 def handle_magnet(message):
 
-    comando = 'transmission-remote 127.0.0.1:9091 --auth=pi:{} --add "{}"'.format(pass_transmission, message.text)
+    comando = 'transmission-remote 127.0.0.1:9091 --auth=pi:{} --add "{}"'.format(
+        pass_transmission, message.text)
     if modo_debug:
         print(comando)
     os.popen(comando)
 
-
-    ejecucion = subprocess.Popen(comando, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    ejecucion = subprocess.Popen(
+        comando, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = ejecucion.communicate()
-    
+
     checkError(ejecucion, stderr, message)
     if modo_debug:
         bot.reply_to(message, 'Exito: {}'.format(formatea(stdout)))
-        bot.reply_to(message, 'Error: {}'.format(checkError(ejecucion, stderr, message)))
+        bot.reply_to(message, 'Error: {}'.format(
+            checkError(ejecucion, stderr, message)))
 
     bot.reply_to(message, 'Ejecutado add torrent')
     send_show_torrent(message)
@@ -205,7 +228,7 @@ def handle_magnet(message):
 @bot.message_handler(regexp="^(http://)?www.(newpct1|tumejortorrent).com/.*")
 def handle_newpct1(message):
 
-    def descargaTorrent(direcc): #PARA NEWPCT1
+    def descargaTorrent(direcc):  # PARA NEWPCT1
         '''
         Funcion que obtiene la url torrent del la dirreccion que recibe
 
@@ -227,20 +250,20 @@ def handle_newpct1(message):
             sopa = BeautifulSoup(page, 'html.parser')
             #print(sopa.findAll('div', {"id": "tab1"}))
             print(sopa.find_all("a", class_="btn-torrent")[0]['href'])
-            return sopa.find('div', {"id": "tab1"}).a['href']          
-
+            return sopa.find('div', {"id": "tab1"}).a['href']
 
     def descargaFichero(url, destino):
         r = requests.get(url)
         with open(destino, "wb") as code:
             code.write(r.content)
 
-
-    regexGenero = re.search('descarga-torrent', message.text) # buscamos el genero
-    if regexGenero: # si hay find continua, sino retorno None el re.search
+    # buscamos el genero
+    regexGenero = re.search('descarga-torrent', message.text)
+    if regexGenero:  # si hay find continua, sino retorno None el re.search
         urlPeli = message.text
     else:
-        urlPeli = re.sub('(http://)?www.newpct1.com/', 'http://www.newpct1.com/descarga-torrent/', message.text)
+        urlPeli = re.sub('(http://)?www.newpct1.com/',
+                         'http://www.newpct1.com/descarga-torrent/', message.text)
 
     url = descargaTorrent(urlPeli)
     if url is not None:
@@ -250,12 +273,12 @@ def handle_newpct1(message):
         file_data = open(fich, 'rb')
         bot.send_document(message.chat.id,  file_data)
         if message.chat.id == administrador:
-            os.rename(fich ,'/home/pi/Downloads/file.torrent')
+            os.rename(fich, '/home/pi/Downloads/file.torrent')
         else:
             pass
         with open('/tmp/descarga_torrent.log', "a") as f:
-            f.write('{}, {}, {} -> {}\n'.format(message.chat.id,  message.chat.first_name, message.chat.username, message.text))
-
+            f.write('{}, {}, {} -> {}\n'.format(message.chat.id,
+                                                message.chat.first_name, message.chat.username, message.text))
 
 
 @bot.message_handler(func=lambda message: message.chat.id == administrador, content_types=["text"])
@@ -289,7 +312,8 @@ def my_photo(message):
 @bot.message_handler(func=lambda message: message.chat.id == administrador, content_types=["voice"])
 def my_voice(message):
     if message.reply_to_message:
-        bot.send_voice(message.chat.id, message.voice.file_id, duration=message.voice.duration)
+        bot.send_voice(
+            message.chat.id, message.voice.file_id, duration=message.voice.duration)
     else:
         bot.send_message(message.chat.id, "No one to reply voice!")
 
@@ -299,13 +323,16 @@ def my_document(message):
     if message.document.mime_type == 'application/x-bittorrent':
         file_info = bot.get_file(message.document.file_id)
         #bot.send_message(message.chat.id, 'https://api.telegram.org/file/bot{0}/{1}'.format(TOKEN, file_info.file_path))
-        file = requests.get('https://api.telegram.org/file/bot{0}/{1}'.format(api_telegram, file_info.file_path))
+        file = requests.get(
+            'https://api.telegram.org/file/bot{0}/{1}'.format(api_telegram, file_info.file_path))
         with open('/home/pi/Downloads/{}.torrent'.format(message.document.file_id), "wb") as code:
             code.write(file.content)
-        bot.reply_to(message, 'Descargando torrent: "{}"'.format(message.document.file_name))
+        bot.reply_to(
+            message, 'Descargando torrent: "{}"'.format(message.document.file_name))
         send_show_torrent(message)
     else:
-        bot.reply_to(message, 'Aun no he implementado este tipo de ficheros: "{}"'.format(message.document.mime_type))
+        bot.reply_to(message, 'Aun no he implementado este tipo de ficheros: "{}"'.format(
+            message.document.mime_type))
 
 
 @bot.message_handler(regexp=".*")
@@ -314,4 +341,6 @@ def handle_resto(message):
     bot.reply_to(message.chat.id, texto)
 
 
-bot.polling(none_stop=True) # Con esto, le decimos al bot que siga funcionando incluso si encuentra algun fallo.
+# Con esto, le decimos al bot que siga funcionando incluso si encuentra
+# algun fallo.
+bot.polling(none_stop=True)

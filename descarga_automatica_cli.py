@@ -39,27 +39,28 @@ def MuestraNotificaciones():
 
             elif i['Nombre'] == 'Email':
                 ml3 = ML2('test1notificaciones@gmail.com', 'i(!f!Boz_A&YLY]q')
-                api_ml3 =	api_ml3
+                api_ml3 = api_ml3
 
     return Datos
 
 global notificaciones
 notificaciones = MuestraNotificaciones()
 
-#https://gist.github.com/kaotika/e8ca5c340ec94f599fb2
+# https://gist.github.com/kaotika/e8ca5c340ec94f599fb2
 
 
 class MiFormulario():
+
     def __init__(self, dbSeries=None):
         if funciones.internetOn():
             self.Otra = 'Otra'  # campo otra del formulario
-            self.EstadoI = 'Ok' # estado inicial
+            self.EstadoI = 'Ok'  # estado inicial
             self.db = dbSeries
 
             #query = 'SELECT Nombre, Temporada, Capitulo, VOSE FROM Series WHERE Siguiendo = "Si" AND ((VOSE = "No" AND Estado="Activa" AND Capitulo <> 0) OR (VOSE = "Si")) ORDER BY Nombre'
             #self.query = 'SELECT Nombre, Temporada, Capitulo, VOSE FROM Series WHERE Siguiendo = "Si" AND ((VOSE = "No" AND Estado="Activa" AND Capitulo <> 0) OR (VOSE = "Si" AND Capitulo <> 0)) ORDER BY Nombre ASC'
             self.query = '''SELECT Nombre, Temporada, Capitulo, VOSE FROM Series WHERE Siguiendo = "Si" ORDER BY Nombre ASC'''
-            self.series =  conectionSQLite(self.db, self.query, True)
+            self.series = conectionSQLite(self.db, self.query, True)
 
             self.listaNotificaciones = str()
             self.actualizaDia = str()
@@ -67,21 +68,22 @@ class MiFormulario():
             urlNew = self.conf['UrlFeedNewpct']
             urlShow = self.conf['UrlFeedShowrss']
 
-            self.capDescargado = dict()			# Diccionario con las series y capitulos para actualizar la bd con el capitulo descargado
+            # Diccionario con las series y capitulos para actualizar la bd con
+            # el capitulo descargado
+            self.capDescargado = dict()
             self.consultaUpdate = str()
 
             try:
                 self.feedNew = feedparser.parse(urlNew)
-            except: #Para el fallo en fedora
+            except:  # Para el fallo en fedora
                 self.feedNew = self.__feedparser_parse(urlNew)
 
             try:
                 self.feedShow = feedparser.parse(urlShow)
-            except: #Para el fallo en fedora
+            except:  # Para el fallo en fedora
                 self.feedShow = self.__feedparser_parse(urlShow)
 
             self.run()
-
 
     def run(self):
         fichNewpct = self.conf['FicheroFeedNewpct']
@@ -103,7 +105,7 @@ class MiFormulario():
         with open('{}/{}'.format(self.rutlog, fichShowrss), 'r') as f:
             self.ultimaSerieShow = f.readline()
 
-        series =  conectionSQLite(self.db, self.query, True)
+        series = conectionSQLite(self.db, self.query, True)
 
         SerieActualNew = str()
         SerieActualShow = str()
@@ -112,7 +114,8 @@ class MiFormulario():
         for i in series:
             try:
                 print(('Revisa: {}'.format(i['Nombre'])))
-                SerieActualTemp = self.ParseaFeed(i['Nombre'], i['Temporada'], i['Capitulo'], i['VOSE'])
+                SerieActualTemp = self.ParseaFeed(
+                    i['Nombre'], i['Temporada'], i['Capitulo'], i['VOSE'])
                 if i['VOSE'] == 'Si':
                     SerieActualShow = SerieActualTemp
                 else:
@@ -120,29 +123,33 @@ class MiFormulario():
             except Exception as e:
                 print('FALLO: ', e)
 
-        if len(self.ultimaSerieNew) != 0:# or len(self.ultimaSerieShow) != 0:
+        if len(self.ultimaSerieNew) != 0:  # or len(self.ultimaSerieShow) != 0:
             print(self.actualizaDia)
-            ejecutaScriptSqlite(self.db, self.actualizaDia) #actualiza los dias en los que sale el capitulo
+            # actualiza los dias en los que sale el capitulo
+            ejecutaScriptSqlite(self.db, self.actualizaDia)
 
             for notif in notificaciones:
                 if notif['Activo'] == 'True':
                     if notif['Nombre'] == 'Telegram':
                         tg3.sendTg(self.listaNotificaciones)
                     elif notif['Nombre'] == 'Pushbullet':
-                        pb3.sendTextPb('Gestor series', self.listaNotificaciones)
+                        pb3.sendTextPb(
+                            'Gestor series', self.listaNotificaciones)
                     elif notif['Nombre'] == 'Email':
                         ml3.sendMail(api_ml3, self.listaNotificaciones)
 
-        #capitulos que descargo
+        # capitulos que descargo
         for i in self.capDescargado.items():
             #print (i)
-            query = 'UPDATE Series SET Capitulo_Descargado={} WHERE Nombre LIKE "{}";\n'.format(str(i[1]), i[0])
+            query = 'UPDATE Series SET Capitulo_Descargado={} WHERE Nombre LIKE "{}";\n'.format(
+                str(i[1]), i[0])
             self.consultaUpdate += query
 
-        print (self.consultaUpdate)
-        ejecutaScriptSqlite(self.db, self.consultaUpdate) #actualiza el ultimo capitulo que he descargado
+        print(self.consultaUpdate)
+        # actualiza el ultimo capitulo que he descargado
+        ejecutaScriptSqlite(self.db, self.consultaUpdate)
 
-        #Guardar ultima serie del feed
+        # Guardar ultima serie del feed
         if SerieActualShow is not None and SerieActualNew is not None:
             with open('{}/{}'.format(self.rutlog, fichNewpct), 'w') as f:
                 pass
@@ -151,8 +158,8 @@ class MiFormulario():
                 pass
                 f.write(SerieActualShow)
         else:
-            print('PROBLEMA CON if SerieActualShow is not None and SerieActualNew is not None:')
-
+            print(
+                'PROBLEMA CON if SerieActualShow is not None and SerieActualNew is not None:')
 
     def ParseaFeed(self, serie, tem, cap, vose):
         '''Solo funciona con series de 2 digitos por la expresion regular'''
@@ -170,19 +177,21 @@ class MiFormulario():
             os.mkdir(ruta)
 
         if len(str(cap)) == 1:
-            cap = '0'+str(cap)
+            cap = '0' + str(cap)
 
         for i in d.entries:
-            #cuando llegamos al ultimo capitulo pasamos a la siguiente serie
+            # cuando llegamos al ultimo capitulo pasamos a la siguiente serie
             if i.title == ultimaSerie:
-                # retornamos el valor que luego usaremos en ultima serie para guardarlo en el fichero
+                # retornamos el valor que luego usaremos en ultima serie para
+                # guardarlo en el fichero
                 return d.entries[0].title
-            regex_vose = '(?i){} {}.*'.format(self.__escapaParentesis(serie.lower()), tem)
+            regex_vose = '(?i){} {}.*'.format(
+                self.__escapaParentesis(serie.lower()), tem)
             regex_cast = '(?i){}( \(Proper\))? - Temporada( )?\d+ \[HDTV 720p?\]\[Cap\.{}\d+(_\d+)?\]\[A.*'.format(
                 self.__escapaParentesis(serie.lower()), tem)
 
             if modo_debug:
-                #print(i.title)
+                # print(i.title)
                 print(regex_cast, i.title)
 
             estado = False
@@ -203,9 +212,11 @@ class MiFormulario():
                     ficheroDescargas = self.conf['FicheroDescargas']
 
                     with open('{}/{}'.format(self.rutlog, ficheroDescargas), 'a') as f:
-                        f.write('{} {}\n'.format(time.strftime('%Y%m%d'), i.title))
+                        f.write(
+                            '{} {}\n'.format(time.strftime('%Y%m%d'), i.title))
 
-                    #En pelis que son VOSE no se si da fallo, esto solo es para no VOSE
+                    # En pelis que son VOSE no se si da fallo, esto solo es
+                    # para no VOSE
                     varNom = i.title.split('-')[0]
                     varEpi = i.title.split('][')[1]
                     if vose == 'Si':
@@ -213,30 +224,35 @@ class MiFormulario():
                         self.listaNotificaciones += '{}\n'.format(i.title)
                     else:
                         # creo un string para solo mandar una notificacion
-                        self.listaNotificaciones += '{} {}\n'.format(varNom, varEpi)
+                        self.listaNotificaciones += '{} {}\n'.format(
+                            varNom, varEpi)
 
-                    funciones.descargaFichero(torrent, r'{}/{}.torrent'.format(ruta, i.title))
-                    self.actualizaDia += '''UPDATE series SET Dia="{}" WHERE Nombre LIKE "{}";\n'''.format(funciones.calculaDiaSemana(), serie)
+                    funciones.descargaFichero(
+                        torrent, r'{}/{}.torrent'.format(ruta, i.title))
+                    self.actualizaDia += '''UPDATE series SET Dia="{}" WHERE Nombre LIKE "{}";\n'''.format(
+                        funciones.calculaDiaSemana(), serie)
 
-                    #Diccionario con todos los capitulos descargados, para actualizar la bd con los capitulos por donde voy
-                    capituloActual = int(re.sub('Cap\.{}'.format(tem), '', varEpi)) # regex para coger el capitulo unicamente
+                    # Diccionario con todos los capitulos descargados, para
+                    # actualizar la bd con los capitulos por donde voy
+                    # regex para coger el capitulo unicamente
+                    capituloActual = int(
+                        re.sub('Cap\.{}'.format(tem), '', varEpi))
                     if serie not in self.capDescargado:
                         self.capDescargado[serie] = capituloActual
                     else:
-                        if self.capDescargado[serie] < capituloActual:		###########REVISAR, CREO QUE ESTA MAL NO ES 4X05 ES 405
+                        # REVISAR, CREO QUE ESTA MAL NO ES 4X05 ES 405
+                        if self.capDescargado[serie] < capituloActual:
                             self.capDescargado[serie] = capituloActual
 
                 print(('DESCARGANDO: {}'.format(serie)))
 
         return d.entries[0].title
 
-
     def __escapaParentesis(self, texto):
         '''
         No he probado si funciona con series como powers
         '''
         return texto.replace('(', '\\(').replace(')', '\\)')
-
 
     def __feedparser_parse(self, url):
         '''
@@ -253,8 +269,7 @@ class MiFormulario():
             else:
                 raise
 
-
-    def buscaTorrent(self, direcc): #PARA NEWPCT1
+    def buscaTorrent(self, direcc):  # PARA NEWPCT1
         '''
         Funcion que obtiene la url torrent del la dirreccion que recibe,
         hay que tener en cuenta que la url que recibe es la del feed
@@ -267,13 +282,13 @@ class MiFormulario():
         '''
 
         session = requests.session()
-        page = session.get(direcc.replace('newpct1.com/', 'newpct1.com/descarga-torrent/'), verify=False).text
+        page = session.get(direcc.replace(
+            'newpct1.com/', 'newpct1.com/descarga-torrent/'), verify=False).text
         sopa = BeautifulSoup(page, 'html.parser')
 
         return sopa.find('div', {"id": "tab1"}).a['href']
 
-
-    def buscaTorrentAntiguo(self, direcc): # para newpct
+    def buscaTorrentAntiguo(self, direcc):  # para newpct
         '''
         Funcion que obtiene la url torrent del la dirreccion que recibe
 
@@ -286,7 +301,7 @@ class MiFormulario():
         page = session.get(direcc, verify=False).text
         sopa = BeautifulSoup(page, 'html.parser')
 
-        return sopa.find('span',id="content-torrent").a['href']
+        return sopa.find('span', id="content-torrent").a['href']
 
 
 def main():
