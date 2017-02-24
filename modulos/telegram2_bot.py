@@ -5,7 +5,7 @@
 
 # https://github.com/eternnoir/pyTelegramBotAPI/blob/master/telebot/types.py
 
-import os
+
 import re
 import subprocess
 
@@ -129,6 +129,7 @@ def send_cgs(message):
     ejecucion = subprocess.Popen(
         comando, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = ejecucion.communicate()
+    stdout = formatea(stdout) # sino stdout esta en bytes
 
     if checkError(ejecucion, stderr):
         bot.reply_to(message, 'Error: {}'.format(stderr))
@@ -146,6 +147,7 @@ def send_crs(message):
     ejecucion = subprocess.Popen(
         comando, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = ejecucion.communicate()
+    stdout = formatea(stdout) # sino stdout esta en bytes
 
     if checkError(ejecucion, stderr):
         bot.reply_to(message, 'Error: {}'.format(stderr))
@@ -162,6 +164,7 @@ def send_mount(message):
     ejecucion = subprocess.Popen(
         comando, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = ejecucion.communicate()
+    stdout = formatea(stdout) # sino stdout esta en bytes
 
     if checkError(ejecucion, stderr):
         bot.reply_to(message, 'Error: {}'.format(stderr))
@@ -178,6 +181,7 @@ def send_ts(message):
     ejecucion = subprocess.Popen(
         comando, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = ejecucion.communicate()
+    stdout = formatea(stdout) # sino stdout esta en bytes
 
     if checkError(ejecucion, stderr):
         bot.reply_to(message, 'Error: {}'.format(stderr))
@@ -196,6 +200,7 @@ def send_sys(message):
     ejecucion = subprocess.Popen(
         comando, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = ejecucion.communicate()
+    stdout = formatea(stdout) # sino stdout esta en bytes
 
     if checkError(ejecucion, stderr):
         bot.reply_to(message, 'Error: {}'.format(stderr))
@@ -208,6 +213,7 @@ def send_df(message):
     ejecucion = subprocess.Popen(
         comando, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = ejecucion.communicate()
+    stdout = formatea(stdout) # sino stdout esta en bytes
 
     if checkError(ejecucion, stderr):
         bot.reply_to(message, 'Error: {}'.format(stderr))
@@ -225,6 +231,7 @@ def send_info(message):
     ejecucion = subprocess.Popen(
         comando, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = ejecucion.communicate()
+    stdout = formatea(stdout) # sino stdout esta en bytes
 
     if checkError(ejecucion, stderr):
         bot.reply_to(message, 'Error: {}'.format(stderr))
@@ -243,6 +250,7 @@ def send_show_torrent(message):
     ejecucion = subprocess.Popen(
         comando, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = ejecucion.communicate()
+    stdout = formatea(stdout) # sino stdout esta en bytes
 
     if checkError(ejecucion, stderr):
         bot.reply_to(message, 'Error: {}'.format(stderr))
@@ -262,6 +270,7 @@ def send_exit(message):
     ejecucion = subprocess.Popen(
         comando, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = ejecucion.communicate()
+    stdout = formatea(stdout) # sino stdout esta en bytes
 
     if checkError(ejecucion, stderr):
         bot.reply_to(message, 'Error: {}'.format(stderr))
@@ -282,6 +291,7 @@ def handle_cmd(message):
         ejecucion = subprocess.Popen(
             comando, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         stdout, stderr = ejecucion.communicate()
+        stdout = formatea(stdout) # sino stdout esta en bytes
 
         if checkError(ejecucion, stderr):
             bot.reply_to(message, 'Error: {}'.format(stderr))
@@ -303,6 +313,7 @@ def handle_magnet(message):
     ejecucion = subprocess.Popen(
         comando, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = ejecucion.communicate()
+    stdout = formatea(stdout) # sino stdout esta en bytes
 
     if modo_debug:
         print(comando)
