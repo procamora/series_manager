@@ -8,10 +8,6 @@ gdrive = 0
 sistema = platform.system()
 nombre_db = 'Series.db'
 
-#api_telegram = '143504303:AAF5JHesA5WGnc9VWrG9EotCqtMtaZfdEVE'
-
-#user_tviso  = 'NotSer'
-#pass_tviso  = 'i(!f!Boz_A&YLY]q'
 
 if os.path.exists('sync.cnf'):
     with open('sync.cnf', 'r') as f:

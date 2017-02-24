@@ -61,6 +61,36 @@ def checkError(codigo, stderr):
         return True
     return False
 
+
+def descargaTorrent(direcc):  # PARA NEWPCT1
+    '''
+    Funcion que obtiene la url torrent del la dirreccion que recibe
+
+    :param str direcc: Dirreccion de la pagina web que contiene el torrent
+
+    :return str: Nos devuelve el string con la url del torrent
+    '''
+    if re.search("newpct1", direcc):
+        bot.reply_to(message, 'Buscando torrent en newpct1')
+        session = requests.session()
+        page = session.get(direcc, verify=False).text
+        sopa = BeautifulSoup(page, 'html.parser')
+        return sopa.find('div', {"id": "tab1"}).a['href']
+
+    elif re.search("tumejortorrent", direcc):
+        bot.reply_to(message, 'Buscando torrent en tumejortorrent')
+        session = requests.session()
+        page = session.get(direcc, verify=False).text
+        sopa = BeautifulSoup(page, 'html.parser')
+        #print(sopa.findAll('div', {"id": "tab1"}))
+        print(sopa.find_all("a", class_="btn-torrent")[0]['href'])
+        return sopa.find('div', {"id": "tab1"}).a['href']
+
+def descargaFichero(url, destino):
+    r = requests.get(url)
+    with open(destino, "wb") as code:
+        code.write(r.content)
+
 # Handle always first "/start" message when new chat with your bot is created
 
 
@@ -227,36 +257,6 @@ def handle_magnet(message):
 
 @bot.message_handler(regexp="^(http://)?www.(newpct1|tumejortorrent).com/.*")
 def handle_newpct1(message):
-
-    def descargaTorrent(direcc):  # PARA NEWPCT1
-        '''
-        Funcion que obtiene la url torrent del la dirreccion que recibe
-
-        :param str direcc: Dirreccion de la pagina web que contiene el torrent
-
-        :return str: Nos devuelve el string con la url del torrent
-        '''
-        if re.search("newpct1", direcc):
-            bot.reply_to(message, 'Buscando torrent en newpct1')
-            session = requests.session()
-            page = session.get(direcc, verify=False).text
-            sopa = BeautifulSoup(page, 'html.parser')
-            return sopa.find('div', {"id": "tab1"}).a['href']
-
-        elif re.search("tumejortorrent", direcc):
-            bot.reply_to(message, 'Buscando torrent en tumejortorrent')
-            session = requests.session()
-            page = session.get(direcc, verify=False).text
-            sopa = BeautifulSoup(page, 'html.parser')
-            #print(sopa.findAll('div', {"id": "tab1"}))
-            print(sopa.find_all("a", class_="btn-torrent")[0]['href'])
-            return sopa.find('div', {"id": "tab1"}).a['href']
-
-    def descargaFichero(url, destino):
-        r = requests.get(url)
-        with open(destino, "wb") as code:
-            code.write(r.content)
-
     # buscamos el genero
     regexGenero = re.search('descarga-torrent', message.text)
     if regexGenero:  # si hay find continua, sino retorno None el re.search

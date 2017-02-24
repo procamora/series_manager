@@ -7,6 +7,7 @@ sudo apt-get install unrar-free
 import re
 import os
 import glob
+import sys
 
 import rarfile
 import requests
@@ -66,8 +67,13 @@ def main(ruta):
             a.sendTg(
                 'Empieza proceos descomprimir: {}'.format(i.split('/')[-1]))
             descomprime(i)
+            a.sendTg(
+                'Termina proceos descomprimir: {}'.format(i.split('/')[-1]))
         except:
             a.sendTg('Fallo al descomprimir: {}'.format(i.split('/')[-1]))
+
+            with open('/tmp/unrar.log', 'a', encoding="UTF-8") as f:
+                f.write(sys.exc_info()[0])
 
 
 if __name__ == '__main__':
