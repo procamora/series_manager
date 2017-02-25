@@ -8,6 +8,7 @@
 
 import re
 import subprocess
+import os
 
 import requests
 import telebot              # Importamos la librería
