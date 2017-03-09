@@ -2,6 +2,7 @@ README
 ======
 
 # IMPLEMENTACIONES FUTURAS
++ [ ] Hacer una plantilla por defecto de la configuracion minimo de sql, si uso lade la ultima por fecha a veces falla, ya que no esta subida a github
 + [x] Poner label en preferencias
 + [ ] Hacer ventana grafica para la actualizacion por imdb
 + [ ] Hacer un modulo que compruebe los estados de las series y pregunte si actualizarlos, que funcione tanto por consola como por gui
