@@ -1,5 +1,9 @@
 .PHONY: clean add commit push discard status exe bin
 
+
+compila:
+	python3 compila_ui.py
+
 clean:
 	rm -f *.pyc
 
