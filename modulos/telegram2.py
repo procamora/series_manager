@@ -13,16 +13,15 @@ except:  # Ejecucion local
 
 
 class TG2():
-
     def __init__(self, chat_id):
-        self.api = self.__datosIniciales()['api_telegram']
+        self.api = self.datosIniciales()['api_telegram']
         self.url = 'https://api.telegram.org/bot{0}/{1}'
         self.chat_id = chat_id
         # Esto hace que no salga la advertencia por fallo al verificar el
         # certificado
         requests.packages.urllib3.disable_warnings()
 
-    def __datosIniciales(self):
+    def datosIniciales(self):
         with open(r'{}/id.conf'.format(directorio_local), 'r') as f:
             id_fich = f.readline().replace('/n', '')
 
@@ -30,7 +29,7 @@ class TG2():
             id_fich)
         return conectionSQLite(ruta_db, query, True)[0]
 
-    def __makeRequest(self, method_name, method='post', params=None, files=None):
+    def makeRequest(self, method_name, method='post', params=None, files=None):
         """
         Makes a request to the Telegram API.
         :param token: The bot's API token. (Created with @BotFather)
@@ -58,17 +57,17 @@ class TG2():
 
         return json.loads(result.text)['ok']
 
-    def __get_method_by_type(self, data_type):
+    def getMethodType(self, data_type):
         data_type = str(type(data_type))
         dic = {
             "<class 'str'>": 'sendMessage',
             "<class '_io.BufferedReader'>": "sendDocument"
         }
-        '''
+        """
         if data_type == 'document':
             return r'sendDocument'
         if data_type == 'sticker':
-            return r'sendSticker'''
+            return r'sendSticker"""
         # print(dic[data_type])
         return dic[data_type]
 
@@ -76,9 +75,9 @@ class TG2():
         payload = {'chat_id': self.chat_id,
                    'text': texto}
 
-        method_url = self.__get_method_by_type(texto)
+        method_url = self.getMethodType(texto)
 
-        return self.__makeRequest(method_url, params=payload, method='post')
+        return self.makeRequest(method_url, params=payload, method='post')
 
     def sendFile(self, url_file):
 
@@ -86,24 +85,24 @@ class TG2():
         files = None
 
         data = open(url_file, 'rb')
-        method_url = self.__get_method_by_type(data)
+        method_url = self.getMethodType(data)
 
         if str(type(data)) == "<class '_io.BufferedReader'>":
             files = {'document': data}
 
-            return self.__makeRequest(method_url, params=payload, files=files, method='post')
+            return self.makeRequest(method_url, params=payload, files=files, method='post')
 
     def recibeTg(self):  # no funciona de momento por la codificacion
         URL = 'https://api.telegram.org/bot{}/getUpdates'.format(self.api)
         req_headers = {'Content-Type': 'application/x-www-form-urlencoded'}
 
         session = requests.session()
-        login = session.post(URL, headers=req_headers)			# Authenticate
+        login = session.post(URL, headers=req_headers)  # Authenticate
 
         print((type(login.text)))
 
         # print(str(login.text.strip().decode('utf-8')))
-        #print( json.loads( str(login.text.strip())))
+        # print( json.loads( str(login.text.strip())))
 
         dat = json.loads(str(login.text.strip()))
 

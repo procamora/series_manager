@@ -30,8 +30,3 @@ class ML2():
             self.message.attach(adjuntos)
 
         self.mail.send(self.message)
-
-'''
-b = ML2('test1notificaciones@gmail.com', 'i(!f!Boz_A&YLY]q')
-b.SendMail('pablojoserocamora@gmail.com', """test de <strong>prueba</strong>""")
-#'''

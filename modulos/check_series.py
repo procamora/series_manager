@@ -20,9 +20,9 @@ def acabada(write=False):
 
 
 def imdb(write=False):
-    '''
+    """
     Busca las series que tienen una fecha de finalizacion en imdb pero sigo intentando actualizarlas
-    '''
+    """
     queryImdb = 'SELECT * FROM Series WHERE imdb_finaliza <> "????" AND imdb_seguir LIKE "Si"'
     query = conectionSQLite(ruta_db, queryImdb, True)
     update = 'UPDATE Series SET imdb_seguir="No" WHERE Nombre LIKE "{}";\n'
@@ -33,9 +33,9 @@ def imdb(write=False):
 
 
 def makeUpdate(query, update, write=False):
-    '''
+    """
     Recibe una lista con los resultados de los datos a cambiar, y el update a falta del nombre
-    '''
+    """
     queryUpdate = str()
     for i in query:
         update.format(i['Nombre'])

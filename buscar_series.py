@@ -11,7 +11,6 @@ from modulos.settings import modo_debug, ruta_db
 
 
 class MiFormulario(QtWidgets.QDialog):
-
     def __init__(self, parent=None, dbSeries=None):
         QtWidgets.QWidget.__init__(self, parent)
         self.ui = Ui_Dialog()
@@ -23,16 +22,16 @@ class MiFormulario(QtWidgets.QDialog):
 
         self.setWindowTitle('Buscador de series')
 
-        self.ui.pushButtonBuscar.clicked.connect(self.__operacionesIniciales)
-        self.ui.pushButtonAplicar.clicked.connect(self.__actualizaSerie)
-        self.ui.pushButtonCerrar.clicked.connect(self.__cancela)
+        self.ui.pushButtonBuscar.clicked.connect(self.operacionesIniciales)
+        self.ui.pushButtonAplicar.clicked.connect(self.actualizaSerie)
+        self.ui.pushButtonCerrar.clicked.connect(self.cancela)
 
-    def __operacionesIniciales(self):
-        '''
+    def operacionesIniciales(self):
+        """
         Busca todas las series que haya con el patron buscado y crea una lista
         para seleccionar posteriormente una %% es para escapar el tanto por ciento
         y que funcione en el string
-        '''
+        """
 
         self.ui.listWidget.clear()
 
@@ -51,11 +50,11 @@ class MiFormulario(QtWidgets.QDialog):
                 item.setText(i['Nombre'])
                 self.ui.listWidget.addItem(item)
 
-    def __actualizaSerie(self):
-        '''
+    def actualizaSerie(self):
+        """
         cojo la serie escogida, saco todos sus datos y se los mando a la libreria
         de actualizar_insertar serie
-        '''
+        """
 
         for i in self.ui.listWidget.selectedItems():
             if modo_debug:
@@ -68,10 +67,10 @@ class MiFormulario(QtWidgets.QDialog):
             actualizar_insertar.MiFormulario.getDatos(
                 datSerie=ser, dbSeries=self.db)
 
-    def __cancela(self):
-        '''
+    def cancela(self):
+        """
         Establece el estado actual en cancelado para retornar None y ejecuta reject
-        '''
+        """
 
         self.EstadoA = self.EstadoF
         self.reject()

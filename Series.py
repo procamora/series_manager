@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-#SISTEMA
+# SISTEMA
 import sys
 import os
 import re
 import platform
 import functools
-#TERCEROS
-from PyQt5 import QtGui, QtWidgets,  QtCore
-#PROPIAS
+# TERCEROS
+from PyQt5 import QtGui, QtWidgets, QtCore
+# PROPIAS
 from ui.series_ui import Ui_MainWindow
 import asistente_inicial
 import lista_activa
@@ -39,47 +39,45 @@ class MiFormulario(QtWidgets.QMainWindow):
 
         self.setWindowTitle('Gestor de Series by Pablo')
 
-        self.__init_listaActiva()		# Crea toda la vista del menu
+        self.initListaActiva()  # Crea toda la vista del menu
         funciones.crearBackUpCompletoDB()
-        self.Menus()
+        self.menus()
 
-
-    def __init_listaActiva(self):
-        self.Otra = 'Otra'  # campo otra del formulario
-        self.EstadoI = 'Ok' # estado inicial
-        self.EstadoF = 'Cancelado' #final
-        self.EstadoA = self.EstadoI  # actual
+    def initListaActiva(self):
+        self.otra = 'otra'  # campo otra del formulario
+        self.estadoI = 'Ok'  # estado inicial
+        self.estadoF = 'Cancelado'  # final
+        self.estadoA = self.estadoI  # actual
         # CUIADO REVISAR ESTO Y UNIFICADO TODOS LOS NOMBRE DE LA DB
         self.db = self.database
 
-        self.QueryCompleta = str()   # lista de consultas que se ejecutaran al final
+        self.queryCompleta = str()  # lista de consultas que se ejecutaran al final
 
         self.ui.gridLayoutGobal = QtWidgets.QGridLayout(self.ui.scrollAreaWidgetContents)
 
-        query = '''SELECT Nombre, Temporada, Capitulo, Dia, Capitulo_Descargado FROM Series WHERE Siguiendo = "Si" AND Capitulo <> 0 AND Estado="Activa"'''
-        series =  conectionSQLite(self.db, query, True)
+        query = """SELECT Nombre, Temporada, Capitulo, Dia, Capitulo_Descargado FROM Series WHERE Siguiendo = "Si" AND Capitulo <> 0 AND Estado='Activa'"""
+        series = conectionSQLite(self.db, query, True)
 
         # todo esto es para ordenar las series por fecha de proximidad de proximo capitulo
         self.fecha2 = funciones.calculaDiaSemana()
         self.fechaOrde = funciones.fechaToNumero(self.fecha2)
 
-        self.listadoFinal = self.__ordenaSeries(self.fechaOrde, series)
+        self.listadoFinal = self.ordenaSeries(self.fechaOrde, series)
         text = self.listadoFinal
 
-        for texto, i in zip(text, list(range(0, len(text)))):# el encabezado lo tengo encima
-            self.__creaListaSerie(i, texto)
+        for texto, i in zip(text, list(range(0, len(text)))):  # el encabezado lo tengo encima
+            self.creaListaSerie(i, texto)
             if modo_debug:
                 print((i, texto))
 
         self.ui.pushButtonAceptar.setVisible(False)
         self.ui.pushButtonAplicar.setText("Guardar")
-        self.ui.pushButtonAplicar.clicked.connect(self.__aplicaDatos)
-        self.ui.pushButtonCerrar.clicked.connect(self.__cancela)
-        self.ui.pushButtonAceptar.clicked.connect(self.__aceptaDatos)
+        self.ui.pushButtonAplicar.clicked.connect(self.aplicaDatos)
+        self.ui.pushButtonCerrar.clicked.connect(self.cancela)
+        self.ui.pushButtonAceptar.clicked.connect(self.aceptaDatos)
 
-
-    def __creaListaSerie(self, n=0, datos=None):
-        '''
+    def creaListaSerie(self, n=0, datos=None):
+        """
         Crea la linea de cada serie completa, generada por qtdesigner y pasado
         el codigo a python, despues visto como se crea y hecho algunas modificaciones
 
@@ -87,7 +85,7 @@ class MiFormulario(QtWidgets.QMainWindow):
         el numero de series que haya
 
         param datos dict: diccionario con todos los datos de la serie a la que se crea una linea
-        '''
+        """
 
         self.datos = datos
         self.labelEmision = QtWidgets.QLabel(self.ui.scrollAreaWidgetContents)
@@ -105,10 +103,10 @@ class MiFormulario(QtWidgets.QMainWindow):
         self.widgetBotones = QtWidgets.QWidget(self.ui.scrollAreaWidgetContents)
         self.widgetBotones.setMaximumSize(QtCore.QSize(90, 45))
         self.horizontalLayoutBotones = QtWidgets.QHBoxLayout(self.widgetBotones)
-        self.ButtonRestar = QtWidgets.QPushButton(self.widgetBotones)
-        self.horizontalLayoutBotones.addWidget(self.ButtonRestar)
-        self.ButtonSumar = QtWidgets.QPushButton(self.widgetBotones)
-        self.horizontalLayoutBotones.addWidget(self.ButtonSumar)
+        self.buttonRestar = QtWidgets.QPushButton(self.widgetBotones)
+        self.horizontalLayoutBotones.addWidget(self.buttonRestar)
+        self.buttonSumar = QtWidgets.QPushButton(self.widgetBotones)
+        self.horizontalLayoutBotones.addWidget(self.buttonSumar)
         self.ui.gridLayoutGobal.addWidget(self.widgetBotones, n, 3, 1, 1, QtCore.Qt.AlignLeft)
 
         self.labelEmision.setText(self.datos["Dia"])
@@ -118,143 +116,139 @@ class MiFormulario(QtWidgets.QMainWindow):
             self.lineEpisodio.setText('{}x0{}'.format(self.datos["Temporada"], self.datos["Capitulo"]))
         else:
             self.lineEpisodio.setText('{}x{}'.format(self.datos["Temporada"], self.datos["Capitulo"]))
-        self.ButtonSumar.setText("+1")
-        self.ButtonRestar.setText("-1")
+        self.buttonSumar.setText("+1")
+        self.buttonRestar.setText("-1")
 
-        #Conexion de los botones sumar y restar enviando la referencia del objeto para trabajar con ella posteriormente
-        self.ButtonSumar.clicked.connect(functools.partial(self.__sumarSerie, self.lineEpisodio, self.datos))
-        self.ButtonRestar.clicked.connect(functools.partial(self.__restarSerie, self.lineEpisodio, self.datos))
+        # Conexion de los botones sumar y restar enviando la referencia del objeto para trabajar con ella posteriormente
+        self.buttonSumar.clicked.connect(functools.partial(self.sumarSerie, self.lineEpisodio, self.datos))
+        self.buttonRestar.clicked.connect(functools.partial(self.restarSerie, self.lineEpisodio, self.datos))
 
-        #Widget para meter el QLineEdit y QPushButton
+        # Widget para meter el QLineEdit y QPushButton
         self.widgetTeoricos = QtWidgets.QWidget(self.ui.scrollAreaWidgetContents)
         self.widgetTeoricos.setMaximumSize(QtCore.QSize(90, 45))
         self.horizontalLayoutTeoricos = QtWidgets.QHBoxLayout(self.widgetTeoricos)
 
-        #Temporada y capitulo teorico
+        # Temporada y capitulo teorico
         self.lineEpisodioTeorico = QtWidgets.QLineEdit(self.ui.scrollAreaWidgetContents)
         self.lineEpisodioTeorico.setEnabled(False)
         self.lineEpisodioTeorico.setReadOnly(True)
         self.lineEpisodioTeorico.setMaximumSize(QtCore.QSize(30, 20))
 
-        #Boton para actualizar el estado conforme al descargado automaticamente
-        self.ButtonTeorico = QtWidgets.QPushButton(self.widgetTeoricos)
+        # Boton para actualizar el estado conforme al descargado automaticamente
+        self.buttonTeorico = QtWidgets.QPushButton(self.widgetTeoricos)
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap((":/Iconos/Icons/fatcow/add.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.ButtonTeorico.setIcon(icon)
+        self.buttonTeorico.setIcon(icon)
 
-        #Spacer para que se vea bonito cuando ocultamos el boton
+        # Spacer para que se vea bonito cuando ocultamos el boton
         spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
 
-        #Incluimos todos al Widget
+        # Incluimos todos al Widget
         self.horizontalLayoutTeoricos.addWidget(self.lineEpisodioTeorico)
-        self.horizontalLayoutTeoricos.addWidget(self.ButtonTeorico)
+        self.horizontalLayoutTeoricos.addWidget(self.buttonTeorico)
         self.horizontalLayoutTeoricos.addItem(spacerItem)
         self.ui.gridLayoutGobal.addWidget(self.widgetTeoricos, n, 4, 1, 1, QtCore.Qt.AlignLeft)
 
-        #Si el capitulo es None o ya lo tengo actualizado no muestro el boton
-        if self.datos["Capitulo_Descargado"] is not None and self.datos["Capitulo"] != self.datos["Capitulo_Descargado"]:
-            self.lineEpisodioTeorico.setText(str(self.datos["Capitulo_Descargado"]))		#Asignamos el valor del capitulo
+        # Si el capitulo es None o ya lo tengo actualizado no muestro el boton
+        if self.datos["Capitulo_Descargado"] is not None and self.datos["Capitulo"] != self.datos[
+            "Capitulo_Descargado"]:
+            self.lineEpisodioTeorico.setText(str(self.datos["Capitulo_Descargado"]))  # Asignamos el valor del capitulo
         else:
             self.lineEpisodioTeorico.setVisible(False)
-            self.ButtonTeorico.setVisible(False)
+            self.buttonTeorico.setVisible(False)
 
-        self.ButtonTeorico.clicked.connect(functools.partial(self.__botonTeorico, self.lineEpisodioTeorico, self.lineEpisodio, self.datos))
+        self.buttonTeorico.clicked.connect(
+            functools.partial(self.botonTeorico, self.lineEpisodioTeorico, self.lineEpisodio, self.datos))
 
-
-    def __botonTeorico(self, capituloT, capitulo, dat):
-        '''
+    def botonTeorico(self, capituloT, capitulo, dat):
+        """
         Calcula si el capitulo descargado es mayor o menor, despues el bucle se ejecuta la diferencia entre los capitulos ejecutando la funcion
         de sumar o restar capitulos
-        '''
+        """
 
         cap = int(capitulo.text().split('x')[-1])
         capT = int(capituloT.text())
 
         if capT > cap:
-            for i in range(0, capT-cap):
+            for i in range(0, capT - cap):
                 if modo_debug:
                     print('Suma: {}'.format(str(i)))
-                self.__sumarSerie(capitulo, dat)
+                self.sumarSerie(capitulo, dat)
         else:
-            for i in range(0, capT-cap):
+            for i in range(0, capT - cap):
                 if modo_debug:
                     print('Resta: {}'.format(str(i)))
-                self.__restarSerie(capitulo, dat)
+                self.restarSerie(capitulo, dat)
 
-
-    def __sumarSerie(self, n, dat):
-        '''
+    def sumarSerie(self, n, dat):
+        """
         Tiene 2 funcionalidades:
             - 1: sumar un capitulo a numero de capitulo que se ve por pantalla de la serie
             - 2: crear una query para actualizar_insertar la bd y la mete en una lista para su posterior ejecucion
 
         param n object: objeto que hace referencia al campo donde sale temporada y capitulo que se modificara
         param dat dict: diccionario con todos los datos de la serie que me modificara
-        '''
+        """
 
-        dat["Capitulo"] = dat["Capitulo"]+1  # esto funciona porque hace referencia al objeto
+        dat["Capitulo"] = dat["Capitulo"] + 1  # esto funciona porque hace referencia al objeto
         if len(str(dat["Capitulo"])) == 1:
             n.setText('{}x0{}'.format(dat["Temporada"], dat["Capitulo"]))
         else:
             n.setText('{}x{}'.format(dat["Temporada"], dat["Capitulo"]))
 
-        query = '''UPDATE series SET Capitulo=Capitulo+1 WHERE Nombre LIKE "{}";'''.format(dat["Nombre"])
-        self.QueryCompleta += '\n'+query
+        query = """UPDATE series SET Capitulo=Capitulo+1 WHERE Nombre LIKE "{}";""".format(dat["Nombre"])
+        self.queryCompleta += '\n' + query
         if modo_debug:
             print(query)
 
-
-    def __restarSerie(self, n, dat):
-        '''
+    def restarSerie(self, n, dat):
+        """
         Tiene 2 funcionalidades,
             - 1: restar un capitulo a numero de capitulo que se ve por pantalla de la serie
             - 2: crear una query para actualizar_insertar la bd y la mete en una lista para su posterior ejecucion
 
         param n object: objeto que hace referencia al campo donde sale temporada y capitulo que se modificara
         param dat dict: diccionario con todos los datos de la serie que me modificara
-        '''
+        """
 
-        dat["Capitulo"] = dat["Capitulo"]-1  # esto funciona porque hace referencia al objeto
+        dat["Capitulo"] = dat["Capitulo"] - 1  # esto funciona porque hace referencia al objeto
         if len(str(dat["Capitulo"])) == 1:
             n.setText('{}x0{}'.format(dat["Temporada"], dat["Capitulo"]))
         else:
             n.setText('{}x{}'.format(dat["Temporada"], dat["Capitulo"]))
 
         query = 'UPDATE series SET Capitulo=Capitulo-1 WHERE Nombre LIKE "{}";'.format(dat["Nombre"])
-        self.QueryCompleta += '\n'+query
+        self.queryCompleta += '\n' + query
         if modo_debug:
             print(query)
 
-
-    def __cancela(self):
-        '''
+    def cancela(self):
+        """
         Establece el estado actual en cancelado para retornar None y ejecuta reject
-        '''
+        """
 
-        self.EstadoA = self.EstadoF
+        self.estadoA = self.estadoF
         self.close()
 
-
-    def __aplicaDatos(self):
-        '''
+    def aplicaDatos(self):
+        """
         Recorre toda la lista de updates alctualizando todas las series,
         cuando termina vacia la lista por si volvemos a darle a aplicar,
         asi evitamos que se ejecute dos veces la misma lista
-        '''
+        """
 
         if modo_debug:
-            print((self.QueryCompleta))
+            print((self.queryCompleta))
 
-        ejecutaScriptSqlite(self.db, self.QueryCompleta)
+        ejecutaScriptSqlite(self.db, self.queryCompleta)
 
-        self.QueryCompleta = str()  # por si vuelvo a darle al boton aplicar
+        self.queryCompleta = str()  # por si vuelvo a darle al boton aplicar
         return True
 
-
-    def __ordenaSeries(self, semana, series):
-        '''
+    def ordenaSeries(self, semana, series):
+        """
         creo una lista ordenada por dia de la semana
-        '''
+        """
 
         lista = list()
         # none es el valor por defecto de la bd cuando no hay dia
@@ -268,25 +262,23 @@ class MiFormulario(QtWidgets.QMainWindow):
             print(lista)
         return lista
 
-
-    def __aceptaDatos(self):
+    def aceptaDatos(self):
         """
         Boton Aceptar, primero aplicas los datos, si retorna True, cierra la ventana
         """
 
-        if self.__aplicaDatos():
+        if self.aplicaDatos():
             self.accept()
 
-
-    def Menus(self):
-        #Crear menu nuevo completo
-        '''
+    def menus(self):
+        # Crear menu nuevo completo
+        """
         self.tools = self.menubar.addMenu('&Tools')
         prevMenu = self.tools.addMenu('Preview')
         prevMenu.addAction('Software', lambda: self.test('Hola'))
-        '''
+        """
 
-        #SERIES
+        # SERIES
         self.ui.actionSeries_Activas.triggered.connect(self.menSeriesActivas)
         self.ui.actionSeries_Activas.setShortcut('Ctrl+A')
         self.ui.actionSeries_Activas.setStatusTip('Edicion rapida de series activas')
@@ -305,7 +297,7 @@ class MiFormulario(QtWidgets.QMainWindow):
         self.ui.actionSalir.setShortcut('Ctrl+X')
         self.ui.actionSalir.setStatusTip('Cerrar el programa')
 
-        #HERRAMIENTRAS
+        # HERRAMIENTRAS
         self.ui.actionActualizar_bd_de_Imdb.triggered.connect(self.menActualizarImdb)
         self.ui.actionDescarga_Automatica.triggered.connect(self.menNewpct1)
         self.ui.actionDescarga_Automatica.setShortcut('Ctrl+N')
@@ -316,7 +308,7 @@ class MiFormulario(QtWidgets.QMainWindow):
         self.ui.actionAbrir_carpeta_de_datos.triggered.connect(self.abrirDirectorioDatos)
         self.ui.actionAbrir_carpeta_de_datos.setStatusTip('Abrir directorio de datos del programa')
 
-        #OPCIONES
+        # OPCIONES
         self.ui.actionPreferencias.triggered.connect(self.menPreferencias)
         self.ui.actionPreferencias.setShortcut('Ctrl+P')
         self.ui.actionPreferencias.setStatusTip('Edicion de preferencias')
@@ -346,55 +338,49 @@ class MiFormulario(QtWidgets.QMainWindow):
 
         ################################################################################################################################
         # revisar esto, hacer un for
-        #self.ui.actionId_de_Opcion = self.ui.menuOpciones.addMenu('Id de Opcion')
-        #self.ui.actionId_de_Opcion.addAction('Desplegable 1')
-        #self.ui.actionId_de_Opcion.addAction('Desplegable 2')
+        # self.ui.actionId_de_Opcion = self.ui.menuOpciones.addMenu('Id de Opcion')
+        # self.ui.actionId_de_Opcion.addAction('Desplegable 1')
+        # self.ui.actionId_de_Opcion.addAction('Desplegable 2')
 
-        #A CERCA DE
+        # A CERCA DE
         self.ui.actionAcerca_de.triggered.connect(self.menAcercaDe)
         self.ui.actionAcerca_de.setShortcut('Ctrl+H')
         self.ui.actionAcerca_de.setStatusTip('A cerca de')
 
-
     def menSeriesActivas(self):
-        '''
+        """
         Muestra todas las series activas con un boton de sumar o restar capitulos
-        '''
+        """
 
         lista_activa.MiFormulario.getDatos(dbSeries=self.database)
 
-
     def menListar(self):
-        '''
+        """
         Muestra las series para hacer modificaciones en masa
-        '''
+        """
 
         listar_todas.MiFormulario.getDatos(dbSeries=self.database)
 
-
     def menActualizaSerie(self):
-        '''
+        """
         Busca una serie especifica en la bd y te abre la ventana de modificacion de la serie
-        '''
+        """
 
         buscar_series.MiFormulario.getDatos(dbSeries=self.database)
 
-
     def menInsertar(self):
-        '''
+        """
         Abre una ventana para meter una nueva serie en la bd
-        '''
+        """
 
         actualizar_insertar.MiFormulario.getDatos(dbSeries=self.database)
 
-
     def RevisaEstadoSeries(self):
-        '''
+        """
         Revisa los estados de las series, si empiezan temporada, acaban temporadao acaban serie
-        '''
+        """
 
         estado_series.MiFormulario.getDatos(dbSeries=self.database)
-
 
     def menActualizarImdb(self):
         import modulos.actualiza_imdb
@@ -402,23 +388,22 @@ class MiFormulario(QtWidgets.QMainWindow):
         print('actulizaCompleto')
         a.actulizaCompleto()
 
-
     def menNewpct1(self):
         Conf = funciones.dbConfiguarion()
-        rutaDesc = str(Conf['RutaDescargas'])   # es unicode
+        rutaDesc = str(Conf['RutaDescargas'])  # es unicode
 
         if not os.path.exists(rutaDesc):
-            dat = {'title':'No existe el directorio', 'text':'El directorio {} no existe'.format(rutaDesc)}
+            dat = {'title': 'No existe el directorio', 'text': 'El directorio {} no existe'.format(rutaDesc)}
             msgbox.MiFormulario.getData(datos=dat)
         else:
             descarga_automatica.MiFormulario.getDatos(dbSeries=self.database)
 
     def menCompletoNewpct1(self):
         Conf = funciones.dbConfiguarion()
-        rutaDesc = str(Conf['RutaDescargas'])   # es unicode
+        rutaDesc = str(Conf['RutaDescargas'])  # es unicode
 
         if not os.path.exists(rutaDesc):
-            dat = {'title':'No existe el directorio', 'text':'El directorio {} no existe'.format(rutaDesc)}
+            dat = {'title': 'No existe el directorio', 'text': 'El directorio {} no existe'.format(rutaDesc)}
             msgbox.MiFormulario.getData(datos=dat)
         else:
             newpct1_completa.MiFormulario.getDatos()
@@ -428,26 +413,23 @@ class MiFormulario(QtWidgets.QMainWindow):
             comando = 'explorer "{}"'.format(funciones.creaDirectorioTrabajo().replace('/', '\\'))
         else:
             if re.search('fedora', platform.platform()):
-                comando = 'dolphin "{}"'.format(funciones.creaDirectorioTrabajo()) # no esta revisado
+                comando = 'dolphin "{}"'.format(funciones.creaDirectorioTrabajo())  # no esta revisado
             else:
-                comando = 'nautilus "{}"'.format(funciones.creaDirectorioTrabajo()) # no esta revisado
+                comando = 'nautilus "{}"'.format(funciones.creaDirectorioTrabajo())  # no esta revisado
 
         os.system(comando)
-
 
     # PREFERENCIAS
     def menPreferencias(self):
         preferencias.MiFormulario.getDatos(dbSeries=self.database)
 
-
     def menNotificaciones(self):
         notificaciones.MiFormulario.getDatos(dbSeries=self.database)
 
-
     def menSeleccionaLog(self, num):
-        '''
+        """
         creo una lista con los directorios/ficheros que quiero borrar
-        '''
+        """
 
         self.listaLog = list()
 
@@ -468,30 +450,27 @@ class MiFormulario(QtWidgets.QMainWindow):
             self.listaLog.append('{}/log/{}'.format(directorio_trabajo, ser['FicheroFeedShowrss']))
             self.listaLog.append('{}/log/{}'.format(directorio_trabajo, ser['FicheroDescargas']))
 
-        #print self.listaLog
+        # print self.listaLog
         self.menVaciaLog()
 
-
     def menVaciaLog(self):
-        '''
+        """
         Borra los ficheros que estan la la lista
-        '''
+        """
 
         for i in self.listaLog:
             with open(i, 'w'):
                 pass
 
-
     def menAsistenteInicial(self):
         asistente_inicial.MiFormulario.getDatos(ruta=directorio_trabajo)
-
 
     def menAcercaDe(self):
         acerca_de.MiFormulario.getDatos()
 
 
 def main():
-    global app   # sino lo pongo sale    QObject::startTimer: QTimer can only be used with threads started with QThread
+    global app  # sino lo pongo sale    QObject::startTimer: QTimer can only be used with threads started with QThread
     app = QtWidgets.QApplication(sys.argv)
 
     myapp = MiFormulario()
@@ -504,5 +483,5 @@ if __name__ == "__main__":
         descarga_automatica.main()
     else:
         main()
-        #funciones.creaDirectorioTrabajo()
-        #print('fin')
+        # funciones.creaDirectorioTrabajo()
+        # print('fin')

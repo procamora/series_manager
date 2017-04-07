@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-'''
+"""
 sudo apt-get install unrar-free
-'''
+"""
 import re
 import os
 import glob
@@ -17,9 +17,9 @@ import telegram2
 
 
 def busca_pass(url):
-    '''
+    """
     funcion para buscar la password en la url dada, parsea todo el html
-    '''
+    """
     session = requests.session()
     page = session.get(url, verify=False).text
     sopa = BeautifulSoup(page, 'html.parser')
@@ -42,8 +42,7 @@ def descomprime(fichero):
                 texto = str()
                 with open('{}{}'.format(dir, i), 'r', encoding="ISO-8859-1") as f:
                     texto = f.read()
-                url = re.findall(
-                    "((https?\:\/\/)?(\w+\.)+\w{2,3}\/?.*\/)", texto)
+                url = re.findall("((https?\:\/\/)?(\w+\.)+\w{2,3}\/?.*\/)", texto)
 
         if len(url) is not None:
             passwd = busca_pass(url[0][0])
@@ -56,7 +55,7 @@ def descomprime(fichero):
 
     rar.extract(member=peli, path=dir)
     os.remove(fichero)
-    #rar.extractall(path=dir, pwd=passwd)
+    # rar.extractall(path=dir, pwd=passwd)
 
 
 def main(ruta):

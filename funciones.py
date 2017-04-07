@@ -59,7 +59,7 @@ def crearFichero(fichero):
 
 
 def dbConfiguarion(name_db=nombre_db, idFile='id.conf'):
-    '''
+    """
     Funcion que obtiene los valores de la configuracion de un programa,
     recibe el nombre de la base de datos y el del fichero con el id de la
     configuracion y devuelve el diciconario con los datos
@@ -68,7 +68,7 @@ def dbConfiguarion(name_db=nombre_db, idFile='id.conf'):
     :param str idFile:  Nombre del fichero con el id de la configuracion de la base de datos
 
     :return dict: Nos devuelve un diccionario con los datos
-    '''
+    """
     ruta = creaDirectorioTrabajo()
     try:
         with open(r'{}/{}'.format(directorio_local, idFile), 'r') as f:
@@ -84,11 +84,11 @@ def dbConfiguarion(name_db=nombre_db, idFile='id.conf'):
 
 
 def plantillaFicheroConf(fich='id.conf', ruta=directorio_local):
-    '''
+    """
     Si hay una configuracion en la la carpeta del programa la mueve a la carpeta
     de configuracion, sino la hay comprueba si existe el fichero, si existe y esta
     vacio o no existe lo pone a 1
-    '''
+    """
 
     fichero_conf = '{}/{}'.format(ruta, fich)
     if os.path.exists(fich):
@@ -116,14 +116,17 @@ def plantillaDatabase(db=nombre_db, ruta=directorio_trabajo):
         # con = sqlite3.connect(fichero_db) #Creo que ya no lo uso
         if os.path.exists(fichero_db):
             if os.stat(fichero_db).st_size == 0:
-                try:
+                if os.path.exists(ficheros_sql[-1]):
                     with open(cambiaBarras(ficheros_sql[-1]), 'r') as f:
                         plantilla = f.read()
                     ejecutaScriptSqlite(fichero_db, plantilla)
-                except:  # da fallo porque el array esta vacio
+                elif os.path.exists(
+                        '{}/SQL/20160724_completo.sql'.format(directorio_local)):  # da fallo porque el array esta vacio
                     with open(cambiaBarras('{}/SQL/20160724_completo.sql'.format(directorio_local)), 'r') as f:
                         plantilla = f.read()
                     ejecutaScriptSqlite(fichero_db, plantilla)
+                else:
+                    print('fallo al hacer backup')
         else:
             with open(cambiaBarras(ficheros_sql[-1]), 'r') as f:
                 plantilla = f.read()
@@ -150,9 +153,9 @@ def cambiaBarras(texto):
 
 
 def calculaDiaSemana():
-    '''
+    """
     Te dice el dia de la semana en el que estamos, lo uso para ordenar serie de mas cerca a mas lejos
-    '''
+    """
 
     x = datetime.datetime.now()
     dicdias = {'MONDAY': 'Lunes',
@@ -180,10 +183,10 @@ def calculaDiaSemana():
 
 
 def fechaToNumero(dia):
-    '''
+    """
     Convierte el dia de la semana a un numero, y luego te crea una lista ordenada
     de los dias de la semana de mas cerca a menos cerca
-    '''
+    """
 
     DiaNombre = ["Lunes", "Martes", "Miercoles",
                  "Jueves", "Viernes", "Sabado", "Domingo"]
@@ -196,7 +199,7 @@ def fechaToNumero(dia):
 
 
 def eliminaTildes(cadena):
-    '''	http:/guimi.net/blogs/hiparco/funcion-para-eliminar-acentos-en-python/5'''
+    """	http:/guimi.net/blogs/hiparco/funcion-para-eliminar-acentos-en-python/5"""
     # s = ''.join((c for c in unicodedata.normalize('NFD',unicode(cadena)) if unicodedata.category(c) != 'Mn'))
     # return s.decode()
     return ''.join((c for c in unicodedata.normalize('NFD', str(cadena)) if unicodedata.category(c) != 'Mn'))
@@ -229,9 +232,9 @@ def descargaFichero(url, destino, libreria='requests'):
 
 
 def muestraMensaje(label, texto='Texto plantilla', estado=True):
-    '''
+    """
     Muestra una determinada label con rojo o verde (depende del estado) y con el texto indicado
-    '''
+    """
 
     label.setText(texto)
     if estado:

@@ -139,9 +139,9 @@ class actualizaImdb():
 
 
     def compruebaTitulo(self, imdb_id):
-        '''
+        """
         Comprueba si el titulo pasado existe o no en la base de datos de imdb
-        '''
+        """
         try:
             self.imdb.get_title_by_id(imdb_id)
         except:
@@ -150,10 +150,10 @@ class actualizaImdb():
 
 
     def series_finalizadas(self):
-        '''
+        """
         busca las series finalizadas que tienen el imdb_seguir a si y lo actualiza a no para
         hacer mas rapidas las futuras actualizaciones
-        '''
+        """
         query = 'SELECT * FROM Series Where Estado LIKE "Finalizada" AND imdb_seguir LIKE "Si"'
         series =  conectionSQLite(self.nombre_db, query, True)
 
@@ -170,14 +170,14 @@ class actualizaImdb():
 def main():
     a = actualizaImdb()
     #print((a.compruebaTitulo('tt1475582')))
-    #'''
+    #"""
     print('actualizaTemporadas')
     #a.actualizaTemporadas()			# actualizar_insertar series con mod parcial(todas lases series siguiendo, tarda bastante)
     print('actulizaCompleto')
     #a.actulizaCompleto()
     print('actualizaSerie')
     #a.actualizaSerie('tt3551096')
-    #'''				# actualizar_insertar series que no tienen datos de capitulo/temporada de imdb
+    #"""				# actualizar_insertar series que no tienen datos de capitulo/temporada de imdb
     #a.series_finalizadas()
 
 

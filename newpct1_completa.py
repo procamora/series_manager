@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-'''
+"""
 
-'''
+"""
 
 import sys
 import requests
@@ -11,7 +11,6 @@ import time
 from abrt_exception_handler3 import send
 from bs4 import BeautifulSoup
 from PyQt5 import QtWidgets, QtCore
-
 
 from ui.descarga_completa_ui import Ui_Dialog
 from modulos.settings import modo_debug
@@ -78,13 +77,13 @@ class mythread(QtCore.QThread):
                 self.textEdit.append(str(e))
 
     def descargaTorrent(self, direcc):  # PARA NEWPCT1
-        '''
+        """
         Funcion que obtiene la url torrent del la dirreccion que recibe
 
         :param str direcc: Dirreccion de la pagina web que contiene el torrent
 
         :return str: Nos devuelve el string con la url del torrent
-        '''
+        """
 
         session = requests.session()
         page = session.get(direcc, verify=False).text
@@ -95,12 +94,11 @@ class mythread(QtCore.QThread):
 
 
 class MiFormulario(QtWidgets.QDialog):
-
     def __init__(self, parent=None):
         QtWidgets.QWidget.__init__(self, parent)
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
-        self.Otra = 'Otra'  # campo otra del formulario
+        self.Otra = 'otra'  # campo otra del formulario
         self.envioTg = False
 
         self.n = 0
@@ -116,10 +114,10 @@ class MiFormulario(QtWidgets.QDialog):
         self.ui.lineTemp.setText(str(self.ui.BoxTemporada.currentText()))
         self.ui.lineCap.setText(str(self.ui.BoxCapitulos.currentText()))
 
-        self.ui.BoxTemporada.activated.connect(self.CampoTemporada)
-        self.ui.BoxCapitulos.activated.connect(self.CampoCapitulos)
+        self.ui.BoxTemporada.activated.connect(self.campoTemporada)
+        self.ui.BoxCapitulos.activated.connect(self.campoCapitulos)
 
-        self.ui.pushButtonAplicar.clicked.connect(self.AplicaCambios)
+        self.ui.pushButtonAplicar.clicked.connect(self.aplicaCambios)
         self.ui.pushButtonCerrar.clicked.connect(self.close)
         self.ui.checkBoxTg.clicked.connect(self.checkTg)
 
@@ -137,10 +135,10 @@ class MiFormulario(QtWidgets.QDialog):
         # sprint((self.n))
         self.ui.progressBar.setValue(self.n)
 
-    def CampoTemporada(self):
-        '''
-        Si en la lista de temporadas seleccionamos Otra se abre un line edit para poner el numero de temporada que no esta, si lo cambiamos se oculta
-        '''
+    def campoTemporada(self):
+        """
+        Si en la lista de temporadas seleccionamos otra se abre un line edit para poner el numero de temporada que no esta, si lo cambiamos se oculta
+        """
 
         if self.ui.BoxTemporada.currentText() == self.Otra:
             self.ui.lineTemp.setEnabled(True)
@@ -151,10 +149,10 @@ class MiFormulario(QtWidgets.QDialog):
             self.ui.lineTemp.setVisible(False)
             self.ui.lineTemp.setText(str(self.ui.BoxTemporada.currentText()))
 
-    def CampoCapitulos(self):
-        '''
-        Si en la lista de temporadas seleccionamos Otra se abre un line edit para poner el numero de temporada que no esta, si lo cambiamos se oculta
-        '''
+    def campoCapitulos(self):
+        """
+        Si en la lista de temporadas seleccionamos otra se abre un line edit para poner el numero de temporada que no esta, si lo cambiamos se oculta
+        """
 
         if self.ui.BoxCapitulos.currentText() == self.Otra:
             self.ui.lineCap.setEnabled(True)
@@ -166,9 +164,9 @@ class MiFormulario(QtWidgets.QDialog):
             self.ui.lineCap.setText(str(self.ui.BoxCapitulos.currentText()))
 
     def listaTemporadas(self, x, y):
-        '''
+        """
         Crea el comboBox de las temporadas, primero lo vacia y luego lo crea con los rangos que le indico
-        '''
+        """
 
         listTemp = list()
         for i in range(x, y):
@@ -179,9 +177,9 @@ class MiFormulario(QtWidgets.QDialog):
         self.ui.BoxTemporada.addItem(self.Otra)
 
     def listaCapitulos(self):
-        '''
+        """
         Crea el comboBox de las temporadas, primero lo vacia y luego lo crea con los rangos que le indico
-        '''
+        """
 
         listCap = list()
         listCap.append('10')
@@ -195,10 +193,10 @@ class MiFormulario(QtWidgets.QDialog):
         self.ui.BoxCapitulos.addItems(listCap)
         self.ui.BoxCapitulos.addItem(self.Otra)
 
-    def AplicaCambios(self):
-        '''
+    def aplicaCambios(self):
+        """
         Recoge todos los valores que necesita, crea el update y lo ejecuta
-        '''
+        """
 
         self.ui.textEdit.clear()
         self.n = 0

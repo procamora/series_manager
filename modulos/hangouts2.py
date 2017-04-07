@@ -23,7 +23,7 @@ class SampleBot(GtalkRobot):
         # the __doc__ of the function is the Regular Expression of this command, if matched, this command method will be called.
         # The parameter "args" is a list, which will hold the matched string in
         # parenthesis of Regular Expression.
-        '''(available|online|on|busy|dnd|away|idle|out|off|xa)( +(.*))?$(?i)'''
+        """(available|online|on|busy|dnd|away|idle|out|off|xa)( +(.*))?$(?i)"""
         show = args[0]
         status = args[1]
         jid = user.getStripped()
@@ -38,7 +38,7 @@ class SampleBot(GtalkRobot):
     # This method is used to send email for users.
     def command_002_SendEmail(self, user, message, args):
         # email ldmiao@gmail.com hello dmeiao, nice to meet you, bla bla ...
-        '''[email|mail|em|m]\s+(.*?@.+?)\s+(.*?),\s*(.*?)(?i)'''
+        """[email|mail|em|m]\s+(.*?@.+?)\s+(.*?),\s*(.*?)(?i)"""
         email_addr = args[0]
         subject = args[1]
         body = args[2]
@@ -49,7 +49,7 @@ class SampleBot(GtalkRobot):
 
     # This method is used to response users.
     def command_100_default(self, user, message, args):
-        '''.*?(?s)(?m)'''
+        """.*?(?s)(?m)"""
         self.replyMessage(
             user, time.strftime("%Y-%m-%d %a %H:%M:%S", time.gmtime()))
 

@@ -15,19 +15,19 @@ import funciones
 
 
 def descargaTorrent(direcc):  # PARA NEWPCT1
-    '''
+    """
     Funcion que obtiene la url torrent del la dirreccion que recibe
 
     :param str direcc: Dirreccion de la pagina web que contiene el torrent
 
     :return str: Nos devuelve el string con la url del torrent
-    '''
+    """
 
     if re.search("newpct1", direcc):
         print("newpct1")
         session = requests.session()
         page = session.get(direcc, verify=False).text
-        #page = urllib.urlopen(direcc).read()
+        # page = urllib.urlopen(direcc).read()
         sopa = BeautifulSoup(page, 'html.parser')
         return sopa.find('div', {"id": "tab1"}).a['href']
 
@@ -37,10 +37,9 @@ def descargaTorrent(direcc):  # PARA NEWPCT1
         page = session.get(direcc, verify=False).text
         # page = urllib.urlopen(direcc).read()
         sopa = BeautifulSoup(page, 'html.parser')
-        #print(sopa.findAll('div', {"id": "tab1"}))
+        # print(sopa.findAll('div', {"id": "tab1"}))
         print(sopa.find_all("a", class_="btn-torrent")[0]['href'])
-        return sopa.find('div', {"id": "tab1"}).a['href']    
-
+        return sopa.find('div', {"id": "tab1"}).a['href']
 
 
 url = "http://www.tumejortorrent.com/descargar-pelicula/contratiempo/bluray-microhd/"

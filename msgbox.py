@@ -7,8 +7,7 @@ from PyQt5 import QtWidgets
 from ui.msgbox_ui import Ui_Dialog
 
 
-class MiFormulario(QtWidgets.QDialog,):
-
+class MiFormulario(QtWidgets.QDialog, ):
     def __init__(self, parent=None, datos=None):
         QtWidgets.QWidget.__init__(self, parent)
         self.ui = Ui_Dialog()
@@ -34,7 +33,7 @@ class MiFormulario(QtWidgets.QDialog,):
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
-    a = ''' Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam iaculis turpis eget ex bibendum, et varius arcu vehicula.
+    a = """ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam iaculis turpis eget ex bibendum, et varius arcu vehicula.
 Donec cursus nunc eros, quis egestas dolor faucibus eu. Vestibulum malesuada erat in ipsum aliquam, vel vestibulum ex sodales. 
 Maecenas tristique sed lorem sit amet lacinia. Sed diam dui, vestibulum sit amet pretium vitae, convallis vitae mi. Nullam placerat dui ipsum, scelerisque feugiat tellus viverra non. 
 Ut vel nibh suscipit risus convallis dictum. Nunc eget lacus justo. Integer feugiat erat at velit feugiat feugiat. Donec laoreet nibh eget tortor mattis cursus. 
@@ -42,10 +41,10 @@ Morbi consectetur, nibh a facilisis finibus, ex mauris tempus quam, quis placera
 Nunc fermentum sed quam a ullamcorper. Pellentesque posuere nec lacus nec ultricies. Nunc ornare volutpat diam mattis laoreet.
 
 Sed in ante at urna luctus varius. Ut purus ipsum, sollicitudin eu facilisis vel, blandit at leo. Ut vestibulum tincidunt tempus.
-    '''
+    """
 
     res = {'title': 'titulo de prueba', 'text': a}
-    #MiFormulario.getData(parent=None, datos=res)
+    # MiFormulario.getData(parent=None, datos=res)
     MiFormulario.getData(datos=res)
     return app
 

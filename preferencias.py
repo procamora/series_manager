@@ -11,56 +11,55 @@ import funciones
 
 
 class MiFormulario(QtWidgets.QDialog):
-
     def __init__(self, parent=None, dbSeries=None):
         QtWidgets.QWidget.__init__(self, parent)
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
-        self.Otra = 'Otra'  # campo otra del formulario
-        self.EstadoI = 'Ok'  # estado inicial
-        self.EstadoF = 'Cancelado'  # final
-        self.EstadoA = self.EstadoI  # actual
+        self.otra = 'otra'  # campo otra del formulario
+        self.estadoI = 'Ok'  # estado inicial
+        self.estadoF = 'Cancelado'  # final
+        self.estadoA = self.estadoI  # actual
         self.db = dbSeries
         self.ruta = directorio_local
         funciones.creaDirectorioTrabajo()
         self.setWindowTitle('Preferencias de configuracion')
         self.ui.tabWidget.setCurrentIndex(0)
 
-        self.__operacionesIniciales()
+        self.operacionesIniciales()
 
         # recogo todos los dias de la caja y le paso el indice del dia en el
         # que sale
-        AllItems = [self.ui.BoxId.itemText(i)
+        allItems = [self.ui.BoxId.itemText(i)
                     for i in range(self.ui.BoxId.count())]
         with open(r'{}/id.conf'.format(self.ruta), 'r') as f:
             id_fich = f.readline().replace('/n', '')
 
         try:
-            self.ui.BoxId.setCurrentIndex(AllItems.index(id_fich))
+            self.ui.BoxId.setCurrentIndex(allItems.index(id_fich))
         except:
             # si da error por algun motivo pongo el primero
-            self.ui.BoxId.setCurrentIndex(AllItems.index('1'))
+            self.ui.BoxId.setCurrentIndex(allItems.index('1'))
 
-        self.__procesosComunes()
+        self.procesosComunes()
 
-        self.ui.pushButton.clicked.connect(self.__buscarDirectorio)
-        self.ui.BoxId.activated.connect(self.__procesosComunes)
+        self.ui.pushButton.clicked.connect(self.buscarDirectorio)
+        self.ui.BoxId.activated.connect(self.procesosComunes)
 
-        self.ui.pushButtonAplicar.clicked.connect(self.__aplicaDatos)
-        self.ui.pushButtonCerrar.clicked.connect(self.__cancela)
-        self.ui.pushButtonAceptar.clicked.connect(self.__aceptaDatos)
+        self.ui.pushButtonAplicar.clicked.connect(self.aplicaDatos)
+        self.ui.pushButtonCerrar.clicked.connect(self.cancela)
+        self.ui.pushButtonAceptar.clicked.connect(self.aceptaDatos)
 
-    def __operacionesIniciales(self):
-        self.__sacaDatos()
-        self.__listaId()
+    def operacionesIniciales(self):
+        self.sacaDatos()
+        self.listaId()
 
-    def __buscarDirectorio(self):
+    def buscarDirectorio(self):
         """
         Se encarga de coger la ruta en la que vamos a guardar el fichero, en este caso solo buscamos directorios,
         y establecemos que la ruta raiz sea el escrotorio, que se establece en el init
         """
 
-        #filenames = QtGui.QFileDialog.getOpenFileName()
+        # filenames = QtGui.QFileDialog.getOpenFileName()
         filenames = QtWidgets.QFileDialog.getExistingDirectory(self, "Open Directory",
                                                                str(self.ui.lineRuta.text(
                                                                )),
@@ -71,19 +70,19 @@ class MiFormulario(QtWidgets.QDialog):
             # QString sino str
             self.ui.lineRuta.setText(filenames)
 
-    def __sacaDatos(self):
-        '''
+    def sacaDatos(self):
+        """
 
-        '''
+        """
 
         query = 'SELECT * FROM Configuraciones'
         self.ser = conectionSQLite(self.db, query, True)
-        self.DatodDb = self.ser[0]
+        self.datodDb = self.ser[0]
 
-    def __listaId(self):
-        '''
+    def listaId(self):
+        """
 
-        '''
+        """
 
         lista = list()
         for i in self.ser:
@@ -91,34 +90,34 @@ class MiFormulario(QtWidgets.QDialog):
 
         self.ui.BoxId.clear()
         self.ui.BoxId.addItems(lista)
-        self.ui.BoxId.addItem(self.Otra)
+        self.ui.BoxId.addItem(self.otra)
 
-    def __averiguaConf(self):
-        '''
+    def averiguaConf(self):
+        """
 
-        '''
+        """
 
         for i in self.ser:
             if str(self.ui.BoxId.currentText()) == str(i['id']):
                 if modo_debug:
                     print((self.ui.BoxId.currentText()))
                     print(i)
-                self.DatodDb = i
-        if self.ui.BoxId.currentText() == self.Otra:
-            self.DatodDb = {'UrlFeedShowrss': '',
+                self.datodDb = i
+        if self.ui.BoxId.currentText() == self.otra:
+            self.datodDb = {'UrlFeedShowrss': '',
                             'RutaDescargas': '',
                             'UrlFeedNewpct': '',
                             'id': ''}
 
-    def __procesosComunes(self):
-        '''
+    def procesosComunes(self):
+        """
 
-        '''
+        """
 
-        self.__averiguaConf()
-        self.__insertarSerie()
+        self.averiguaConf()
+        self.insertarSerie()
 
-    def __aplicaDatos(self):
+    def aplicaDatos(self):
         datos = {
             'ID': str(self.ui.BoxId.currentText()),
             'Newpct': str(self.ui.lineNewpct.text()),
@@ -126,20 +125,20 @@ class MiFormulario(QtWidgets.QDialog):
             'Ruta': funciones.cambiaBarras(str(self.ui.lineRuta.text()))
         }
 
-        if datos['ID'] == self.Otra:
+        if datos['ID'] == self.otra:
             print('insert')
-            query = '''INSERT INTO Configuraciones(UrlFeedNewpct, UrlFeedShowrss, RutaDescargas)
-VALUES ("{}", "{}", "{}", "{}", "{}", "{}", "{}")'''.format(datos['Newpct'], datos['showrss'], datos['Ruta'])
+            query = """INSERT INTO Configuraciones(UrlFeedNewpct, UrlFeedShowrss, RutaDescargas)
+VALUES ("{}", "{}", "{}", "{}", "{}", "{}", "{}")""".format(datos['Newpct'], datos['showrss'], datos['Ruta'])
 
             if modo_debug:
                 print('update')
                 print(query)
 
             conectionSQLite(self.db, query)
-            self.__operacionesIniciales()
+            self.operacionesIniciales()
         else:
-            query = '''UPDATE Configuraciones SET UrlFeedNewpct="{}", UrlFeedShowrss="{}", RutaDescargas="{}"
-            WHERE ID LIKE {}'''.format(datos['Newpct'], datos['showrss'], datos['Ruta'], datos['ID'])
+            query = """UPDATE Configuraciones SET UrlFeedNewpct="{}", UrlFeedShowrss="{}", RutaDescargas="{}"
+            WHERE ID LIKE {}""".format(datos['Newpct'], datos['showrss'], datos['Ruta'], datos['ID'])
 
             if modo_debug:
                 print('update')
@@ -152,29 +151,29 @@ VALUES ("{}", "{}", "{}", "{}", "{}", "{}", "{}")'''.format(datos['Newpct'], dat
 
         return True
 
-    def __insertarSerie(self):
-        '''
+    def insertarSerie(self):
+        """
 
-        '''
+        """
 
-        self.ui.lineNewpct.setText(self.DatodDb['UrlFeedNewpct'])
-        self.ui.lineShowrss.setText(self.DatodDb['UrlFeedShowrss'])
-        self.ui.lineRuta.setText(str(self.DatodDb['RutaDescargas']))
+        self.ui.lineNewpct.setText(self.datodDb['UrlFeedNewpct'])
+        self.ui.lineShowrss.setText(self.datodDb['UrlFeedShowrss'])
+        self.ui.lineRuta.setText(str(self.datodDb['RutaDescargas']))
 
-    def __cancela(self):
-        '''
+    def cancela(self):
+        """
         Establece el estado actual en cancelado para retornar None y ejecuta reject
-        '''
+        """
 
-        self.EstadoA = self.EstadoF
+        self.estadoA = self.estadoF
         self.reject()
 
-    def __aceptaDatos(self):
+    def aceptaDatos(self):
         """
         Boton Aceptar, primero aplicas los datos, si retorna True, cierra la ventana
         """
 
-        if self.__aplicaDatos():
+        if self.aplicaDatos():
             self.accept()
 
     @staticmethod
@@ -188,6 +187,7 @@ def main():
     MiFormulario.getDatos(dbSeries=ruta_db)
     return app
 
-# revisar cuando pongo Otra, poner insetar en vez de otra
+
+# revisar cuando pongo otra, poner insetar en vez de otra
 if __name__ == '__main__':
     main()

@@ -8,10 +8,9 @@ from ui.acerca_de_ui import Ui_Dialog
 
 
 class MiFormulario(QtWidgets.QDialog):
-
     def __init__(self, parent=None):
-        #super(MiFormulario, self).__init__()
-        #uic.loadUi('ui/AcercaDe.ui', self)
+        # super(MiFormulario, self).__init__()
+        # uic.loadUi('ui/AcercaDe.ui', self)
         QtWidgets.QWidget.__init__(self, parent)
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)

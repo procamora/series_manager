@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-'''
+"""
 
-'''
+"""
 import re
 import os
 import time
@@ -20,10 +20,10 @@ from modulos.settings import modo_debug, directorio_trabajo, ruta_db
 import funciones
 
 
-def MuestraNotificaciones():
-    '''
+def muestraNotificaciones():
+    """
     poner las api de la base de datos
-    '''
+    """
     queryN = 'SELECT * FROM notificaciones'
     Datos = conectionSQLite(ruta_db, queryN, True)
 
@@ -43,23 +43,24 @@ def MuestraNotificaciones():
 
     return Datos
 
+
 global notificaciones
-notificaciones = MuestraNotificaciones()
+notificaciones = muestraNotificaciones()
+
 
 # https://gist.github.com/kaotika/e8ca5c340ec94f599fb2
 
 
 class MiFormulario():
-
     def __init__(self, dbSeries=None):
         if funciones.internetOn():
-            self.Otra = 'Otra'  # campo otra del formulario
+            self.Otra = 'otra'  # campo otra del formulario
             self.EstadoI = 'Ok'  # estado inicial
             self.db = dbSeries
 
-            #query = 'SELECT Nombre, Temporada, Capitulo, VOSE FROM Series WHERE Siguiendo = "Si" AND ((VOSE = "No" AND Estado="Activa" AND Capitulo <> 0) OR (VOSE = "Si")) ORDER BY Nombre'
-            #self.query = 'SELECT Nombre, Temporada, Capitulo, VOSE FROM Series WHERE Siguiendo = "Si" AND ((VOSE = "No" AND Estado="Activa" AND Capitulo <> 0) OR (VOSE = "Si" AND Capitulo <> 0)) ORDER BY Nombre ASC'
-            self.query = '''SELECT Nombre, Temporada, Capitulo, VOSE FROM Series WHERE Siguiendo = "Si" ORDER BY Nombre ASC'''
+            # query = 'SELECT Nombre, Temporada, Capitulo, VOSE FROM Series WHERE Siguiendo = "Si" AND ((VOSE = "No" AND Estado="Activa" AND Capitulo <> 0) OR (VOSE = "Si")) ORDER BY Nombre'
+            # self.query = 'SELECT Nombre, Temporada, Capitulo, VOSE FROM Series WHERE Siguiendo = "Si" AND ((VOSE = "No" AND Estado="Activa" AND Capitulo <> 0) OR (VOSE = "Si" AND Capitulo <> 0)) ORDER BY Nombre ASC'
+            self.query = """SELECT Nombre, Temporada, Capitulo, VOSE FROM Series WHERE Siguiendo = "Si" ORDER BY Nombre ASC"""
             self.series = conectionSQLite(self.db, self.query, True)
 
             self.listaNotificaciones = str()
@@ -76,12 +77,12 @@ class MiFormulario():
             try:
                 self.feedNew = feedparser.parse(urlNew)
             except:  # Para el fallo en fedora
-                self.feedNew = self.__feedparser_parse(urlNew)
+                self.feedNew = self.feedParser(urlNew)
 
             try:
                 self.feedShow = feedparser.parse(urlShow)
             except:  # Para el fallo en fedora
-                self.feedShow = self.__feedparser_parse(urlShow)
+                self.feedShow = self.feedParser(urlShow)
 
             self.run()
 
@@ -114,7 +115,7 @@ class MiFormulario():
         for i in series:
             try:
                 print(('Revisa: {}'.format(i['Nombre'])))
-                SerieActualTemp = self.ParseaFeed(
+                SerieActualTemp = self.parseaFeed(
                     i['Nombre'], i['Temporada'], i['Capitulo'], i['VOSE'])
                 if i['VOSE'] == 'Si':
                     SerieActualShow = SerieActualTemp
@@ -140,7 +141,7 @@ class MiFormulario():
 
         # capitulos que descargo
         for i in self.capDescargado.items():
-            #print (i)
+            # print (i)
             query = 'UPDATE Series SET Capitulo_Descargado={} WHERE Nombre LIKE "{}";\n'.format(
                 str(i[1]), i[0])
             self.consultaUpdate += query
@@ -161,11 +162,11 @@ class MiFormulario():
             print(
                 'PROBLEMA CON if SerieActualShow is not None and SerieActualNew is not None:')
 
-    def ParseaFeed(self, serie, tem, cap, vose):
-        '''Solo funciona con series de 2 digitos por la expresion regular'''
+    def parseaFeed(self, serie, tem, cap, vose):
+        """Solo funciona con series de 2 digitos por la expresion regular"""
 
         cap = str(cap)
-        ruta = str(self.conf['RutaDescargas'])   # es unicode
+        ruta = str(self.conf['RutaDescargas'])  # es unicode
         if vose == 'Si':
             ultimaSerie = self.ultimaSerieShow
             d = self.feedShow
@@ -186,9 +187,9 @@ class MiFormulario():
                 # guardarlo en el fichero
                 return d.entries[0].title
             regex_vose = '(?i){} {}.*'.format(
-                self.__escapaParentesis(serie.lower()), tem)
+                self.escapaParentesis(serie.lower()), tem)
             regex_cast = '(?i){}( \(Proper\))? - Temporada( )?\d+ \[HDTV 720p?\]\[Cap\.{}\d+(_\d+)?\]\[A.*'.format(
-                self.__escapaParentesis(serie.lower()), tem)
+                self.escapaParentesis(serie.lower()), tem)
 
             if modo_debug:
                 # print(i.title)
@@ -229,7 +230,7 @@ class MiFormulario():
 
                     funciones.descargaFichero(
                         torrent, r'{}/{}.torrent'.format(ruta, i.title))
-                    self.actualizaDia += '''UPDATE series SET Dia="{}" WHERE Nombre LIKE "{}";\n'''.format(
+                    self.actualizaDia += """UPDATE series SET Dia="{}" WHERE Nombre LIKE "{}";\n""".format(
                         funciones.calculaDiaSemana(), serie)
 
                     # Diccionario con todos los capitulos descargados, para
@@ -248,17 +249,17 @@ class MiFormulario():
 
         return d.entries[0].title
 
-    def __escapaParentesis(self, texto):
-        '''
+    def escapaParentesis(self, texto):
+        """
         No he probado si funciona con series como powers
-        '''
+        """
         return texto.replace('(', '\\(').replace(')', '\\)')
 
-    def __feedparser_parse(self, url):
-        '''
+    def feedParser(self, url):
+        """
         Da un fallo en fedora 23, por eso hace falta esta funcion
         https://github.com/kurtmckee/feedparser/issues/30
-        '''
+        """
 
         try:
             return feedparser.parse(url)
@@ -270,7 +271,7 @@ class MiFormulario():
                 raise
 
     def buscaTorrent(self, direcc):  # PARA NEWPCT1
-        '''
+        """
         Funcion que obtiene la url torrent del la dirreccion que recibe,
         hay que tener en cuenta que la url que recibe es la del feed
         y que no es la apgina que contiene el torrent, pero como todas tienen
@@ -279,7 +280,7 @@ class MiFormulario():
         :param str direcc: Dirreccion de la pagina web que contiene el torrent
 
         :return str: Nos devuelve el string con la url del torrent
-        '''
+        """
 
         session = requests.session()
         page = session.get(direcc.replace(
@@ -289,13 +290,13 @@ class MiFormulario():
         return sopa.find('div', {"id": "tab1"}).a['href']
 
     def buscaTorrentAntiguo(self, direcc):  # para newpct
-        '''
+        """
         Funcion que obtiene la url torrent del la dirreccion que recibe
 
         :param str direcc: Dirreccion de la pagina web que contiene el torrent
 
         :return str: Nos devuelve el string con la url del torrent
-        '''
+        """
 
         session = requests.session()
         page = session.get(direcc, verify=False).text

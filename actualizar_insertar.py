@@ -13,25 +13,24 @@ import funciones
 
 
 class MiFormulario(QtWidgets.QDialog):
-
     def __init__(self, parent=None, dbSeries=None, datSerie=None):
         QtWidgets.QWidget.__init__(self, parent)
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
-        self.Otra = 'Otra'  # campo otra del formulario
-        self.EstadoI = 'Ok'  # estado inicial
-        self.EstadoF = 'Cancelado'  # final
-        self.EstadoA = self.EstadoI  # actual
+        self.otra = 'otra'  # campo otra del formulario
+        self.estadoI = 'Ok'  # estado inicial
+        self.estadoF = 'Cancelado'  # final
+        self.estadoA = self.estadoI  # actual
         self.db = dbSeries
         self.datSerie = datSerie
 
         # para todos establezco esto que el estado es Activa, si actualizo lo
         # modifico en la funcion creaConf
-        self.__listaEstados()
+        self.listaEstados()
 
-        AllItems = [self.ui.BoxEstado.itemText(
+        allItems = [self.ui.BoxEstado.itemText(
             i) for i in range(self.ui.BoxEstado.count())]
-        self.ui.BoxEstado.setCurrentIndex(AllItems.index('Activa'))
+        self.ui.BoxEstado.setCurrentIndex(allItems.index('Activa'))
 
         if self.datSerie is not None:  # Actualizar
             self.setWindowTitle(
@@ -41,22 +40,22 @@ class MiFormulario(QtWidgets.QDialog):
             self.NombreOriginal = str(self.datSerie['Nombre'])
 
             self.ui.pushButtonAplicar.setText('Actualizar')
-            self.__creaConf()
+            self.creaConf()
         else:  # Insertar
             self.setWindowTitle('Insertar Serie')
             self.ui.pushButtonAplicar.setText('Insertar')
 
             # Generar checkbox
-            self.__listaTemporadas(1, 5)
-            self.__listaCapitulos(1, 13)
+            self.listaTemporadas(1, 5)
+            self.listaCapitulos(1, 13)
 
             # pongo la fecha de hoy para insertar por defecto
             # recogo todos los dias de la caja y le paso el indice del dia en
             # el que sale
-            AllItems = [self.ui.BoxEmision.itemText(
+            allItems = [self.ui.BoxEmision.itemText(
                 i) for i in range(self.ui.BoxEmision.count())]
             self.ui.BoxEmision.setCurrentIndex(
-                AllItems.index(funciones.calculaDiaSemana()))
+                allItems.index(funciones.calculaDiaSemana()))
 
         # Ocultar textos
         self.ui.lineTemp.hide()
@@ -66,20 +65,20 @@ class MiFormulario(QtWidgets.QDialog):
         self.ui.lineCapitulo.setText(str(self.ui.BoxCapitulo.currentText()))
 
         # conectores
-        self.ui.BoxTemporada.activated.connect(self.__campoTemp)
-        self.ui.BoxCapitulo.activated.connect(self.__campoCap)
+        self.ui.BoxTemporada.activated.connect(self.campoTemp)
+        self.ui.BoxCapitulo.activated.connect(self.campoCap)
 
-        self.ui.pushButtonAplicar.clicked.connect(self.__aplicaDatos)
-        self.ui.pushButtonCerrar.clicked.connect(self.__cancela)
-        self.ui.pushButtonAceptar.clicked.connect(self.__aceptaDatos)
+        self.ui.pushButtonAplicar.clicked.connect(self.aplicaDatos)
+        self.ui.pushButtonCerrar.clicked.connect(self.cancela)
+        self.ui.pushButtonAceptar.clicked.connect(self.aceptaDatos)
 
-    def __campoTemp(self):
-        '''
-        Si en la lista de temporadas seleccionamos Otra se abre un line edit
+    def campoTemp(self):
+        """
+        Si en la lista de temporadas seleccionamos otra se abre un line edit
         para poner el numero de temporada que no esta, si lo cambiamos se oculta
-        '''
+        """
 
-        if self.ui.BoxTemporada.currentText() == self.Otra:
+        if self.ui.BoxTemporada.currentText() == self.otra:
             self.ui.lineTemp.setEnabled(True)
             self.ui.lineTemp.setVisible(True)
             self.ui.lineTemp.setText('')
@@ -88,13 +87,13 @@ class MiFormulario(QtWidgets.QDialog):
             self.ui.lineTemp.setVisible(False)
             self.ui.lineTemp.setText(str(self.ui.BoxTemporada.currentText()))
 
-    def __campoCap(self):
-        '''
-        Si en la lista de capitulos seleccionamos Otra se abre un line edit
+    def campoCap(self):
+        """
+        Si en la lista de capitulos seleccionamos otra se abre un line edit
         para poner el numero de capitulo que no esta, si lo cambiamos se oculta
-        '''
+        """
 
-        if str(self.ui.BoxCapitulo.currentText()) == self.Otra:
+        if str(self.ui.BoxCapitulo.currentText()) == self.otra:
             self.ui.lineCapitulo.setEnabled(True)
             self.ui.lineCapitulo.setVisible(True)
             self.ui.lineCapitulo.setText('')
@@ -104,11 +103,11 @@ class MiFormulario(QtWidgets.QDialog):
             self.ui.lineCapitulo.setText(
                 str(self.ui.BoxCapitulo.currentText()))
 
-    def __listaTemporadas(self, x, y):
-        '''
+    def listaTemporadas(self, x, y):
+        """
         Crea el comboBox de las temporadas, primero lo vacia y
         luego lo crea con los rangos que le indico
-        '''
+        """
 
         listTemp = list()
         for i in range(x, y):
@@ -116,13 +115,13 @@ class MiFormulario(QtWidgets.QDialog):
 
         self.ui.BoxTemporada.clear()
         self.ui.BoxTemporada.addItems(listTemp)
-        self.ui.BoxTemporada.addItem(self.Otra)
+        self.ui.BoxTemporada.addItem(self.otra)
 
-    def __listaCapitulos(self, x, y):
-        '''
+    def listaCapitulos(self, x, y):
+        """
         Crea el comboBox de los capitulos, primero lo vacia y
         luego lo crea con los rangos que le indico
-        '''
+        """
 
         listCap = list()
         for i in range(x, y):
@@ -130,13 +129,13 @@ class MiFormulario(QtWidgets.QDialog):
 
         self.ui.BoxCapitulo.clear()
         self.ui.BoxCapitulo.addItems(listCap)
-        self.ui.BoxCapitulo.addItem(self.Otra)
+        self.ui.BoxCapitulo.addItem(self.otra)
 
-    def __listaEstados(self):
-        '''
+    def listaEstados(self):
+        """
         Crea el comboBox de los estados, primero lo vacia y
         luego lo crea con los rangos que le indico
-        '''
+        """
         estados = 'SELECT * FROM ID_Estados'
         query_estados = conectionSQLite(self.db, estados, True)
         listEst = list()
@@ -146,19 +145,19 @@ class MiFormulario(QtWidgets.QDialog):
         self.ui.BoxEstado.clear()
         self.ui.BoxEstado.addItems(listEst)
 
-    def __creaConf(self):
-        '''
+    def creaConf(self):
+        """
         Establece los valores por defecto que se le indican en caso de que se indiquen
-        '''
+        """
         if modo_debug:
             print((self.datSerie))
 
         self.ui.lineTitulo.setText(self.datSerie['Nombre'])
 
         # Generar checkbox
-        self.__listaTemporadas(
+        self.listaTemporadas(
             self.datSerie['Temporada'], self.datSerie['Temporada'] + 2)
-        self.__listaCapitulos(
+        self.listaCapitulos(
             self.datSerie['Capitulo'], self.datSerie['Capitulo'] + 8)
 
         if self.datSerie['Siguiendo'] == 'Si':
@@ -168,10 +167,10 @@ class MiFormulario(QtWidgets.QDialog):
 
         # recogo todos los dias de la caja y le paso el indice del dia en el
         # que sale
-        AllItems = [self.ui.BoxEmision.itemText(
+        allItems = [self.ui.BoxEmision.itemText(
             i) for i in range(self.ui.BoxEmision.count())]
         self.ui.BoxEmision.setCurrentIndex(
-            AllItems.index(self.datSerie['Dia']))
+            allItems.index(self.datSerie['Dia']))
 
         if self.datSerie['VOSE'] == 'Si':
             self.ui.radioVOSE_Si.click()
@@ -183,20 +182,20 @@ class MiFormulario(QtWidgets.QDialog):
         else:
             self.ui.radioAcabadaNo.click()
 
-        AllItems = [self.ui.BoxEstado.itemText(
+        allItems = [self.ui.BoxEstado.itemText(
             i) for i in range(self.ui.BoxEstado.count())]
         self.ui.BoxEstado.setCurrentIndex(
-            AllItems.index(self.datSerie['Estado']))
+            allItems.index(self.datSerie['Estado']))
 
         if self.datSerie['imdb_id'] is not None:
             self.ui.lineImdb.setText(self.datSerie['imdb_id'])
 
         self.ui.radioImdbNo.click()
 
-    def __aplicaDatos(self):
-        '''
+    def aplicaDatos(self):
+        """
         Recoge todos los valores que necesita, crea el update y lo ejecuta
-        '''
+        """
 
         self.ui.label_Info.setText('')
         if self.ui.radioVOSE_Si.isChecked():
@@ -205,19 +204,19 @@ class MiFormulario(QtWidgets.QDialog):
             vose = 'No'
 
         if self.ui.radioAcabadaSi.isChecked():
-            Acabada = 'Si'
+            acabada = 'Si'
         else:
-            Acabada = 'No'
+            acabada = 'No'
 
         if self.ui.radioImdbSi.isChecked():
-            Imdb = 'Si'
+            imdb = 'Si'
         else:
-            Imdb = 'No'
+            imdb = 'No'
 
         if self.ui.radioSeguirSi.isChecked():
-            Seguir = 'Si'
+            seguir = 'Si'
         else:
-            Seguir = 'No'
+            seguir = 'No'
 
         if len(str(self.ui.lineImdb.text())) == 0:  # añadido de insertar
             str_imdb = 'NULL'
@@ -228,13 +227,13 @@ class MiFormulario(QtWidgets.QDialog):
             'Titulo': str(self.ui.lineTitulo.text()).lstrip().rstrip(),
             'Temporada': str(self.ui.lineTemp.text()),
             'Capitulo': str(self.ui.lineCapitulo.text()),
-            'Seguir': Seguir,
+            'Seguir': seguir,
             'Emision': str(self.ui.BoxEmision.currentText()),
             'VOSE': vose,
-            'Acabada': Acabada,
+            'Acabada': acabada,
             'Estado': str(self.ui.BoxEstado.currentText()),
             'idImdb': str_imdb,
-            'ImdbLanzar': Imdb
+            'ImdbLanzar': imdb
         }
 
         # Nombre vacia produce errores al descargar series
@@ -243,26 +242,25 @@ class MiFormulario(QtWidgets.QDialog):
             # LO PONGA
             if len(str(self.ui.lineImdb.text())) == 0:
                 if self.datSerie is not None:
-                    query = '''
-UPDATE series SET Nombre="{}", Temporada={}, Capitulo={}, Siguiendo="{}", Dia="{}", VOSE="{}", Acabada="{}", Estado="{}",
-imdb_id={} WHERE Nombre="{}"'''.format( datos['Titulo'], datos['Temporada'], datos['Capitulo'], datos['Seguir'],
-                                        datos['Emision'], datos['VOSE'], datos['Acabada'], datos['Estado'], datos['idImdb'], self.NombreOriginal)
+                    query = '''UPDATE series SET Nombre="{}", Temporada={}, Capitulo={}, Siguiendo="{}", Dia="{}", VOSE="{}", Acabada="{}", Estado="{}",imdb_id={} WHERE Nombre="{}"'''.format(
+                        datos['Titulo'], datos['Temporada'], datos['Capitulo'], datos['Seguir'],
+                        datos['Emision'], datos['VOSE'], datos['Acabada'], datos['Estado'], datos['idImdb'],
+                        self.NombreOriginal)
                 else:
-                    query = '''
-INSERT INTO series(Nombre, Temporada, Capitulo, Siguiendo, Dia, VOSE, Acabada, Estado, imdb_id)
-VALUES ("{}", {}, {}, "{}", "{}", "{}", "{}", "{}", {})'''.format(datos['Titulo'], datos['Temporada'],
-                                                                  datos['Capitulo'], datos['Seguir'], datos['Emision'], datos['VOSE'], datos['Acabada'], datos['Estado'], datos['idImdb'])
+                    query = '''INSERT INTO series(Nombre, Temporada, Capitulo, Siguiendo, Dia, VOSE, Acabada, Estado, imdb_id) VALUES ("{}", {}, {}, "{}", "{}", "{}", "{}", "{}", {})'''.format(
+                        datos['Titulo'], datos['Temporada'], datos['Capitulo'], datos['Seguir'], datos['Emision'],
+                        datos['VOSE'], datos['Acabada'], datos['Estado'], datos['idImdb'])
             else:
                 if self.datSerie is not None:
-                    query = '''
-UPDATE series SET Nombre="{}", Temporada={}, Capitulo={}, Siguiendo="{}", Dia="{}", VOSE="{}", Acabada="{}", Estado="{}",
-imdb_id="{}" WHERE Nombre="{}"'''.format( datos['Titulo'], datos['Temporada'], datos['Capitulo'], datos['Seguir'],
-                                          datos['Emision'], datos['VOSE'], datos['Acabada'], datos['Estado'], datos['idImdb'], self.NombreOriginal)
+                    query = '''UPDATE series SET Nombre="{}", Temporada={}, Capitulo={}, Siguiendo="{}", Dia="{}", VOSE="{}", Acabada="{}", Estado="{}",imdb_id="{}" WHERE Nombre="{}"'''.format(
+                        datos['Titulo'], datos['Temporada'], datos['Capitulo'], datos['Seguir'], datos['Emision'],
+                        datos['VOSE'], datos['Acabada'], datos['Estado'], datos['idImdb'], self.NombreOriginal)
                 else:
-                    query = '''
-INSERT INTO series(Nombre, Temporada, Capitulo, Siguiendo, Dia, VOSE, Acabada, Estado, imdb_id)
-VALUES ("{}", {}, {}, "{}", "{}", "{}", "{}", "{}", "{}")'''.format( datos['Titulo'], datos['Temporada'],
-                                                                     datos['Capitulo'], datos['Seguir'], datos['Emision'], datos['VOSE'], datos['Acabada'], datos['Estado'], datos['idImdb'])
+                    query = '''INSERT INTO series(Nombre, Temporada, Capitulo, Siguiendo, Dia, VOSE, Acabada, Estado, imdb_id)
+VALUES ("{}", {}, {}, "{}", "{}", "{}", "{}", "{}", "{}")'''.format(datos['Titulo'], datos['Temporada'],
+                                                                    datos['Capitulo'], datos['Seguir'],
+                                                                    datos['Emision'], datos['VOSE'], datos['Acabada'],
+                                                                    datos['Estado'], datos['idImdb'])
             try:
                 if modo_debug:
                     print(query)
@@ -271,7 +269,7 @@ VALUES ("{}", {}, {}, "{}", "{}", "{}", "{}", "{}", "{}")'''.format( datos['Titu
                     imbd_test = modulos.actualiza_imdb.actualizaImdb()
 
                     if imbd_test.compruebaTitulo(datos['idImdb']):
-                        self.__ejecutaImdb()
+                        self.ejecutaImdb()
                         conectionSQLite(self.db, query)
                         # Si es una inserccion despues de insertar vacio el
                         # titulo para poder hacer mas
@@ -307,7 +305,7 @@ VALUES ("{}", {}, {}, "{}", "{}", "{}", "{}", "{}", "{}")'''.format( datos['Titu
             funciones.muestraMensaje(self.ui.label_Info, 'Titulo vacio', False)
             return False
 
-    def __ejecutaImdb(self):
+    def ejecutaImdb(self):
         """
         Actualiza los datos de la serie de imdb siempre que el id no este vacio
         """
@@ -319,20 +317,20 @@ VALUES ("{}", {}, {}, "{}", "{}", "{}", "{}", "{}", "{}")'''.format( datos['Titu
                 print('actualiza imdb')
             a.actualizaSerie(id_imdb)
 
-    def __aceptaDatos(self):
+    def aceptaDatos(self):
         """
         Boton Aceptar, primero aplicas los datos, si retorna True, cierra la ventana
         """
 
-        if self.__aplicaDatos():
+        if self.aplicaDatos():
             self.accept()
 
-    def __cancela(self):
-        '''
+    def cancela(self):
+        """
         Establece el estado actual en cancelado para retornar None y ejecuta reject
-        '''
+        """
 
-        self.EstadoA = self.EstadoF
+        self.estadoA = self.estadoF
         self.reject()
 
     @staticmethod
@@ -342,13 +340,14 @@ VALUES ("{}", {}, {}, "{}", "{}", "{}", "{}", "{}", "{}")'''.format( datos['Titu
 
 
 def main():
-    #query = 'SELECT * FROM Series WHERE Nombre LIKE "Silicon Valley"'
-    #ser = conectionSQLite('{}/{}'.format(directorio_trabajo, nombre_db), query, True)[0]
+    # query = 'SELECT * FROM Series WHERE Nombre LIKE "Silicon Valley"'
+    # ser = conectionSQLite('{}/{}'.format(directorio_trabajo, nombre_db), query, True)[0]
     ser = None
     app = QtWidgets.QApplication(sys.argv)
     # hay que poner la base de datos como parametro
     MiFormulario.getDatos(dbSeries=ruta_db, datSerie=ser)
     return app
+
 
 if __name__ == '__main__':
     main()

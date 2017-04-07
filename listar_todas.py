@@ -10,52 +10,51 @@ from modulos.settings import modo_debug, ruta_db
 
 
 class MiFormulario(QtWidgets.QDialog):
-
     def __init__(self, parent=None, dbSeries=None):
         QtWidgets.QWidget.__init__(self, parent)
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
-        self.EstadoI = 'Ok'  # estado inicial
-        self.EstadoF = 'Cancelado'  # final
-        self.EstadoA = self.EstadoI  # actual
+        self.estadoI = 'Ok'  # estado inicial
+        self.estadoF = 'Cancelado'  # final
+        self.estadoA = self.estadoI  # actual
         self.db = dbSeries
 
         # lista de consultas que se ejecutaran al final
-        self.QueryCompleta = str()
+        self.queryCompleta = str()
 
         self.setWindowTitle('Modificaciones en masa')
         # esto permite selecionar multiples
         self.ui.listWidget.setSelectionMode(
             QtWidgets.QAbstractItemView.ExtendedSelection)
 
-        self.__sacaSeries()
+        self.sacaSeries()
 
-        self.ui.radioButtonAct.clicked.connect(self.__seriesActuales)
-        self.ui.radioButtonTemp.clicked.connect(self.__seriesTemporales)
-        self.ui.radioButtonPausada.clicked.connect(self.__seriesPausadas)
-        self.ui.radioButtonTodas.clicked.connect(self.__seriesTodas)
-        self.ui.pushButtonRefresh.clicked.connect(self.__sacaSeries)
+        self.ui.radioButtonAct.clicked.connect(self.seriesActuales)
+        self.ui.radioButtonTemp.clicked.connect(self.seriesTemporales)
+        self.ui.radioButtonPausada.clicked.connect(self.seriesPausadas)
+        self.ui.radioButtonTodas.clicked.connect(self.seriesTodas)
+        self.ui.pushButtonRefresh.clicked.connect(self.sacaSeries)
 
-        self.ui.pushButtonAnadir.clicked.connect(self.__printCurrentItems)
+        self.ui.pushButtonAnadir.clicked.connect(self.printCurrentItems)
 
-        self.ui.pushButtonAplicar.clicked.connect(self.__aplicaDatos)
-        self.ui.pushButtonCerrar.clicked.connect(self.__cancela)
-        self.ui.pushButtonAceptar.clicked.connect(self.__aceptaDatos)
+        self.ui.pushButtonAplicar.clicked.connect(self.aplicaDatos)
+        self.ui.pushButtonCerrar.clicked.connect(self.cancela)
+        self.ui.pushButtonAceptar.clicked.connect(self.aceptaDatos)
 
-    def __sacaSeries(self):
-        '''
+    def sacaSeries(self):
+        """
         Saca todas las series de la bd y las mete en una lista de diccionarios accesible en todo el objeto
-        '''
+        """
         query = 'SELECT * FROM Series ORDER BY Nombre'
         self.seriesTest = conectionSQLite(self.db, query, True)
         self.ui.radioButtonAct.setChecked(True)
         # lo ejecuto al principio ya que es el activado por defecto
-        self.__seriesActuales()
+        self.seriesActuales()
 
-    def __seriesActuales(self):
-        '''
+    def seriesActuales(self):
+        """
         Creo una lista con todas las series que estoy siguiendo
-        '''
+        """
 
         self.ui.listWidget.clear()
         for i in self.seriesTest:
@@ -64,10 +63,10 @@ class MiFormulario(QtWidgets.QDialog):
                 item.setText(i['Nombre'])
                 self.ui.listWidget.addItem(item)
 
-    def __seriesTemporales(self):
-        '''
+    def seriesTemporales(self):
+        """
         Creo una lista con todas las series que han acabado temporada
-        '''
+        """
 
         self.ui.listWidget.clear()
         for i in self.seriesTest:
@@ -76,10 +75,10 @@ class MiFormulario(QtWidgets.QDialog):
                 item.setText(i['Nombre'])
                 self.ui.listWidget.addItem(item)
 
-    def __seriesPausadas(self):
-        '''
+    def seriesPausadas(self):
+        """
         Creo una lista con todas las series que han acabado temporada
-        '''
+        """
 
         self.ui.listWidget.clear()
         for i in self.seriesTest:
@@ -88,10 +87,10 @@ class MiFormulario(QtWidgets.QDialog):
                 item.setText(i['Nombre'])
                 self.ui.listWidget.addItem(item)
 
-    def __seriesTodas(self):
-        '''
+    def seriesTodas(self):
+        """
         Creo una lista con todas las series
-        '''
+        """
 
         self.ui.listWidget.clear()
         for i in self.seriesTest:
@@ -99,58 +98,58 @@ class MiFormulario(QtWidgets.QDialog):
             item.setText(i['Nombre'])
             self.ui.listWidget.addItem(item)
 
-    def __printCurrentItems(self):
-        '''
+    def printCurrentItems(self):
+        """
         Coge todas las series seleccionadas y las mete en una lista con su respectiva consulta para despues ejecutarlas
-        '''
+        """
 
         for i in self.ui.listWidget.selectedItems():
             if self.ui.radioButtonAcabaT.isChecked():
-                query = '''UPDATE series SET Temporada=Temporada+1, Capitulo="00", Estado="En Espera" WHERE Nombre
-                    LIKE "{}";\n'''.format(i.text())
-                self.QueryCompleta += query
+                query = """UPDATE series SET Temporada=Temporada+1, Capitulo="00", Estado="En Espera" WHERE Nombre
+                    LIKE "{}";\n""".format(i.text())
+                self.queryCompleta += query
 
             elif self.ui.radioButtonEmpieza.isChecked():
                 query = 'UPDATE series SET Capitulo="01", Estado="Activa" WHERE Nombre LIKE "{}";\n'.format(
                     i.text())
-                self.QueryCompleta += query
+                self.queryCompleta += query
 
             elif self.ui.radioButtonEspera.isChecked():
                 query = 'UPDATE series SET Estado="Pausada" WHERE Nombre LIKE "{}";\n'.format(
                     i.text())
-                self.QueryCompleta += query
+                self.queryCompleta += query
 
             elif self.ui.radioButtonFinalizada.isChecked():
                 query = 'UPDATE series SET Estado="Finalizada", Acabada="Si" WHERE Nombre LIKE "{}";\n'.format(
                     i.text())
-                self.QueryCompleta += query
+                self.queryCompleta += query
 
         if modo_debug:
-            print((self.QueryCompleta))
+            print((self.queryCompleta))
 
-    def __aplicaDatos(self):
-        '''
+    def aplicaDatos(self):
+        """
         Ejecuta todas las consultas que hay en la lista
-        '''
+        """
 
         if modo_debug:
-            print((self.QueryCompleta))
+            print((self.queryCompleta))
 
-        ejecutaScriptSqlite(self.db, self.QueryCompleta)
+        ejecutaScriptSqlite(self.db, self.queryCompleta)
 
-        self.QueryCompleta = str()
+        self.queryCompleta = str()
         return True
 
-    def __cancela(self):
-        '''
+    def cancela(self):
+        """
         Establece el estado actual en cancelado para retornar None y ejecuta reject
-        '''
+        """
 
-        self.EstadoA = self.EstadoF
+        self.estadoA = self.estadoF
         self.reject()
 
-    def __aceptaDatos(self):
-        if self.__aplicaDatos():
+    def aceptaDatos(self):
+        if self.aplicaDatos():
             self.accept()
 
     @staticmethod
