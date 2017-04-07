@@ -11,8 +11,8 @@ import subprocess
 import os
 
 import requests
-import telebot              # Importamos la librería
-from telebot import types   # Y los tipos especiales de esta
+import telebot  # Importamos la librería
+from telebot import types  # Y los tipos especiales de esta
 from bs4 import BeautifulSoup
 
 try:  # Ejecucion desde Series.py
@@ -27,8 +27,7 @@ def datosIniciales():
     with open(r'{}/id.conf'.format(directorio_local), 'r') as f:
         id_fich = f.readline().replace('/n', '')
 
-    query = 'SELECT * FROM Configuraciones, Credenciales WHERE ID LIKE {} LIMIT 1'.format(
-        id_fich)
+    query = 'SELECT * FROM Configuraciones, Credenciales WHERE ID LIKE {} LIMIT 1'.format(id_fich)
     return conectionSQLite(ruta_db, query, True)[0]
 
 
@@ -38,14 +37,14 @@ usuariosPermitidos = [33063767, 40522670]
 bot = telebot.TeleBot(credenciales['api_telegram'])
 pass_transmission = credenciales['pass_transmission']
 
-
 dicc_botones = {
-    'cgs': 'cron Gestor Series',
-    'log': 'vaciar log series',
-    'mount': 'mount -a',
-    'sys': 'reboot system',
-    'ts': 'reboot transmission',
-    'exit': 'exit',
+    'cgs': '/cron_Gestor_Series',
+    'log': '/empty_log',
+    'mount': '/mount',
+    'rar': '/descomprime',
+    'sys': '/reboot_system',
+    'ts': '/reboot_transmission',
+    'exit': '/exit',
 }
 
 
@@ -65,13 +64,13 @@ def checkError(codigo, stderr):
 
 
 def descargaTorrent(direcc, message):  # PARA NEWPCT1
-    '''
+    """
     Funcion que obtiene la url torrent del la dirreccion que recibe
 
     :param str direcc: Dirreccion de la pagina web que contiene el torrent
 
     :return str: Nos devuelve el string con la url del torrent
-    '''
+    """
     if re.search("newpct1", direcc):
         bot.reply_to(message, 'Buscando torrent en newpct1')
         session = requests.session()
@@ -80,6 +79,8 @@ def descargaTorrent(direcc, message):  # PARA NEWPCT1
         return sopa.find('div', {"id": "tab1"}).a['href']
 
     elif re.search("tumejortorrent", direcc):
+        # han cambiado la pagina, modifico tumejortorrent por newpct1
+        """
         bot.reply_to(message, 'Buscando torrent en tumejortorrent')
         session = requests.session()
         page = session.get(direcc, verify=False).text
@@ -87,12 +88,15 @@ def descargaTorrent(direcc, message):  # PARA NEWPCT1
         # print(sopa.findAll('div', {"id": "tab1"}))
         print(sopa.find_all("a", class_="btn-torrent")[0]['href'])
         return sopa.find('div', {"id": "tab1"}).a['href']
+        """
+        return descargaTorrent(direcc.replace("tumejortorrent", "newpct1"), message)
 
 
 def descargaFichero(url, destino):
     r = requests.get(url)
     with open(destino, "wb") as code:
         code.write(r.content)
+
 
 # Handle always first "/start" message when new chat with your bot is created
 
@@ -115,51 +119,46 @@ def command_system(message):
 
     markup = types.ReplyKeyboardMarkup(one_time_keyboard=True)
     markup.row(dicc_botones['cgs'], dicc_botones['log'], dicc_botones['mount'])
-    markup.row(dicc_botones['ts'], dicc_botones['sys'])
+    markup.row(dicc_botones['rar'], dicc_botones['ts'], dicc_botones['sys'])
     markup.row(dicc_botones['exit'])
 
-    bot.send_message(
-        message.chat.id, "Escoge una opcion: ", reply_markup=markup)
+    bot.send_message(message.chat.id, "Escoge una opcion: ", reply_markup=markup)
 
 
-@bot.message_handler(func=lambda message: message.chat.id == administrador, commands=['cron_gestor_series'])
+@bot.message_handler(func=lambda message: message.chat.id == administrador, commands=['/cron_Gestor_Series'])
 def send_cgs(message):
     bot.reply_to(message, 'Ejecutado con gs')
 
     comando = 'cd /home/pi/Gestor-de-Series/ && /usr/bin/python3 /home/pi/Gestor-de-Series/descarga_automatica_cli.py'
-    ejecucion = subprocess.Popen(
-        comando, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    ejecucion = subprocess.Popen(comando, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = ejecucion.communicate()
-    #stdout = formatea(stdout) # sino stdout esta en bytes
+    # stdout = formatea(stdout) # sino stdout esta en bytes
 
     if checkError(ejecucion, stderr):
         bot.reply_to(message, 'Error: {}'.format(stderr))
         return
     elif len(stdout) == 0:
-        bot.reply_to(
-            message, 'Ejecutado, puede que haya fallado o sea muy largo el resultado')
+        bot.reply_to(message, 'Ejecutado, puede que haya fallado o sea muy largo el resultado')
     else:
         bot.reply_to(message, stdout)
 
 
-@bot.message_handler(func=lambda message: message.chat.id == administrador, commands=['variar_log'])
+@bot.message_handler(func=lambda message: message.chat.id == administrador, commands=['/empty_log'])
 def send_log(message):
-
     fichero = '{}/log/{}'.format(directorio_trabajo, credenciales['FicheroFeedNewpct'])
 
     with open(fichero, 'w'):
         pass
-    
+
     bot.reply_to(message, 'Log vaciado')
 
 
-@bot.message_handler(func=lambda message: message.chat.id == administrador, commands=['mount_a'])
+@bot.message_handler(func=lambda message: message.chat.id == administrador, commands=['/mount'])
 def send_mount(message):
     comando = 'sudo mount -a'
-    ejecucion = subprocess.Popen(
-        comando, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    ejecucion = subprocess.Popen(comando, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = ejecucion.communicate()
-    stdout = formatea(stdout) # sino stdout esta en bytes
+    stdout = formatea(stdout)  # sino stdout esta en bytes
 
     if checkError(ejecucion, stderr):
         bot.reply_to(message, 'Error: {}'.format(stderr))
@@ -170,13 +169,30 @@ def send_mount(message):
         bot.reply_to(message, stdout)
 
 
+@bot.message_handler(func=lambda message: message.chat.id == administrador, commands=['/descomprime'])
+def send_descomprime(message):
+    bot.reply_to(message, 'Ejecutado unrar')
+
+    comando = "cd /home/pi/Gestor-de-Series/modulos/ && /usr/bin/python3 /home/pi/Gestor-de-Series/modulos/descomprime_rar.py"
+    ejecucion = subprocess.Popen(comando, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = ejecucion.communicate()
+    # stdout = formatea(stdout) # sino stdout esta en bytes
+
+    if checkError(ejecucion, stderr):
+        bot.reply_to(message, 'Error: {}'.format(stderr))
+        return
+    elif len(stdout) == 0:
+        bot.reply_to(message, 'Ejecutado, puede que haya fallado o sea muy largo el resultado')
+    else:
+        bot.reply_to(message, stdout)
+
+
 @bot.message_handler(func=lambda message: message.chat.id == administrador, commands=['reboot_transmission'])
 def send_ts(message):
     comando = 'sudo /etc/init.d/transmission-daemon restart'
-    ejecucion = subprocess.Popen(
-        comando, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    ejecucion = subprocess.Popen(comando, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = ejecucion.communicate()
-    stdout = formatea(stdout) # sino stdout esta en bytes
+    stdout = formatea(stdout)  # sino stdout esta en bytes
 
     if checkError(ejecucion, stderr):
         bot.reply_to(message, 'Error: {}'.format(stderr))
@@ -192,10 +208,9 @@ def send_sys(message):
     bot.reply_to(message, 'Se ejecutara en breve el reboot')
 
     comando = 'sudo reboot'
-    ejecucion = subprocess.Popen(
-        comando, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    ejecucion = subprocess.Popen(comando, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = ejecucion.communicate()
-    stdout = formatea(stdout) # sino stdout esta en bytes
+    stdout = formatea(stdout)  # sino stdout esta en bytes
 
     if checkError(ejecucion, stderr):
         bot.reply_to(message, 'Error: {}'.format(stderr))
@@ -205,10 +220,9 @@ def send_sys(message):
 @bot.message_handler(func=lambda message: message.chat.id == administrador, commands=['df_h'])
 def send_df(message):
     comando = 'df -h'
-    ejecucion = subprocess.Popen(
-        comando, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    ejecucion = subprocess.Popen(comando, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = ejecucion.communicate()
-    stdout = formatea(stdout) # sino stdout esta en bytes
+    stdout = formatea(stdout)  # sino stdout esta en bytes
 
     if checkError(ejecucion, stderr):
         bot.reply_to(message, 'Error: {}'.format(stderr))
@@ -223,10 +237,9 @@ def send_df(message):
 def send_info(message):
     # uptime, cpu, ram, disk, speed download/upload
     comando = 'pwd'
-    ejecucion = subprocess.Popen(
-        comando, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    ejecucion = subprocess.Popen(comando, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = ejecucion.communicate()
-    stdout = formatea(stdout) # sino stdout esta en bytes
+    stdout = formatea(stdout)  # sino stdout esta en bytes
 
     if checkError(ejecucion, stderr):
         bot.reply_to(message, 'Error: {}'.format(stderr))
@@ -239,13 +252,11 @@ def send_info(message):
 
 @bot.message_handler(func=lambda message: message.chat.id == administrador, commands=['show_torrent'])
 def send_show_torrent(message):
-    #f = os.popen('transmission-remote --auth=pi:{} -l | egrep -v "Finished|Stopped|Seeding|ID|Sum:" |  awk \'{print $2}{for(i=13; i<=NF; i++) printf "%s",$i (i==NF?ORS:OFS)}\''.format(pass_transmission))
     comando = 'transmission-remote 127.0.0.1:9091 --auth=pi:{} -l | egrep -v "Finished|Stopped|Seeding|ID|Sum:"'.format(
         pass_transmission)
-    ejecucion = subprocess.Popen(
-        comando, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    ejecucion = subprocess.Popen(comando, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = ejecucion.communicate()
-    stdout = formatea(stdout) # sino stdout esta en bytes
+    stdout = formatea(stdout)  # sino stdout esta en bytes
 
     if checkError(ejecucion, stderr):
         bot.reply_to(message, 'Error: {}'.format(stderr))
@@ -253,7 +264,8 @@ def send_show_torrent(message):
     elif len(stdout) != 0:
         for line in stdout:
             line = re.sub(
-                '\[AC3 5\.1-Castellano-AC3 5.1 Ingles\+Subs\]|\[ES-EN\]|\[AC3 5.1 Español Castellano\]|\[HDTV 720p?\]|(\d+\.?\d+|None)( )+(MB|GB|kB|Unknown).*(Up & Down|Downloading|Queued|Idle|Uploading)( )*| - Temporada \d+ |(\d+\.\d+)( )+(\d+\.\d+)', '', stdout)
+                '\[AC3 5\.1-Castellano-AC3 5.1 Ingles\+Subs\]|\[ES-EN\]|\[AC3 5.1 Español Castellano\]|\[HDTV 720p?\]|(\d+\.?\d+|None)( )+(MB|GB|kB|Unknown).*(Up & Down|Downloading|Queued|Idle|Uploading)( )*| - Temporada \d+ |(\d+\.\d+)( )+(\d+\.\d+)',
+                '', stdout)
         bot.reply_to(message, line)
     else:
         bot.reply_to(message, 'Ningun torrent activo en este momento.')
@@ -262,10 +274,9 @@ def send_show_torrent(message):
 @bot.message_handler(func=lambda message: message.chat.id == administrador, commands=['exit'])
 def send_exit(message):
     comando = 'pwd'
-    ejecucion = subprocess.Popen(
-        comando, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    ejecucion = subprocess.Popen(comando, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = ejecucion.communicate()
-    stdout = formatea(stdout) # sino stdout esta en bytes
+    stdout = formatea(stdout)  # sino stdout esta en bytes
 
     if checkError(ejecucion, stderr):
         bot.reply_to(message, 'Error: {}'.format(stderr))
@@ -283,10 +294,9 @@ def handle_cmd(message):
     comando = re.sub('[Cc]md: ', '', message.text)
     if comando not in peligro:
 
-        ejecucion = subprocess.Popen(
-            comando, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        ejecucion = subprocess.Popen(comando, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         stdout, stderr = ejecucion.communicate()
-        stdout = formatea(stdout) # sino stdout esta en bytes
+        stdout = formatea(stdout)  # sino stdout esta en bytes
 
         if checkError(ejecucion, stderr):
             bot.reply_to(message, 'Error: {}'.format(stderr))
@@ -303,12 +313,10 @@ def handle_cmd(message):
 def handle_magnet(message):
     bot.reply_to(message, 'Ejecutado add torrent')
 
-    comando = 'transmission-remote 127.0.0.1:9091 --auth=pi:{} --add "{}"'.format(
-        pass_transmission, message.text)
-    ejecucion = subprocess.Popen(
-        comando, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    comando = 'transmission-remote 127.0.0.1:9091 --auth=pi:{} --add "{}"'.format(pass_transmission, message.text)
+    ejecucion = subprocess.Popen(comando, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = ejecucion.communicate()
-    stdout = formatea(stdout) # sino stdout esta en bytes
+    stdout = formatea(stdout)  # sino stdout esta en bytes
 
     if modo_debug:
         print(comando)
@@ -327,8 +335,7 @@ def handle_newpct1(message):
     if regexGenero:  # si hay find continua, sino retorno None el re.search
         urlPeli = message.text
     else:
-        urlPeli = re.sub('(http://)?www.newpct1.com/',
-                         'http://www.newpct1.com/descarga-torrent/', message.text)
+        urlPeli = re.sub('(http://)?www.newpct1.com/', 'http://www.newpct1.com/descarga-torrent/', message.text)
 
     url = descargaTorrent(urlPeli, message)
     if url is not None:
@@ -336,15 +343,14 @@ def handle_newpct1(message):
         descargaFichero(url, fich)
 
         file_data = open(fich, 'rb')
-        bot.send_document(message.chat.id,  file_data)
+        bot.send_document(message.chat.id, file_data)
         if message.chat.id == administrador:
-            os.rename(
-                fich, '{}/file.torrent'.format(credenciales['RutaDescargas']))
+            os.rename(fich, '{}/file.torrent'.format(credenciales['RutaDescargas']))
         else:
             pass
         with open('/tmp/descarga_torrent.log', "a") as f:
-            f.write('{}, {}, {} -> {}\n'.format(message.chat.id,
-                                                message.chat.first_name, message.chat.username, message.text))
+            f.write('{}, {}, {} -> {}\n'.format(message.chat.id, message.chat.first_name, message.chat.username,
+                                                message.text))
 
 
 @bot.message_handler(func=lambda message: message.chat.id == administrador, content_types=["text"])
@@ -378,8 +384,7 @@ def my_photo(message):
 @bot.message_handler(func=lambda message: message.chat.id == administrador, content_types=["voice"])
 def my_voice(message):
     if message.reply_to_message:
-        bot.send_voice(
-            message.chat.id, message.voice.file_id, duration=message.voice.duration)
+        bot.send_voice(message.chat.id, message.voice.file_id, duration=message.voice.duration)
     else:
         bot.send_message(message.chat.id, "No one to reply voice!")
 
@@ -388,13 +393,12 @@ def my_voice(message):
 def my_document(message):
     if message.document.mime_type == 'application/x-bittorrent':
         file_info = bot.get_file(message.document.file_id)
-        #bot.send_message(message.chat.id, 'https://api.telegram.org/file/bot{0}/{1}'.format(TOKEN, file_info.file_path))
+        # bot.send_message(message.chat.id, 'https://api.telegram.org/file/bot{0}/{1}'.format(TOKEN, file_info.file_path))
         file = requests.get(
             'https://api.telegram.org/file/bot{0}/{1}'.format(credenciales['api_telegram'], file_info.file_path))
         with open('/home/pi/Downloads/{}.torrent'.format(message.document.file_id), "wb") as code:
             code.write(file.content)
-        bot.reply_to(
-            message, 'Descargando torrent: "{}"'.format(message.document.file_name))
+        bot.reply_to(message, 'Descargando torrent: "{}"'.format(message.document.file_name))
         send_show_torrent(message)
     else:
         bot.reply_to(message, 'Aun no he implementado este tipo de ficheros: "{}"'.format(
