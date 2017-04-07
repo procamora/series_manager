@@ -111,6 +111,12 @@ def command_start(message):
 @bot.message_handler(commands=["help"])
 def command_help(message):
     bot.send_message(message.chat.id, "Aqui pondre todas las opciones")
+    markup = types.InlineKeyboardMarkup()
+    itembtna = types.InlineKeyboardButton('Github', url="https://github.com/procamora/Gestor-Series")
+    itembtnv = types.InlineKeyboardButton('Documentacion',
+                                          url="https://github.com/procamora/Gestor-Series/blob/master/README.md")
+    markup.row(itembtna, itembtnv)
+    bot.send_message(message.chat.id, "Aqui pondre todas las opciones", reply_markup=markup)
 
 
 @bot.message_handler(commands=["system"])
