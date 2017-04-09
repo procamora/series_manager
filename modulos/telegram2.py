@@ -32,7 +32,6 @@ class TG2():
     def makeRequest(self, method_name, method='post', params=None, files=None):
         """
         Makes a request to the Telegram API.
-        :param token: The bot's API token. (Created with @BotFather)
         :param method_name: Name of the API method to be called. (E.g. 'getUpdates')
         :param method: HTTP method to be used. Defaults to 'get'.
         :param params: Optional parameters. Should be a dictionary with key-value pairs.

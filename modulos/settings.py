@@ -3,13 +3,14 @@
 import os
 import platform
 
+from .constantes import sync_gdrive, sync_sqlite, nombre_db
+
 modo_debug = True
 gdrive = 0
 sistema = platform.system()
-nombre_db = 'Series.db'
 
-opcion1 = '{}/sync.cnf'.format(os.path.dirname(os.path.realpath(__file__)))
-opcion2 = '{}/../sync.cnf'.format(os.path.dirname(os.path.realpath(__file__)))
+opcion1 = '{}/{}'.format(os.path.dirname(os.path.realpath(__file__)), sync_gdrive)
+opcion2 = '{}/../{}'.format(os.path.dirname(os.path.realpath(__file__)), sync_gdrive)
 
 os.path.dirname(os.path.realpath(__file__))
 if os.path.exists(opcion1):

@@ -24,34 +24,6 @@ from modulos.settings import modo_debug, directorio_trabajo, ruta_db
 import funciones
 
 
-def muestraNotificaciones():
-    """
-    poner las api de la base de datos
-    """
-    queryN = 'SELECT * FROM Notificaciones'
-    Datos = conectionSQLite(ruta_db, queryN, True)
-
-    global tg3, pb3, ml3, api_ml3
-
-    for i in Datos:
-        if i['Activo'] == 'True':
-            if i['Nombre'] == 'Telegram':
-                tg3 = TG2(i['API'])
-
-            elif i['Nombre'] == 'Pushbullet':
-                pb3 = PB2(i['API'])
-
-            elif i['Nombre'] == 'Email':
-                ml3 = ML2('test1notificaciones@gmail.com', 'i(!f!Boz_A&YLY]q')
-                api_ml3 = api_ml3
-
-    return Datos
-
-
-global notificaciones
-notificaciones = muestraNotificaciones()
-
-
 # https://gist.github.com/kaotika/e8ca5c340ec94f599fb2
 
 
@@ -137,7 +109,7 @@ class mythread(QtCore.QThread):
             # actualiza los dias en los que sale el capitulo
             ejecutaScriptSqlite(self.db, self.actualizaDia)
 
-            for notif in notificaciones:
+            for notif in MiFormulario.notificaciones:
                 if notif['Activo'] == 'True':
                     if notif['Nombre'] == 'Telegram':
                         tg3.sendTg(self.listaNotificaciones)
@@ -325,6 +297,8 @@ class MiFormulario(QtWidgets.QDialog):
         self.setWindowTitle('Descarga automatica de newpct1')
         self.ui.progressBar.setValue(self.n)
 
+        self.notificaciones = self.muestraNotificaciones()  # variable publica
+
         query = """SELECT Nombre, Temporada, Capitulo, VOSE FROM Series WHERE Siguiendo = "Si" ORDER BY Nombre ASC"""
         self.series = conectionSQLite(self.db, query, True)
 
@@ -342,8 +316,32 @@ class MiFormulario(QtWidgets.QDialog):
         self.ui.textEditVistas.append(str(self.series[self.n]['Nombre']))
         self.n += 1
         if modo_debug:
-            print((self.n))
+            print(self.n)
         self.ui.progressBar.setValue(self.n)
+
+    @staticmethod
+    def muestraNotificaciones():
+        """
+        poner las api de la base de datos
+        """
+        queryN = 'SELECT * FROM Notificaciones'
+        Datos = conectionSQLite(ruta_db, queryN, True)
+
+        global tg3, pb3, ml3, api_ml3
+
+        for i in Datos:
+            if i['Activo'] == 'True':
+                if i['Nombre'] == 'Telegram':
+                    tg3 = TG2(i['API'])
+
+                elif i['Nombre'] == 'Pushbullet':
+                    pb3 = PB2(i['API'])
+
+                elif i['Nombre'] == 'Email':
+                    ml3 = ML2('test1notificaciones@gmail.com', 'i(!f!Boz_A&YLY]q')
+                    api_ml3 = api_ml3
+
+        return Datos
 
     @staticmethod
     def getDatos(parent=None, dbSeries=None):

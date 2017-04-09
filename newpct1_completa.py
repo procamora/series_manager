@@ -8,7 +8,7 @@ import sys
 import requests
 import time
 
-from abrt_exception_handler3 import send
+#from abrt_exception_handler3 import send
 from bs4 import BeautifulSoup
 from PyQt5 import QtWidgets, QtCore
 
@@ -128,11 +128,9 @@ class MiFormulario(QtWidgets.QDialog):
             self.envioTg = False
 
     def update(self):
-        # self.ui.textEdit.append('{} {}x{}'.format(str(self.ui.lineTitulo.text()).lower().replace(' ', '-'), str(self.ui.lineTemp.text()), self.n+1))
         self.n += 1
         if modo_debug:
-            pass
-        # sprint((self.n))
+            print(self.n)
         self.ui.progressBar.setValue(self.n)
 
     def campoTemporada(self):

@@ -22,6 +22,7 @@ class MiFormulario(QtWidgets.QDialog):
 
         # str de consultas que se ejecutaran al final
         self.QueryCompleta = str()
+        self.actuales = list()
 
         self.setWindowTitle('Estado de series Activas')
 
@@ -52,13 +53,16 @@ class MiFormulario(QtWidgets.QDialog):
         query = """SELECT Nombre FROM Series WHERE Estado LIKE "En Espera" AND Capitulo LIKE 0"""
         self.DatSeriesEmpiezanTemporada = conectionSQLite(self.db, query, True)
 
-        query = """SELECT ID, Nombre, Estado, imdb_Finaliza FROM Series WHERE imdb_Finaliza <> "????" AND Capitulo LIKE imdb_Capitulos AND Estado <> 'Finalizada'"""
+        query = """SELECT ID, Nombre, Estado, imdb_Finaliza FROM Series WHERE imdb_Finaliza <> "????" AND Capitulo 
+        LIKE imdb_Capitulos AND Estado <> 'Finalizada'"""
         self.DatSerieFinalizada = conectionSQLite(self.db, query, True)
 
-        query = """SELECT ID, Nombre, Estado, imdb_Finaliza FROM Series WHERE imdb_Finaliza LIKE "????" AND Capitulo LIKE imdb_Capitulos"""
+        query = """SELECT ID, Nombre, Estado, imdb_Finaliza FROM Series WHERE imdb_Finaliza LIKE "????" AND Capitulo 
+        LIKE imdb_Capitulos"""
         self.DatTemporadaAcabada = conectionSQLite(self.db, query, True)
 
-        query = """SELECT ID, Nombre, Temporada, Capitulo, imdb_Temporada, imdb_Capitulos FROM Series WHERE Estado LIKE "Finalizada" AND Acabada LIKE "Si" AND (Capitulo <> imdb_Capitulos OR Temporada <> imdb_Temporada)"""
+        query = """SELECT ID, Nombre, Temporada, Capitulo, imdb_Temporada, imdb_Capitulos FROM Series WHERE Estado 
+        LIKE "Finalizada" AND Acabada LIKE "Si" AND (Capitulo <> imdb_Capitulos OR Temporada <> imdb_Temporada)"""
         self.DatSeriesFinalizadas = conectionSQLite(self.db, query, True)
 
         self.ui.radioButtonFinalizada.setChecked(True)
@@ -66,8 +70,9 @@ class MiFormulario(QtWidgets.QDialog):
         self.serieFinalizada()
 
         query = """SELECT * FROM Credenciales"""
-        datos = conectionSQLite(self.db, query, True)[0]
-        self.actuales = conectTviso(datos['user_tviso'], datos['pass_tviso'])
+        datos = conectionSQLite(self.db, query, True)
+        if len(datos) > 0:
+            self.actuales = conectTviso(datos[0]['user_tviso'], datos[0]['pass_tviso'])
 
     def botonSiguiendo(self, seriesTest):
         """
@@ -101,7 +106,7 @@ class MiFormulario(QtWidgets.QDialog):
         """
 
         if modo_debug:
-            print((self.QueryCompleta))
+            print(self.QueryCompleta)
 
         ejecutaScriptSqlite(self.db, self.QueryCompleta)
 
@@ -166,7 +171,8 @@ class MiFormulario(QtWidgets.QDialog):
         for i in self.ui.listWidget.selectedItems():
 
             if self.ui.radioButtonAcabaT.isChecked():
-                query = """UPDATE series SET Temporada=Temporada+1, Capitulo="00", Estado="En Espera" WHERE Nombre Like "{}";""".format(
+                query = """UPDATE series SET Temporada=Temporada+1, Capitulo="00", Estado="En Espera" 
+                WHERE Nombre Like "{}";""".format(
                     i.text())
                 self.QueryCompleta += '\n' + query
 
@@ -175,7 +181,8 @@ class MiFormulario(QtWidgets.QDialog):
                 self.QueryCompleta += '\n' + query
 
             elif self.ui.radioButtonFinalizada.isChecked():
-                query = """UPDATE series SET Estado="Finalizada", Acabada="Si", Siguiendo="No" WHERE Nombre Like "{}";""".format(
+                query = """UPDATE series SET Estado="Finalizada", Acabada="Si", Siguiendo="No" 
+                WHERE Nombre Like "{}";""".format(
                     i.text())
                 self.QueryCompleta += '\n' + query
 

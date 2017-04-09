@@ -55,7 +55,7 @@ def descomprime(fichero):
 
     rar.extract(member=peli, path=dir)
     os.remove(fichero)
-    # rar.extractall(path=dir, pwd=passwd)
+    #rar.extractall(path=dir, pwd=passwd)
 
 
 def main(ruta):

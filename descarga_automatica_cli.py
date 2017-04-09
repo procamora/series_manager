@@ -20,34 +20,6 @@ from modulos.settings import modo_debug, directorio_trabajo, ruta_db
 import funciones
 
 
-def muestraNotificaciones():
-    """
-    poner las api de la base de datos
-    """
-    queryN = 'SELECT * FROM notificaciones'
-    Datos = conectionSQLite(ruta_db, queryN, True)
-
-    global tg3, pb3, ml3, api_ml3
-
-    for i in Datos:
-        if i['Activo'] == 'True':
-            if i['Nombre'] == 'Telegram':
-                tg3 = TG2(i['API'])
-
-            elif i['Nombre'] == 'Pushbullet':
-                pb3 = PB2(i['API'])
-
-            elif i['Nombre'] == 'Email':
-                ml3 = ML2('test1notificaciones@gmail.com', 'i(!f!Boz_A&YLY]q')
-                api_ml3 = api_ml3
-
-    return Datos
-
-
-global notificaciones
-notificaciones = muestraNotificaciones()
-
-
 # https://gist.github.com/kaotika/e8ca5c340ec94f599fb2
 
 
@@ -57,6 +29,8 @@ class MiFormulario():
             self.Otra = 'otra'  # campo otra del formulario
             self.EstadoI = 'Ok'  # estado inicial
             self.db = dbSeries
+
+            self.notificaciones = self.muestraNotificaciones()  # variable publica
 
             # query = 'SELECT Nombre, Temporada, Capitulo, VOSE FROM Series WHERE Siguiendo = "Si" AND ((VOSE = "No" AND Estado="Activa" AND Capitulo <> 0) OR (VOSE = "Si")) ORDER BY Nombre'
             # self.query = 'SELECT Nombre, Temporada, Capitulo, VOSE FROM Series WHERE Siguiendo = "Si" AND ((VOSE = "No" AND Estado="Activa" AND Capitulo <> 0) OR (VOSE = "Si" AND Capitulo <> 0)) ORDER BY Nombre ASC'
@@ -303,6 +277,30 @@ class MiFormulario():
         sopa = BeautifulSoup(page, 'html.parser')
 
         return sopa.find('span', id="content-torrent").a['href']
+
+    @staticmethod
+    def muestraNotificaciones():
+        """
+        poner las api de la base de datos
+        """
+        queryN = 'SELECT * FROM notificaciones'
+        Datos = conectionSQLite(ruta_db, queryN, True)
+
+        global tg3, pb3, ml3, api_ml3
+
+        for i in Datos:
+            if i['Activo'] == 'True':
+                if i['Nombre'] == 'Telegram':
+                    tg3 = TG2(i['API'])
+
+                elif i['Nombre'] == 'Pushbullet':
+                    pb3 = PB2(i['API'])
+
+                elif i['Nombre'] == 'Email':
+                    ml3 = ML2('test1notificaciones@gmail.com', 'i(!f!Boz_A&YLY]q')
+                    api_ml3 = api_ml3
+
+        return Datos
 
 
 def main():

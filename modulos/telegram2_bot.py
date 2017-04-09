@@ -68,6 +68,7 @@ def descargaTorrent(direcc, message):  # PARA NEWPCT1
     Funcion que obtiene la url torrent del la dirreccion que recibe
 
     :param str direcc: Dirreccion de la pagina web que contiene el torrent
+    :param obj message: instancia del mensaje recibido
 
     :return str: Nos devuelve el string con la url del torrent
     """

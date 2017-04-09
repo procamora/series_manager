@@ -21,7 +21,7 @@ class MiFormulario(QtWidgets.QDialog):
         self.estadoA = self.estadoI  # actual
         self.db = dbSeries
         self.ruta = directorio_local
-        funciones.creaDirectorioTrabajo()
+
         self.setWindowTitle('Preferencias de configuracion')
         self.ui.tabWidget.setCurrentIndex(0)
 
@@ -29,16 +29,20 @@ class MiFormulario(QtWidgets.QDialog):
 
         # recogo todos los dias de la caja y le paso el indice del dia en el
         # que sale
-        allItems = [self.ui.BoxId.itemText(i)
-                    for i in range(self.ui.BoxId.count())]
+        allItems = [self.ui.BoxId.itemText(i) for i in range(self.ui.BoxId.count())]
+
+        print((allItems))
         with open(r'{}/id.conf'.format(self.ruta), 'r') as f:
             id_fich = f.readline().replace('/n', '')
 
         try:
             self.ui.BoxId.setCurrentIndex(allItems.index(id_fich))
-        except:
-            # si da error por algun motivo pongo el primero
-            self.ui.BoxId.setCurrentIndex(allItems.index('1'))
+        except ValueError:
+            if len(allItems) == 1: # si solo hay 1 es 'Otra'
+                self.ui.BoxId.setCurrentIndex(allItems.index(self.otra))
+            else:
+                # si da error por algun motivo pongo el primero
+                self.ui.BoxId.setCurrentIndex(allItems.index('1'))
 
         self.procesosComunes()
 
@@ -60,10 +64,9 @@ class MiFormulario(QtWidgets.QDialog):
         """
 
         # filenames = QtGui.QFileDialog.getOpenFileName()
-        filenames = QtWidgets.QFileDialog.getExistingDirectory(self, "Open Directory",
-                                                               str(self.ui.lineRuta.text(
-                                                               )),
-                                                               QtWidgets.QFileDialog.ShowDirsOnly | QtWidgets.QFileDialog.DontResolveSymlinks)
+        filenames = QtWidgets.QFileDialog.getExistingDirectory(self, "Open Directory", str(self.ui.lineRuta.text()),
+                                                               QtWidgets.QFileDialog.ShowDirsOnly |
+                                                               QtWidgets.QFileDialog.DontResolveSymlinks)
 
         if filenames is not None:
             # if not (filenames.isNull()): en python 3 filenames ya no es un
@@ -76,8 +79,9 @@ class MiFormulario(QtWidgets.QDialog):
         """
 
         query = 'SELECT * FROM Configuraciones'
-        self.ser = conectionSQLite(self.db, query, True)
-        self.datodDb = self.ser[0]
+        self.configuraciones = conectionSQLite(self.db, query, True)
+        if len(self.configuraciones) > 0:
+            self.datodDb = self.configuraciones[0]
 
     def listaId(self):
         """
@@ -85,7 +89,7 @@ class MiFormulario(QtWidgets.QDialog):
         """
 
         lista = list()
-        for i in self.ser:
+        for i in self.configuraciones:
             lista.append(str(i['id']))
 
         self.ui.BoxId.clear()
@@ -97,7 +101,7 @@ class MiFormulario(QtWidgets.QDialog):
 
         """
 
-        for i in self.ser:
+        for i in self.configuraciones:
             if str(self.ui.BoxId.currentText()) == str(i['id']):
                 if modo_debug:
                     print((self.ui.BoxId.currentText()))
@@ -127,8 +131,8 @@ class MiFormulario(QtWidgets.QDialog):
 
         if datos['ID'] == self.otra:
             print('insert')
-            query = """INSERT INTO Configuraciones(UrlFeedNewpct, UrlFeedShowrss, RutaDescargas)
-VALUES ("{}", "{}", "{}", "{}", "{}", "{}", "{}")""".format(datos['Newpct'], datos['showrss'], datos['Ruta'])
+            query = """INSERT INTO Configuraciones(UrlFeedNewpct, UrlFeedShowrss, RutaDescargas) VALUES ("{}", "{}", 
+            "{}", "{}", "{}", "{}", "{}")""".format(datos['Newpct'], datos['showrss'], datos['Ruta'])
 
             if modo_debug:
                 print('update')

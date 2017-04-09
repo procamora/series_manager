@@ -1,25 +1,27 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import sqlite3
+import os
 
 
 def conectionSQLite(db, query, dict=False):
-    conn = sqlite3.connect(db)
-    if dict:
-        conn.row_factory = __dictFactory
-    cursor = conn.cursor()
-    cursor.execute(query)
+    if os.path.exists(db):
+        conn = sqlite3.connect(db)
+        if dict:
+            conn.row_factory = __dictFactory
+        cursor = conn.cursor()
+        cursor.execute(query)
 
-    if query.upper().startswith('SELECT'):
-        data = cursor.fetchall()   # Traer los resultados de un select
-    else:
-        conn.commit()              # Hacer efectiva la escritura de datos
-        data = None
+        if query.upper().startswith('SELECT'):
+            data = cursor.fetchall()  # Traer los resultados de un select
+        else:
+            conn.commit()  # Hacer efectiva la escritura de datos
+            data = None
 
-    cursor.close()
-    conn.close()
+        cursor.close()
+        conn.close()
 
-    return data
+        return data
 
 
 def __dictFactory(cursor, row):
@@ -36,3 +38,14 @@ def ejecutaScriptSqlite(db, script):
     conn.commit()
     cursor.close()
     conn.close()
+
+
+def dumpDatabase(db):
+    """
+    Hace un dump de la base de datos y lo retorna
+    :param db: ruta de la base de datos
+    :return dump: volcado de la base de datos 
+    """
+    if os.path.exists(db):
+        con = sqlite3.connect(db)
+        return '\n'.join(con.iterdump())

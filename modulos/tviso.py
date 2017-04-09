@@ -54,13 +54,11 @@ def conectTvisoMechanize(USERNAME, PASSWORD):   # NO funciona en python 3
     # print cookiejar
     url = br.open(URLAFTER)
     returnPage = url.read()
-    compl = re.findall(
-        '<span class="event-name full-name">.*</span>', returnPage)
+    compl = re.findall('<span class="event-name full-name">.*</span>', returnPage)
     series = list()
 
     for i in compl:
-        a = i.replace(
-            '<span class="event-name full-name">', '').replace('</span>', '')
+        a = i.replace('<span class="event-name full-name">', '').replace('</span>', '')
         series.append(a)
 
     # eliminar duplicados
@@ -83,19 +81,15 @@ def conectTviso(USERNAME, PASSWORD):  # funciona en python 3
         'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; WOW64; rv:35.0) Gecko/20100101 Firefox/35.0', 'Content-Type': 'application/x-www-form-urlencoded'}
 
     session = requests.session()
-    login = session.post(
-        URLLOGIN, data=formdata, headers=req_headers, verify=True)			# Authenticate
+    login = session.post(URLLOGIN, data=formdata, headers=req_headers, verify=True)			# Authenticate
     # Accedo a la pagina donde esta el saldo total
-    series = session.get(
-        URLAFTER, cookies=login.cookies, headers=req_headers, verify=True)
+    series = session.get(URLAFTER, cookies=login.cookies, headers=req_headers, verify=True)
 
-    compl = re.findall(
-        '<span class="event-name full-name">.*</span>', series.text)
+    compl = re.findall('<span class="event-name full-name">.*</span>', series.text)
     series = list()
 
     for i in compl:
-        a = i.replace(
-            '<span class="event-name full-name">', '').replace('</span>', '')
+        a = i.replace('<span class="event-name full-name">', '').replace('</span>', '')
         series.append(a)
 
     # eliminar duplicados
@@ -104,7 +98,7 @@ def conectTviso(USERNAME, PASSWORD):  # funciona en python 3
 
 
 def main():
-    opcion1 = conectTviso()
+    opcion1 = conectTviso("user", "pass")
 
     for i in opcion1:
         print(i)

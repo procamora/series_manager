@@ -3,13 +3,7 @@ import requests
 from bs4 import BeautifulSoup
 
 def descargaTorrent(direcc, message):  # PARA NEWPCT1
-    """
-    Funcion que obtiene la url torrent del la dirreccion que recibe
 
-    :param str direcc: Dirreccion de la pagina web que contiene el torrent
-
-    :return str: Nos devuelve el string con la url del torrent
-    """
     if re.search("newpct1", direcc):
         session = requests.session()
         page = session.get(direcc, verify=False).text

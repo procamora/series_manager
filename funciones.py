@@ -1,56 +1,39 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import os
-import sqlite3
 import time
 import datetime
 import unicodedata
 import requests
 import glob
 
-from modulos.connect_sqlite import conectionSQLite, ejecutaScriptSqlite
-from modulos.settings import directorio_trabajo, directorio_local, nombre_db, ruta_db
-import asistente_inicial
+from modulos.connect_sqlite import conectionSQLite, ejecutaScriptSqlite, dumpDatabase
+from modulos.settings import directorio_trabajo, directorio_local, nombre_db, ruta_db, sync_sqlite, sync_gdrive, \
+    modo_debug
 
 
-def creaDirectorioTrabajo(directorio='Gestor-series'):
+def creaDirectorioTrabajo():
+    """
+    Funcion encargada de checkear el correcto estado del directorio de trabajo
+    Si el directorio no existe lo crea y crea la base de datos dejandola vacia
+    
+    Si el directorio existe comprueba que exista la base de datos y que no este vacia
+    """
+
     if not os.path.exists(directorio_trabajo):
-        print("NO EXISTE DIRECTORIO TRABAJO")
-        asistente_inicial.main()
+        if modo_debug:
+            print("NO EXISTE DIRECTORIO TRABAJO")
         os.mkdir(directorio_trabajo)
-        plantillaDatabase(nombre_db, directorio_trabajo)
-        plantillaFicheroConf('id.conf', directorio_local)
+        plantillaDatabase()
+        plantillaFicheroConf()
     else:
-        ruta_id = '{}/{}'.format(directorio_local, 'id.conf')
+        ruta_id = '{}/{}'.format(directorio_local, sync_sqlite)
         if not os.path.exists(ruta_db) or os.stat(ruta_db).st_size == 0:
             print(1)
-            plantillaDatabase(nombre_db, directorio_trabajo)
+            plantillaDatabase()
         if not os.path.exists(ruta_id) or os.stat(ruta_id).st_size == 0:
             print(2)
-            plantillaFicheroConf('id.conf', directorio_local)
-    return directorio_trabajo
-
-
-def configuarion(fichero):
-    with open(fichero, 'r') as f:
-        a = f.read()
-    # print a
-    b = a.replace('/n', '->')
-    b = b.replace(' ', '')
-    # print b
-
-    pri = b.split('->')
-    # print pri
-    par = list()
-    impar = list()
-
-    for i in pri:
-        if (pri.index(i) % 2 == 0):
-            par.append(i)
-        else:
-            impar.append(i)
-    dictionary = dict(list(zip(par, impar)))
-    return dictionary
+            plantillaFicheroConf()
 
 
 def crearFichero(fichero):
@@ -58,20 +41,19 @@ def crearFichero(fichero):
         f.write("")
 
 
-def dbConfiguarion(name_db=nombre_db, idFile='id.conf'):
-    """
-    Funcion que obtiene los valores de la configuracion de un programa,
-    recibe el nombre de la base de datos y el del fichero con el id de la
-    configuracion y devuelve el diciconario con los datos
+def cambiaBarras(texto):
+    return texto.replace('\\', '/')
 
-    :param str name_db: Nombre de la base de datos sqlite
-    :param str idFile:  Nombre del fichero con el id de la configuracion de la base de datos
+
+def dbConfiguarion():
+    """
+    Funcion que obtiene los valores de la configuracion de un programa, devuelve el diciconario con los datos
 
     :return dict: Nos devuelve un diccionario con los datos
     """
-    ruta = creaDirectorioTrabajo()
+
     try:
-        with open(r'{}/{}'.format(directorio_local, idFile), 'r') as f:
+        with open(r'{}/{}'.format(directorio_local, sync_sqlite), 'r') as f:
             id_db = f.readline()
     except:
         print('fallo en dbConfiguarion')
@@ -79,21 +61,22 @@ def dbConfiguarion(name_db=nombre_db, idFile='id.conf'):
 
     query = 'SELECT * FROM Configuraciones WHERE id IS {}'.format(id_db)
     # print u'{}/{}'.format(creaDirectorioTrabajo(),name_db)
-    consulta = conectionSQLite('{}/{}'.format(ruta, name_db), query, True)[0]
+    consulta = conectionSQLite('{}/{}'.format(directorio_trabajo, nombre_db), query, True)[0]
     return consulta
 
 
-def plantillaFicheroConf(fich='id.conf', ruta=directorio_local):
+def plantillaFicheroConf():
     """
     Si hay una configuracion en la la carpeta del programa la mueve a la carpeta
     de configuracion, sino la hay comprueba si existe el fichero, si existe y esta
     vacio o no existe lo pone a 1
     """
 
-    fichero_conf = '{}/{}'.format(ruta, fich)
-    if os.path.exists(fich):
-        print((fich, fichero_conf))
-        os.rename(fich, fichero_conf)
+    fichero_conf = '{}/{}'.format(directorio_local, sync_sqlite)
+    if os.path.exists(sync_sqlite):
+        if modo_debug:
+            print(sync_sqlite, fichero_conf)
+        os.rename(sync_sqlite, fichero_conf)
     else:
         if os.path.exists(fichero_conf):
             if os.stat(fichero_conf).st_size == 0:
@@ -104,52 +87,34 @@ def plantillaFicheroConf(fich='id.conf', ruta=directorio_local):
                 f.write("1")
 
 
-# MODIFICAR ESTO PORQUE HE AÑADIDO ESTA FUNCION EN CONECTIONSQLITE
-def plantillaDatabase(db=nombre_db, ruta=directorio_trabajo):
-    ficheros_sql = glob.glob('{}/SQL/*.sql'.format(directorio_local))
+def plantillaDatabase():
+    """
+    Funcion encargada de checkear el correcto estado de la base de datos, si no existe la base de datos o esta vacia le
+    cargo la estructura basica
+    """
 
-    fichero_db = '{}/{}'.format(ruta, db)
-    if os.path.exists(db):
-        print((db, fichero_db))
-        os.rename(db, fichero_db)
-    else:
-        # con = sqlite3.connect(fichero_db) #Creo que ya no lo uso
-        if os.path.exists(fichero_db):
-            if os.stat(fichero_db).st_size == 0:
-                if os.path.exists(ficheros_sql[-1]):
-                    with open(cambiaBarras(ficheros_sql[-1]), 'r') as f:
-                        plantilla = f.read()
-                    ejecutaScriptSqlite(fichero_db, plantilla)
-                elif os.path.exists(
-                        '{}/SQL/20160724_completo.sql'.format(directorio_local)):  # da fallo porque el array esta vacio
-                    with open(cambiaBarras('{}/SQL/20160724_completo.sql'.format(directorio_local)), 'r') as f:
-                        plantilla = f.read()
-                    ejecutaScriptSqlite(fichero_db, plantilla)
-                else:
-                    print('fallo al hacer backup')
-        else:
-            with open(cambiaBarras(ficheros_sql[-1]), 'r') as f:
-                plantilla = f.read()
-            ejecutaScriptSqlite(fichero_db, plantilla)
+    ficheros_sql = glob.glob('{}/SQL/*estructura.sql'.format(directorio_local))
+    fichero_db = '{}/{}'.format(directorio_trabajo, nombre_db)
+
+    if not os.path.exists(fichero_db) or not os.stat(fichero_db).st_size > 50000:  # estructura pesa 72Kb
+        if modo_debug:
+            print("creando db")
+        with open(cambiaBarras(ficheros_sql[-1]), 'r') as f:
+            plantilla = f.read()
+        ejecutaScriptSqlite(fichero_db, plantilla)
 
 
 def crearBackUpCompletoDB():
-    db = ruta_db
+    """
+    Funcion encargada de generar backup de la base de datos y guardarlo 
+    """
 
-    con = sqlite3.connect(db)
-    data = '\n'.join(con.iterdump())
+    data = dumpDatabase(ruta_db)
     try:
         with open('{}/SQL/{}.sql'.format(directorio_local, time.strftime("%Y%m%d")), 'w') as f:
             f.write(data)
-    except IOError:
-        with open('SQL/{}.sql'.format(time.strftime("%Y%m%d")), 'w') as f:
-            f.write(data)
     except:
-        print('error final')
-
-
-def cambiaBarras(texto):
-    return texto.replace('\\', '/')
+        print('error al hacer backup')
 
 
 def calculaDiaSemana():
@@ -175,7 +140,7 @@ def calculaDiaSemana():
     try:
         a = dicdias[fecha.strftime('%A').upper()]
         return eliminaTildes(a)
-    # en linux sale el dia en castellano, por eso lo paso directamente
+    # en linux en algunas distriuciones sale el dia en castellano, por eso lo paso directamente
     # poniendo la primera letra en mayusculas
     except KeyError:
         a = fecha.strftime('%A').capitalize()

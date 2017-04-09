@@ -27,15 +27,21 @@ from modulos.settings import directorio_trabajo, sistema, nombre_db, directorio_
 import funciones
 
 
-class MiFormulario(QtWidgets.QMainWindow):
+class Series(QtWidgets.QMainWindow):
     def __init__(self, parent=None):
         QtWidgets.QWidget.__init__(self, parent)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        try:
-            self.database = '{}/{}'.format(funciones.creaDirectorioTrabajo(), nombre_db)
-        except:
-            self.database = ruta_db
+
+        self.database = '{}/{}'.format(directorio_trabajo, nombre_db)
+
+        self.otra = 'otra'  # campo otra del formulario
+        self.estadoI = 'Ok'  # estado inicial
+        self.estadoF = 'Cancelado'  # final
+        self.estadoA = self.estadoI  # actual
+        # CUIADO REVISAR ESTO Y UNIFICADO TODOS LOS NOMBRE DE LA DB
+        self.db = self.database
+        self.queryCompleta = str()  # lista de consultas que se ejecutaran al final
 
         self.setWindowTitle('Gestor de Series by Pablo')
 
@@ -44,31 +50,23 @@ class MiFormulario(QtWidgets.QMainWindow):
         self.menus()
 
     def initListaActiva(self):
-        self.otra = 'otra'  # campo otra del formulario
-        self.estadoI = 'Ok'  # estado inicial
-        self.estadoF = 'Cancelado'  # final
-        self.estadoA = self.estadoI  # actual
-        # CUIADO REVISAR ESTO Y UNIFICADO TODOS LOS NOMBRE DE LA DB
-        self.db = self.database
-
-        self.queryCompleta = str()  # lista de consultas que se ejecutaran al final
 
         self.ui.gridLayoutGobal = QtWidgets.QGridLayout(self.ui.scrollAreaWidgetContents)
 
-        query = """SELECT Nombre, Temporada, Capitulo, Dia, Capitulo_Descargado FROM Series WHERE Siguiendo = "Si" AND Capitulo <> 0 AND Estado='Activa'"""
+        query = """SELECT Nombre, Temporada, Capitulo, Dia, Capitulo_Descargado FROM Series 
+                WHERE Siguiendo = "Si" AND Capitulo <> 0 AND Estado='Activa'"""
         series = conectionSQLite(self.db, query, True)
 
         # todo esto es para ordenar las series por fecha de proximidad de proximo capitulo
-        self.fecha2 = funciones.calculaDiaSemana()
-        self.fechaOrde = funciones.fechaToNumero(self.fecha2)
+        fecha2 = funciones.calculaDiaSemana()
+        fechaOrde = funciones.fechaToNumero(fecha2)
 
-        self.listadoFinal = self.ordenaSeries(self.fechaOrde, series)
-        text = self.listadoFinal
+        listadoFinal = self.ordenaSeries(fechaOrde, series)
 
-        for texto, i in zip(text, list(range(0, len(text)))):  # el encabezado lo tengo encima
+        for texto, i in zip(listadoFinal, list(range(0, len(listadoFinal)))):  # el encabezado lo tengo encima
             self.creaListaSerie(i, texto)
             if modo_debug:
-                print((i, texto))
+                print(i, texto)
 
         self.ui.pushButtonAceptar.setVisible(False)
         self.ui.pushButtonAplicar.setText("Guardar")
@@ -87,78 +85,75 @@ class MiFormulario(QtWidgets.QMainWindow):
         param datos dict: diccionario con todos los datos de la serie a la que se crea una linea
         """
 
-        self.datos = datos
-        self.labelEmision = QtWidgets.QLabel(self.ui.scrollAreaWidgetContents)
-        self.ui.gridLayoutGobal.addWidget(self.labelEmision, n, 0, 1, 1, QtCore.Qt.AlignLeft)
+        labelEmision = QtWidgets.QLabel(self.ui.scrollAreaWidgetContents)
+        self.ui.gridLayoutGobal.addWidget(labelEmision, n, 0, 1, 1, QtCore.Qt.AlignLeft)
 
-        self.labelNombre = QtWidgets.QLabel(self.ui.scrollAreaWidgetContents)
-        self.ui.gridLayoutGobal.addWidget(self.labelNombre, n, 1, 1, 1, QtCore.Qt.AlignLeft)
+        labelNombre = QtWidgets.QLabel(self.ui.scrollAreaWidgetContents)
+        self.ui.gridLayoutGobal.addWidget(labelNombre, n, 1, 1, 1, QtCore.Qt.AlignLeft)
 
-        self.lineEpisodio = QtWidgets.QLineEdit(self.ui.scrollAreaWidgetContents)
-        self.lineEpisodio.setEnabled(False)
-        self.lineEpisodio.setMaximumSize(QtCore.QSize(50, 20))
-        self.lineEpisodio.setReadOnly(True)
-        self.ui.gridLayoutGobal.addWidget(self.lineEpisodio, n, 2, 1, 1, QtCore.Qt.AlignLeft)
+        lineEpisodio = QtWidgets.QLineEdit(self.ui.scrollAreaWidgetContents)
+        lineEpisodio.setEnabled(False)
+        lineEpisodio.setMaximumSize(QtCore.QSize(50, 20))
+        lineEpisodio.setReadOnly(True)
+        self.ui.gridLayoutGobal.addWidget(lineEpisodio, n, 2, 1, 1, QtCore.Qt.AlignLeft)
 
-        self.widgetBotones = QtWidgets.QWidget(self.ui.scrollAreaWidgetContents)
-        self.widgetBotones.setMaximumSize(QtCore.QSize(90, 45))
-        self.horizontalLayoutBotones = QtWidgets.QHBoxLayout(self.widgetBotones)
-        self.buttonRestar = QtWidgets.QPushButton(self.widgetBotones)
-        self.horizontalLayoutBotones.addWidget(self.buttonRestar)
-        self.buttonSumar = QtWidgets.QPushButton(self.widgetBotones)
-        self.horizontalLayoutBotones.addWidget(self.buttonSumar)
-        self.ui.gridLayoutGobal.addWidget(self.widgetBotones, n, 3, 1, 1, QtCore.Qt.AlignLeft)
+        widgetBotones = QtWidgets.QWidget(self.ui.scrollAreaWidgetContents)
+        widgetBotones.setMaximumSize(QtCore.QSize(90, 45))
+        horizontalLayoutBotones = QtWidgets.QHBoxLayout(widgetBotones)
+        buttonRestar = QtWidgets.QPushButton(widgetBotones)
+        horizontalLayoutBotones.addWidget(buttonRestar)
+        buttonSumar = QtWidgets.QPushButton(widgetBotones)
+        horizontalLayoutBotones.addWidget(buttonSumar)
+        self.ui.gridLayoutGobal.addWidget(widgetBotones, n, 3, 1, 1, QtCore.Qt.AlignLeft)
 
-        self.labelEmision.setText(self.datos["Dia"])
-        self.labelNombre.setText(self.datos["Nombre"])
+        labelEmision.setText(datos["Dia"])
+        labelNombre.setText(datos["Nombre"])
         # hago esto para que quede bonito los numeros de los capitulos
-        if len(str(self.datos["Capitulo"])) == 1:
-            self.lineEpisodio.setText('{}x0{}'.format(self.datos["Temporada"], self.datos["Capitulo"]))
+        if len(str(datos["Capitulo"])) == 1:
+            lineEpisodio.setText('{}x0{}'.format(datos["Temporada"], datos["Capitulo"]))
         else:
-            self.lineEpisodio.setText('{}x{}'.format(self.datos["Temporada"], self.datos["Capitulo"]))
-        self.buttonSumar.setText("+1")
-        self.buttonRestar.setText("-1")
+            lineEpisodio.setText('{}x{}'.format(datos["Temporada"], datos["Capitulo"]))
+        buttonSumar.setText("+1")
+        buttonRestar.setText("-1")
 
         # Conexion de los botones sumar y restar enviando la referencia del objeto para trabajar con ella posteriormente
-        self.buttonSumar.clicked.connect(functools.partial(self.sumarSerie, self.lineEpisodio, self.datos))
-        self.buttonRestar.clicked.connect(functools.partial(self.restarSerie, self.lineEpisodio, self.datos))
+        buttonSumar.clicked.connect(functools.partial(self.sumarSerie, lineEpisodio, datos))
+        buttonRestar.clicked.connect(functools.partial(self.restarSerie, lineEpisodio, datos))
 
         # Widget para meter el QLineEdit y QPushButton
-        self.widgetTeoricos = QtWidgets.QWidget(self.ui.scrollAreaWidgetContents)
-        self.widgetTeoricos.setMaximumSize(QtCore.QSize(90, 45))
-        self.horizontalLayoutTeoricos = QtWidgets.QHBoxLayout(self.widgetTeoricos)
+        widgetTeoricos = QtWidgets.QWidget(self.ui.scrollAreaWidgetContents)
+        widgetTeoricos.setMaximumSize(QtCore.QSize(90, 45))
+        horizontalLayoutTeoricos = QtWidgets.QHBoxLayout(widgetTeoricos)
 
         # Temporada y capitulo teorico
-        self.lineEpisodioTeorico = QtWidgets.QLineEdit(self.ui.scrollAreaWidgetContents)
-        self.lineEpisodioTeorico.setEnabled(False)
-        self.lineEpisodioTeorico.setReadOnly(True)
-        self.lineEpisodioTeorico.setMaximumSize(QtCore.QSize(30, 20))
+        lineEpisodioTeorico = QtWidgets.QLineEdit(self.ui.scrollAreaWidgetContents)
+        lineEpisodioTeorico.setEnabled(False)
+        lineEpisodioTeorico.setReadOnly(True)
+        lineEpisodioTeorico.setMaximumSize(QtCore.QSize(30, 20))
 
         # Boton para actualizar el estado conforme al descargado automaticamente
-        self.buttonTeorico = QtWidgets.QPushButton(self.widgetTeoricos)
+        buttonTeorico = QtWidgets.QPushButton(widgetTeoricos)
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap((":/Iconos/Icons/fatcow/add.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.buttonTeorico.setIcon(icon)
+        icon.addPixmap(QtGui.QPixmap(":/Iconos/Icons/fatcow/add.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        buttonTeorico.setIcon(icon)
 
         # Spacer para que se vea bonito cuando ocultamos el boton
         spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
 
         # Incluimos todos al Widget
-        self.horizontalLayoutTeoricos.addWidget(self.lineEpisodioTeorico)
-        self.horizontalLayoutTeoricos.addWidget(self.buttonTeorico)
-        self.horizontalLayoutTeoricos.addItem(spacerItem)
-        self.ui.gridLayoutGobal.addWidget(self.widgetTeoricos, n, 4, 1, 1, QtCore.Qt.AlignLeft)
+        horizontalLayoutTeoricos.addWidget(lineEpisodioTeorico)
+        horizontalLayoutTeoricos.addWidget(buttonTeorico)
+        horizontalLayoutTeoricos.addItem(spacerItem)
+        self.ui.gridLayoutGobal.addWidget(widgetTeoricos, n, 4, 1, 1, QtCore.Qt.AlignLeft)
 
         # Si el capitulo es None o ya lo tengo actualizado no muestro el boton
-        if self.datos["Capitulo_Descargado"] is not None and self.datos["Capitulo"] != self.datos[
-            "Capitulo_Descargado"]:
-            self.lineEpisodioTeorico.setText(str(self.datos["Capitulo_Descargado"]))  # Asignamos el valor del capitulo
+        if datos["Capitulo_Descargado"] is not None and datos["Capitulo"] != datos["Capitulo_Descargado"]:
+            lineEpisodioTeorico.setText(str(datos["Capitulo_Descargado"]))  # Asignamos el valor del capitulo
         else:
-            self.lineEpisodioTeorico.setVisible(False)
-            self.buttonTeorico.setVisible(False)
+            lineEpisodioTeorico.setVisible(False)
+            buttonTeorico.setVisible(False)
 
-        self.buttonTeorico.clicked.connect(
-            functools.partial(self.botonTeorico, self.lineEpisodioTeorico, self.lineEpisodio, self.datos))
+        buttonTeorico.clicked.connect(functools.partial(self.botonTeorico, lineEpisodioTeorico, lineEpisodio, datos))
 
     def botonTeorico(self, capituloT, capitulo, dat):
         """
@@ -238,14 +233,15 @@ class MiFormulario(QtWidgets.QMainWindow):
         """
 
         if modo_debug:
-            print((self.queryCompleta))
+            print(self.queryCompleta)
 
         ejecutaScriptSqlite(self.db, self.queryCompleta)
 
         self.queryCompleta = str()  # por si vuelvo a darle al boton aplicar
         return True
 
-    def ordenaSeries(self, semana, series):
+    @staticmethod
+    def ordenaSeries(semana, series):
         """
         creo una lista ordenada por dia de la semana
         """
@@ -336,7 +332,7 @@ class MiFormulario(QtWidgets.QMainWindow):
         self.ui.actionAsistente_inicial.triggered.connect(self.menAsistenteInicial)
         self.ui.actionAsistente_inicial.setStatusTip('Edicion de preferencias')
 
-        ################################################################################################################################
+        ################################################################################################################
         # revisar esto, hacer un for
         # self.ui.actionId_de_Opcion = self.ui.menuOpciones.addMenu('Id de Opcion')
         # self.ui.actionId_de_Opcion.addAction('Desplegable 1')
@@ -382,7 +378,8 @@ class MiFormulario(QtWidgets.QMainWindow):
 
         estado_series.MiFormulario.getDatos(dbSeries=self.database)
 
-    def menActualizarImdb(self):
+    @staticmethod
+    def menActualizarImdb():
         import modulos.actualiza_imdb
         a = modulos.actualiza_imdb.actualizaImdb()
         print('actulizaCompleto')
@@ -398,7 +395,8 @@ class MiFormulario(QtWidgets.QMainWindow):
         else:
             descarga_automatica.MiFormulario.getDatos(dbSeries=self.database)
 
-    def menCompletoNewpct1(self):
+    @staticmethod
+    def menCompletoNewpct1():
         Conf = funciones.dbConfiguarion()
         rutaDesc = str(Conf['RutaDescargas'])  # es unicode
 
@@ -408,14 +406,15 @@ class MiFormulario(QtWidgets.QMainWindow):
         else:
             newpct1_completa.MiFormulario.getDatos()
 
-    def abrirDirectorioDatos(self):
+    @staticmethod
+    def abrirDirectorioDatos():
         if sistema == 'win32':
-            comando = 'explorer "{}"'.format(funciones.creaDirectorioTrabajo().replace('/', '\\'))
+            comando = 'explorer "{}"'.format(directorio_trabajo.replace('/', '\\'))
         else:
             if re.search('fedora', platform.platform()):
-                comando = 'dolphin "{}"'.format(funciones.creaDirectorioTrabajo())  # no esta revisado
+                comando = 'dolphin "{}"'.format(directorio_trabajo)  # no esta revisado
             else:
-                comando = 'nautilus "{}"'.format(funciones.creaDirectorioTrabajo())  # no esta revisado
+                comando = 'nautilus "{}"'.format(directorio_trabajo)  # no esta revisado
 
         os.system(comando)
 
@@ -431,7 +430,7 @@ class MiFormulario(QtWidgets.QMainWindow):
         creo una lista con los directorios/ficheros que quiero borrar
         """
 
-        self.listaLog = list()
+        listaLog = list()
 
         with open(r'{}/id.conf'.format(directorio_local), 'r') as f:
             id_fich = f.readline().replace('/n', '')
@@ -440,40 +439,53 @@ class MiFormulario(QtWidgets.QMainWindow):
         ser = conectionSQLite(self.database, query, True)[0]
 
         if num == 'newpct1':
-            self.listaLog.append('{}/log/{}'.format(directorio_trabajo, ser['FicheroFeedNewpct']))
+            listaLog.append('{}/log/{}'.format(directorio_trabajo, ser['FicheroFeedNewpct']))
         elif num == 'showrss':
-            self.listaLog.append('{}/log/{}'.format(directorio_trabajo, ser['FicheroFeedShowrss']))
+            listaLog.append('{}/log/{}'.format(directorio_trabajo, ser['FicheroFeedShowrss']))
         elif num == 'Descargas':
-            self.listaLog.append('{}/log/{}'.format(directorio_trabajo, ser['FicheroDescargas']))
+            listaLog.append('{}/log/{}'.format(directorio_trabajo, ser['FicheroDescargas']))
         elif num == 'Todos':
-            self.listaLog.append('{}/log/{}'.format(directorio_trabajo, ser['FicheroFeedNewpct']))
-            self.listaLog.append('{}/log/{}'.format(directorio_trabajo, ser['FicheroFeedShowrss']))
-            self.listaLog.append('{}/log/{}'.format(directorio_trabajo, ser['FicheroDescargas']))
+            listaLog.append('{}/log/{}'.format(directorio_trabajo, ser['FicheroFeedNewpct']))
+            listaLog.append('{}/log/{}'.format(directorio_trabajo, ser['FicheroFeedShowrss']))
+            listaLog.append('{}/log/{}'.format(directorio_trabajo, ser['FicheroDescargas']))
 
         # print self.listaLog
-        self.menVaciaLog()
+        self.menVaciaLog(listaLog)
 
-    def menVaciaLog(self):
+    @staticmethod
+    def menVaciaLog(listaLog):
         """
         Borra los ficheros que estan la la lista
         """
 
-        for i in self.listaLog:
+        for i in listaLog:
             with open(i, 'w'):
                 pass
 
-    def menAsistenteInicial(self):
-        asistente_inicial.MiFormulario.getDatos(ruta=directorio_trabajo)
+    @staticmethod
+    def menAsistenteInicial():
+        asistente_inicial.AsistenteInicial.getDatos(ruta=directorio_trabajo)
 
-    def menAcercaDe(self):
+    @staticmethod
+    def menAcercaDe():
         acerca_de.MiFormulario.getDatos()
 
 
 def main():
-    global app  # sino lo pongo sale    QObject::startTimer: QTimer can only be used with threads started with QThread
+    # intentamos crear los ficheros de configuracion necesarios un maximo de 3 veces
+    contador = 0
+    while not asistente_inicial.AsistenteInicial.checkIntegridadFicheros():
+        contador += 1
+        print("Intento {} de 3".format(contador))
+        if contador == 3:
+            return
+
+    funciones.creaDirectorioTrabajo()
+
+    # global app  # sino lo pongo sale QObject::startTimer: QTimer can only be used with threads started with QThread
     app = QtWidgets.QApplication(sys.argv)
 
-    myapp = MiFormulario()
+    myapp = Series()
     myapp.show()
     app.exec_()
 
@@ -483,5 +495,3 @@ if __name__ == "__main__":
         descarga_automatica.main()
     else:
         main()
-        # funciones.creaDirectorioTrabajo()
-        # print('fin')

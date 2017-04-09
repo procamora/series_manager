@@ -28,13 +28,12 @@ class MiFormulario(QtWidgets.QDialog):
         # modifico en la funcion creaConf
         self.listaEstados()
 
-        allItems = [self.ui.BoxEstado.itemText(
-            i) for i in range(self.ui.BoxEstado.count())]
-        self.ui.BoxEstado.setCurrentIndex(allItems.index('Activa'))
+        allItems = [self.ui.BoxEstado.itemText(i) for i in range(self.ui.BoxEstado.count())]
+        if len(allItems) > 0:
+            self.ui.BoxEstado.setCurrentIndex(allItems.index('Activa'))
 
         if self.datSerie is not None:  # Actualizar
-            self.setWindowTitle(
-                'Actualizar serie: {}'.format(self.datSerie['Nombre']))
+            self.setWindowTitle('Actualizar serie: {}'.format(self.datSerie['Nombre']))
 
             # para poder modifical el nombre en el update
             self.NombreOriginal = str(self.datSerie['Nombre'])
@@ -52,10 +51,8 @@ class MiFormulario(QtWidgets.QDialog):
             # pongo la fecha de hoy para insertar por defecto
             # recogo todos los dias de la caja y le paso el indice del dia en
             # el que sale
-            allItems = [self.ui.BoxEmision.itemText(
-                i) for i in range(self.ui.BoxEmision.count())]
-            self.ui.BoxEmision.setCurrentIndex(
-                allItems.index(funciones.calculaDiaSemana()))
+            allItems = [self.ui.BoxEmision.itemText(i) for i in range(self.ui.BoxEmision.count())]
+            self.ui.BoxEmision.setCurrentIndex(allItems.index(funciones.calculaDiaSemana()))
 
         # Ocultar textos
         self.ui.lineTemp.hide()
@@ -150,15 +147,13 @@ class MiFormulario(QtWidgets.QDialog):
         Establece los valores por defecto que se le indican en caso de que se indiquen
         """
         if modo_debug:
-            print((self.datSerie))
+            print(self.datSerie)
 
         self.ui.lineTitulo.setText(self.datSerie['Nombre'])
 
         # Generar checkbox
-        self.listaTemporadas(
-            self.datSerie['Temporada'], self.datSerie['Temporada'] + 2)
-        self.listaCapitulos(
-            self.datSerie['Capitulo'], self.datSerie['Capitulo'] + 8)
+        self.listaTemporadas(self.datSerie['Temporada'], self.datSerie['Temporada'] + 2)
+        self.listaCapitulos(self.datSerie['Capitulo'], self.datSerie['Capitulo'] + 8)
 
         if self.datSerie['Siguiendo'] == 'Si':
             self.ui.radioSeguirSi.click()
@@ -167,10 +162,8 @@ class MiFormulario(QtWidgets.QDialog):
 
         # recogo todos los dias de la caja y le paso el indice del dia en el
         # que sale
-        allItems = [self.ui.BoxEmision.itemText(
-            i) for i in range(self.ui.BoxEmision.count())]
-        self.ui.BoxEmision.setCurrentIndex(
-            allItems.index(self.datSerie['Dia']))
+        allItems = [self.ui.BoxEmision.itemText(i) for i in range(self.ui.BoxEmision.count())]
+        self.ui.BoxEmision.setCurrentIndex(allItems.index(self.datSerie['Dia']))
 
         if self.datSerie['VOSE'] == 'Si':
             self.ui.radioVOSE_Si.click()
@@ -182,10 +175,8 @@ class MiFormulario(QtWidgets.QDialog):
         else:
             self.ui.radioAcabadaNo.click()
 
-        allItems = [self.ui.BoxEstado.itemText(
-            i) for i in range(self.ui.BoxEstado.count())]
-        self.ui.BoxEstado.setCurrentIndex(
-            allItems.index(self.datSerie['Estado']))
+        allItems = [self.ui.BoxEstado.itemText(i) for i in range(self.ui.BoxEstado.count())]
+        self.ui.BoxEstado.setCurrentIndex(allItems.index(self.datSerie['Estado']))
 
         if self.datSerie['imdb_id'] is not None:
             self.ui.lineImdb.setText(self.datSerie['imdb_id'])
@@ -242,25 +233,26 @@ class MiFormulario(QtWidgets.QDialog):
             # LO PONGA
             if len(str(self.ui.lineImdb.text())) == 0:
                 if self.datSerie is not None:
-                    query = '''UPDATE series SET Nombre="{}", Temporada={}, Capitulo={}, Siguiendo="{}", Dia="{}", VOSE="{}", Acabada="{}", Estado="{}",imdb_id={} WHERE Nombre="{}"'''.format(
-                        datos['Titulo'], datos['Temporada'], datos['Capitulo'], datos['Seguir'],
-                        datos['Emision'], datos['VOSE'], datos['Acabada'], datos['Estado'], datos['idImdb'],
-                        self.NombreOriginal)
+                    query = '''UPDATE series SET Nombre="{}", Temporada={}, Capitulo={}, Siguiendo="{}", Dia="{}", 
+                    VOSE="{}", Acabada="{}", Estado="{}",imdb_id={} WHERE Nombre="{}"'''.format(
+                        datos['Titulo'], datos['Temporada'], datos['Capitulo'], datos['Seguir'], datos['Emision'],
+                        datos['VOSE'], datos['Acabada'], datos['Estado'], datos['idImdb'], self.NombreOriginal)
                 else:
-                    query = '''INSERT INTO series(Nombre, Temporada, Capitulo, Siguiendo, Dia, VOSE, Acabada, Estado, imdb_id) VALUES ("{}", {}, {}, "{}", "{}", "{}", "{}", "{}", {})'''.format(
+                    query = '''INSERT INTO series(Nombre, Temporada, Capitulo, Siguiendo, Dia, VOSE, Acabada, Estado, 
+                    imdb_id) VALUES ("{}", {}, {}, "{}", "{}", "{}", "{}", "{}", {})'''.format(
                         datos['Titulo'], datos['Temporada'], datos['Capitulo'], datos['Seguir'], datos['Emision'],
                         datos['VOSE'], datos['Acabada'], datos['Estado'], datos['idImdb'])
             else:
                 if self.datSerie is not None:
-                    query = '''UPDATE series SET Nombre="{}", Temporada={}, Capitulo={}, Siguiendo="{}", Dia="{}", VOSE="{}", Acabada="{}", Estado="{}",imdb_id="{}" WHERE Nombre="{}"'''.format(
+                    query = '''UPDATE series SET Nombre="{}", Temporada={}, Capitulo={}, Siguiendo="{}", Dia="{}", 
+                    VOSE="{}", Acabada="{}", Estado="{}",imdb_id="{}" WHERE Nombre="{}"'''.format(
                         datos['Titulo'], datos['Temporada'], datos['Capitulo'], datos['Seguir'], datos['Emision'],
                         datos['VOSE'], datos['Acabada'], datos['Estado'], datos['idImdb'], self.NombreOriginal)
                 else:
-                    query = '''INSERT INTO series(Nombre, Temporada, Capitulo, Siguiendo, Dia, VOSE, Acabada, Estado, imdb_id)
-VALUES ("{}", {}, {}, "{}", "{}", "{}", "{}", "{}", "{}")'''.format(datos['Titulo'], datos['Temporada'],
-                                                                    datos['Capitulo'], datos['Seguir'],
-                                                                    datos['Emision'], datos['VOSE'], datos['Acabada'],
-                                                                    datos['Estado'], datos['idImdb'])
+                    query = '''INSERT INTO series(Nombre, Temporada, Capitulo, Siguiendo, Dia, VOSE, Acabada, Estado, 
+                  imdb_id) VALUES ("{}", {}, {}, "{}", "{}", "{}", "{}", "{}", "{}")'''.format(
+                        datos['Titulo'], datos['Temporada'], datos['Capitulo'], datos['Seguir'], datos['Emision'],
+                        datos['VOSE'], datos['Acabada'], datos['Estado'], datos['idImdb'])
             try:
                 if modo_debug:
                     print(query)
@@ -274,26 +266,21 @@ VALUES ("{}", {}, {}, "{}", "{}", "{}", "{}", "{}", "{}")'''.format(datos['Titul
                         # Si es una inserccion despues de insertar vacio el
                         # titulo para poder hacer mas
                         if self.datSerie is None:
-                            funciones.muestraMensaje(
-                                self.ui.label_Info, 'Insertado con imdb', True)
+                            funciones.muestraMensaje(self.ui.label_Info, 'Insertado con imdb', True)
                             self.ui.lineTitulo.setText('')
                         else:
-                            funciones.muestraMensaje(
-                                self.ui.label_Info, 'Actualizado con imdb', True)
+                            funciones.muestraMensaje(self.ui.label_Info, 'Actualizado con imdb', True)
                     else:  # Si da error no quiero que borre el nombre
-                        funciones.muestraMensaje(
-                            self.ui.label_Info, 'fallo en imdb', False)
+                        funciones.muestraMensaje(self.ui.label_Info, 'fallo en imdb', False)
                 else:
                     conectionSQLite(self.db, query)
                     # Si es una inserccion despues de insertar vacio el titulo
                     # para poder hacer mas
                     if self.datSerie is None:
-                        funciones.muestraMensaje(
-                            self.ui.label_Info, 'Insertado', True)
+                        funciones.muestraMensaje(self.ui.label_Info, 'Insertado', True)
                         self.ui.lineTitulo.setText('')
                     else:
-                        funciones.muestraMensaje(
-                            self.ui.label_Info, 'Actualizado', True)
+                        funciones.muestraMensaje(self.ui.label_Info, 'Actualizado', True)
                 return True
 
             except Exception as e:
@@ -341,7 +328,7 @@ VALUES ("{}", {}, {}, "{}", "{}", "{}", "{}", "{}", "{}")'''.format(datos['Titul
 
 def main():
     # query = 'SELECT * FROM Series WHERE Nombre LIKE "Silicon Valley"'
-    # ser = conectionSQLite('{}/{}'.format(directorio_trabajo, nombre_db), query, True)[0]
+    # configuracion = conectionSQLite('{}/{}'.format(directorio_trabajo, nombre_db), query, True)[0]
     ser = None
     app = QtWidgets.QApplication(sys.argv)
     # hay que poner la base de datos como parametro
