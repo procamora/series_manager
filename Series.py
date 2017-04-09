@@ -6,6 +6,7 @@ import os
 import re
 import platform
 import functools
+import subprocess
 # TERCEROS
 from PyQt5 import QtGui, QtWidgets, QtCore
 # PROPIAS
@@ -408,15 +409,24 @@ class Series(QtWidgets.QMainWindow):
 
     @staticmethod
     def abrirDirectorioDatos():
-        if sistema == 'win32':
+        if sistema == 'Windows':
             comando = 'explorer "{}"'.format(directorio_trabajo.replace('/', '\\'))
         else:
-            if re.search('fedora', platform.platform()):
-                comando = 'dolphin "{}"'.format(directorio_trabajo)  # no esta revisado
-            else:
-                comando = 'nautilus "{}"'.format(directorio_trabajo)  # no esta revisado
+            entornoGrafico = str()
+            for i in ["dolphin", "caja", "nautilus"]:
+                cmd = "{} -h".format(i)
+                ejecucion = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                ejecucion.communicate()
+                if ejecucion.returncode == 0:
+                    entornoGrafico = i
+                    break
 
-        os.system(comando)
+            if entornoGrafico is not None:
+                comando = '{} "{}"'.format(entornoGrafico, directorio_trabajo)  # no esta revisado
+                print(entornoGrafico)
+
+        ejecucion = subprocess.Popen(comando, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        ejecucion.communicate()  # no se lanza un hilo, hasta que no se cierre la ventana no sepuede seguir usando
 
     # PREFERENCIAS
     def menPreferencias(self):

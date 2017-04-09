@@ -3,7 +3,11 @@
 import os
 import platform
 
-from .constantes import sync_gdrive, sync_sqlite, nombre_db
+try:  # Ejecucion desde Series.py
+    from .constantes import sync_gdrive, sync_sqlite, nombre_db
+except:  # Ejecucion local
+    from constantes import sync_gdrive, sync_sqlite, nombre_db
+
 
 modo_debug = True
 gdrive = 0
