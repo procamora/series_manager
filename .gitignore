@@ -4,7 +4,7 @@ build/
 dist/
 SQL/
 Pruebas.py
-sync.cnf
+sync.conf
 id.conf
 ui/*.py*
 geany_run_script.bat
