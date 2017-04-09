@@ -8,6 +8,7 @@ class algo():
         self.a = "A"
         self._b = "B"
         self.__c = "C"
+        self.d = [1, 2, 3, 4]
 
     def otro(self):
         return ("asd")
@@ -15,8 +16,12 @@ class algo():
     def _privado(self):
         return ("aasdasdsd")
 
+    @property
+    def b(self):
+        return self._b
+
 
 a = algo()
 print(a.a)
-print(a.otro())
-print(a._privado())
+print(a.b)
+print(a.d)

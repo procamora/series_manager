@@ -10,7 +10,7 @@ from modulos.connect_sqlite import conectionSQLite
 from modulos.settings import modo_debug, ruta_db
 
 
-class MiFormulario(QtWidgets.QDialog):
+class BuscarSeries(QtWidgets.QDialog):
     def __init__(self, parent=None, dbSeries=None):
         QtWidgets.QWidget.__init__(self, parent)
         self.ui = Ui_Dialog()
@@ -37,15 +37,15 @@ class MiFormulario(QtWidgets.QDialog):
 
         query = 'SELECT Nombre FROM Series WHERE Nombre LIKE "%%{}%%"'.format(
             self.ui.lineEdit.text())
-        self.seriesTest = conectionSQLite(self.db, query, True)
+        seriesTest = conectionSQLite(self.db, query, True)
 
-        if len(self.seriesTest) == 0:
+        if len(seriesTest) == 0:
             item = QtWidgets.QListWidgetItem()
             item.setText('Serie no encontrada')
             self.ui.listWidget.addItem(item)
 
         else:
-            for i in self.seriesTest:
+            for i in seriesTest:
                 item = QtWidgets.QListWidgetItem()
                 item.setText(i['Nombre'])
                 self.ui.listWidget.addItem(item)
@@ -64,7 +64,7 @@ class MiFormulario(QtWidgets.QDialog):
                 i.text())
             ser = conectionSQLite(self.db, query, True)[0]
 
-            actualizar_insertar.MiFormulario.getDatos(
+            actualizar_insertar.ActualizarInsertar.getDatos(
                 datSerie=ser, dbSeries=self.db)
 
     def cancela(self):
@@ -77,13 +77,13 @@ class MiFormulario(QtWidgets.QDialog):
 
     @staticmethod
     def getDatos(parent=None, dbSeries=None):
-        dialog = MiFormulario(parent, dbSeries)
+        dialog = BuscarSeries(parent, dbSeries)
         dialog.exec_()
 
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
-    MiFormulario.getDatos(dbSeries=ruta_db)
+    BuscarSeries.getDatos(dbSeries=ruta_db)
     return app
 
 

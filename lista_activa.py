@@ -8,7 +8,7 @@ from ui.lista_activa_ui import Ui_Dialog
 from modulos.settings import modo_debug, ruta_db
 
 
-class MiFormulario(QtWidgets.QDialog):
+class ListaActiva(QtWidgets.QDialog):
     def __init__(self, parent=None, dbSeries=None):
         QtWidgets.QWidget.__init__(self, parent)
         self.ui = Ui_Dialog()
@@ -23,6 +23,8 @@ class MiFormulario(QtWidgets.QDialog):
 
         if modo_debug:
             print(self.db)
+
+        self.database = QtSql.QSqlDatabase.addDatabase('QSQLITE')
         self.crearConexion()
 
         testModel = QtSql.QSqlTableModel()
@@ -42,7 +44,6 @@ class MiFormulario(QtWidgets.QDialog):
 
         """
 
-        self.database = QtSql.QSqlDatabase.addDatabase('QSQLITE')
         self.database.setDatabaseName(self.db)
         if self.database.open():
             return True
@@ -76,13 +77,13 @@ class MiFormulario(QtWidgets.QDialog):
 
     @staticmethod
     def getDatos(parent=None, dbSeries=None):
-        dialog = MiFormulario(parent, dbSeries)
+        dialog = ListaActiva(parent, dbSeries)
         dialog.exec_()
 
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
-    MiFormulario.getDatos(dbSeries=ruta_db)
+    ListaActiva.getDatos(dbSeries=ruta_db)
     return app
 
 

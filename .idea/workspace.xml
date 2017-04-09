@@ -2,96 +2,25 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="40912294-d943-44c9-b7bf-47471b881e41" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/TestSeries.e4p" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Icons/Icons.tar.gz" afterPath="$PROJECT_DIR$/Icons/Icons.tar.gz" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Icons/Principal.ico" afterPath="$PROJECT_DIR$/Icons/Principal.ico" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Icons/Principal.png" afterPath="$PROJECT_DIR$/Icons/Principal.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Icons/fatcow/Principal.png" afterPath="$PROJECT_DIR$/Icons/fatcow/Principal.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Icons/fatcow/Principal32.png" afterPath="$PROJECT_DIR$/Icons/fatcow/Principal32.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Icons/fatcow/Principal64.png" afterPath="$PROJECT_DIR$/Icons/fatcow/Principal64.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Icons/fatcow/Principal_Original.png" afterPath="$PROJECT_DIR$/Icons/fatcow/Principal_Original.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Icons/fatcow/accept_button.png" afterPath="$PROJECT_DIR$/Icons/fatcow/accept_button.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Icons/fatcow/add.png" afterPath="$PROJECT_DIR$/Icons/fatcow/add.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Icons/fatcow/application_edit.png" afterPath="$PROJECT_DIR$/Icons/fatcow/application_edit.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Icons/fatcow/arrow_refresh.png" afterPath="$PROJECT_DIR$/Icons/fatcow/arrow_refresh.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Icons/fatcow/arrow_refresh_small.png" afterPath="$PROJECT_DIR$/Icons/fatcow/arrow_refresh_small.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Icons/fatcow/box_search.png" afterPath="$PROJECT_DIR$/Icons/fatcow/box_search.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Icons/fatcow/cancel.png" afterPath="$PROJECT_DIR$/Icons/fatcow/cancel.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Icons/fatcow/cross.png" afterPath="$PROJECT_DIR$/Icons/fatcow/cross.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Icons/fatcow/database_refresh.png" afterPath="$PROJECT_DIR$/Icons/fatcow/database_refresh.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Icons/fatcow/delete.png" afterPath="$PROJECT_DIR$/Icons/fatcow/delete.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Icons/fatcow/edit_button.png" afterPath="$PROJECT_DIR$/Icons/fatcow/edit_button.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Icons/fatcow/file_save_as.png" afterPath="$PROJECT_DIR$/Icons/fatcow/file_save_as.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Icons/fatcow/find.png" afterPath="$PROJECT_DIR$/Icons/fatcow/find.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Icons/fatcow/folder_search.png" afterPath="$PROJECT_DIR$/Icons/fatcow/folder_search.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Icons/fatcow/google_custom_search.png" afterPath="$PROJECT_DIR$/Icons/fatcow/google_custom_search.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Icons/fatcow/page_edit.png" afterPath="$PROJECT_DIR$/Icons/fatcow/page_edit.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Icons/fatcow/page_refresh.png" afterPath="$PROJECT_DIR$/Icons/fatcow/page_refresh.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Icons/fatcow/page_save.png" afterPath="$PROJECT_DIR$/Icons/fatcow/page_save.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Icons/fatcow/refresh_all.png" afterPath="$PROJECT_DIR$/Icons/fatcow/refresh_all.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Icons/fatcow/table_refresh.png" afterPath="$PROJECT_DIR$/Icons/fatcow/table_refresh.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Icons/icon-circleplay.png" afterPath="$PROJECT_DIR$/Icons/icon-circleplay.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Icons/personal.gif" afterPath="$PROJECT_DIR$/Icons/personal.gif" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Icons/personal.png" afterPath="$PROJECT_DIR$/Icons/personal.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/README.pdf" afterPath="$PROJECT_DIR$/README.pdf" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/Gestor-Series.iml" afterPath="$PROJECT_DIR$/.idea/Gestor-Series.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/dictionaries/procamora.xml" afterPath="$PROJECT_DIR$/.idea/dictionaries/procamora.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/modules.xml" afterPath="$PROJECT_DIR$/.idea/modules.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/vagrant.xml" afterPath="$PROJECT_DIR$/.idea/vagrant.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/vcs.xml" afterPath="$PROJECT_DIR$/.idea/vcs.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.project" afterPath="$PROJECT_DIR$/.project" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.pydevproject" afterPath="$PROJECT_DIR$/.pydevproject" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.settings/org.eclipse.core.resources.prefs" afterPath="$PROJECT_DIR$/.settings/org.eclipse.core.resources.prefs" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Icons/URL.url" afterPath="$PROJECT_DIR$/Icons/URL.url" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Icons/fatcow/files" afterPath="$PROJECT_DIR$/Icons/fatcow/files" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Icons/fatcow/info.txt" afterPath="$PROJECT_DIR$/Icons/fatcow/info.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Icons/resources_rc.py" afterPath="$PROJECT_DIR$/Icons/resources_rc.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Icons/test.qrc" afterPath="$PROJECT_DIR$/Icons/test.qrc" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/LICENSE" afterPath="$PROJECT_DIR$/LICENSE" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Makefile" afterPath="$PROJECT_DIR$/Makefile" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/README.html" afterPath="$PROJECT_DIR$/README.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/README.md" afterPath="$PROJECT_DIR$/README.md" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Series.py" afterPath="$PROJECT_DIR$/Series.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/_config.yml" afterPath="$PROJECT_DIR$/_config.yml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/acerca_de.py" afterPath="$PROJECT_DIR$/acerca_de.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/actualizar_insertar.py" afterPath="$PROJECT_DIR$/actualizar_insertar.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/asistente_inicial.py" afterPath="$PROJECT_DIR$/asistente_inicial.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/check_imdb.py" afterPath="$PROJECT_DIR$/check_imdb.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/buscar_series.py" afterPath="$PROJECT_DIR$/buscar_series.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/descarga_automatica.py" afterPath="$PROJECT_DIR$/descarga_automatica.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/descarga_automatica_cli.py" afterPath="$PROJECT_DIR$/descarga_automatica_cli.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/estado_series.py" afterPath="$PROJECT_DIR$/estado_series.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fatcow.qrc" afterPath="$PROJECT_DIR$/fatcow.qrc" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/funciones.py" afterPath="$PROJECT_DIR$/funciones.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/kk.py" afterPath="$PROJECT_DIR$/kk.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/modulos/check_series.py" afterPath="$PROJECT_DIR$/modulos/check_series.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/modulos/connect_sqlite.py" afterPath="$PROJECT_DIR$/modulos/connect_sqlite.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/modulos/descomprime_rar.py" afterPath="$PROJECT_DIR$/modulos/descomprime_rar.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/modulos/prueba.py" afterPath="$PROJECT_DIR$/modulos/prueba.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/modulos/settings.py" afterPath="$PROJECT_DIR$/modulos/settings.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lista_activa.py" afterPath="$PROJECT_DIR$/lista_activa.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/listar_todas.py" afterPath="$PROJECT_DIR$/listar_todas.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/modulos/telegram2.py" afterPath="$PROJECT_DIR$/modulos/telegram2.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/modulos/telegram2_bot.py" afterPath="$PROJECT_DIR$/modulos/telegram2_bot.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/modulos/tviso.py" afterPath="$PROJECT_DIR$/modulos/tviso.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/msgbox.py" afterPath="$PROJECT_DIR$/msgbox.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/newpct1_completa.py" afterPath="$PROJECT_DIR$/newpct1_completa.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/notificaciones.py" afterPath="$PROJECT_DIR$/notificaciones.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/preferencias.py" afterPath="$PROJECT_DIR$/preferencias.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/requirements.txt" afterPath="$PROJECT_DIR$/requirements.txt" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test.py" afterPath="$PROJECT_DIR$/test.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ui/acerca_de.ui" afterPath="$PROJECT_DIR$/ui/acerca_de.ui" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ui/actualizar_insertar.ui" afterPath="$PROJECT_DIR$/ui/actualizar_insertar.ui" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ui/asistente_inicial.ui" afterPath="$PROJECT_DIR$/ui/asistente_inicial.ui" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ui/buscar_series.ui" afterPath="$PROJECT_DIR$/ui/buscar_series.ui" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ui/descarga_automatica.ui" afterPath="$PROJECT_DIR$/ui/descarga_automatica.ui" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ui/descarga_completa.ui" afterPath="$PROJECT_DIR$/ui/descarga_completa.ui" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ui/estado_series.ui" afterPath="$PROJECT_DIR$/ui/estado_series.ui" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ui/fatcow.qrc" afterPath="$PROJECT_DIR$/ui/fatcow.qrc" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ui/lista_activa.ui" afterPath="$PROJECT_DIR$/ui/lista_activa.ui" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ui/listar_todas.ui" afterPath="$PROJECT_DIR$/ui/listar_todas.ui" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ui/msgbox.ui" afterPath="$PROJECT_DIR$/ui/msgbox.ui" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ui/notificaciones.ui" afterPath="$PROJECT_DIR$/ui/notificaciones.ui" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ui/preferencias.ui" afterPath="$PROJECT_DIR$/ui/preferencias.ui" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ui/series.ui" afterPath="$PROJECT_DIR$/ui/series.ui" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -104,20 +33,22 @@
     <SUITE FILE_PATH="coverage/Gestor_Series$settings.coverage" NAME="settings Coverage Results" MODIFIED="1491674120130" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/modulos" />
     <SUITE FILE_PATH="coverage/Gestor_Series$asistente_inicial.coverage" NAME="asistente_inicial Coverage Results" MODIFIED="1491689300576" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Gestor_Series$prueba.coverage" NAME="prueba Coverage Results" MODIFIED="1491610400099" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/modulos" />
-    <SUITE FILE_PATH="coverage/Gestor_Series$Series.coverage" NAME="Series Coverage Results" MODIFIED="1491699686792" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Gestor_Series$Series.coverage" NAME="Series Coverage Results" MODIFIED="1491757014606" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Gestor_Series$funcionesIniciales.coverage" NAME="funcionesIniciales Coverage Results" MODIFIED="1491675193711" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/Gestor_Series$test.coverage" NAME="test Coverage Results" MODIFIED="1491600346023" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Gestor_Series$descarga_automatica_cli.coverage" NAME="descarga_automatica_cli Coverage Results" MODIFIED="1491753471742" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Gestor_Series$test.coverage" NAME="test Coverage Results" MODIFIED="1491753242483" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Gestor_Series$notificaciones.coverage" NAME="notificaciones Coverage Results" MODIFIED="1491603589995" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Gestor_Series$listar_todas.coverage" NAME="listar_todas Coverage Results" MODIFIED="1491603859710" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/Gestor_Series$descarga_automatica.coverage" NAME="descarga_automatica Coverage Results" MODIFIED="1491656052981" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Gestor_Series$descarga_automatica.coverage" NAME="descarga_automatica Coverage Results" MODIFIED="1491756636074" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Gestor_Series$newpct1_completa.coverage" NAME="newpct1_completa Coverage Results" MODIFIED="1491758652074" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Gestor_Series$python35.coverage" NAME="python35 Coverage Results" MODIFIED="1491593825316" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/Gestor_Series$lista_activa.coverage" NAME="lista_activa Coverage Results" MODIFIED="1491603717684" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Gestor_Series$actualizar_insertar.coverage" NAME="actualizar_insertar Coverage Results" MODIFIED="1491698606971" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Gestor_Series$acerca_de.coverage" NAME="acerca_de Coverage Results" MODIFIED="1491601979409" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Gestor_Series$funciones.coverage" NAME="funciones Coverage Results" MODIFIED="1491695746041" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Gestor_Series$telegram2_bot.coverage" NAME="telegram2_bot Coverage Results" MODIFIED="1491606047142" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/modulos" />
-    <SUITE FILE_PATH="coverage/Gestor_Series$msgbox.coverage" NAME="msgbox Coverage Results" MODIFIED="1491603873537" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/Gestor_Series$preferencias.coverage" NAME="preferencias Coverage Results" MODIFIED="1491699671935" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Gestor_Series$msgbox.coverage" NAME="msgbox Coverage Results" MODIFIED="1491700995023" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Gestor_Series$preferencias.coverage" NAME="preferencias Coverage Results" MODIFIED="1491736547036" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
   <component name="DatabaseView">
     <option name="SHOW_INTERMEDIATE" value="true" />
@@ -133,19 +64,31 @@
     <favorites_list name="Gestor-Series" />
   </component>
   <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="Series.py" pinned="false" current-in-tab="true">
+    <leaf>
+      <file leaf-file-name="Series.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Series.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="371">
-              <caret line="434" column="40" lean-forward="true" selection-start-line="434" selection-start-column="40" selection-end-line="434" selection-end-column="40" />
+            <state relative-caret-position="736">
+              <caret line="313" column="78" lean-forward="true" selection-start-line="313" selection-start-column="78" selection-end-line="313" selection-end-column="78" />
               <folding>
                 <element signature="e#57#67#0" expanded="true" />
-                <marker date="1491697383905" expanded="true" signature="1642:1791" ph="SELECT Nombr... Series" />
-                <marker date="1491697383905" expanded="true" signature="1642:1792" ph="SELECT Nombr... Series" />
-                <marker date="1491697383905" expanded="true" signature="8431:8491" ph="UPDATE serie... " />
-                <marker date="1491697383905" expanded="true" signature="9425:9485" ph="UPDATE serie... " />
-                <marker date="1491697383905" expanded="true" signature="18127:18195" ph="SELECT * FRO... Configuraciones" />
+                <marker date="1491739855292" expanded="true" signature="1642:1791" ph="SELECT Nombr... Series" />
+                <marker date="1491739855292" expanded="true" signature="1642:1792" ph="SELECT Nombr... Series" />
+                <marker date="1491739855292" expanded="true" signature="8431:8491" ph="UPDATE serie... " />
+                <marker date="1491739855292" expanded="true" signature="9425:9485" ph="UPDATE serie... " />
+                <marker date="1491739855292" expanded="true" signature="18130:18198" ph="SELECT * FRO... Configuraciones" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="newpct1_completa.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/newpct1_completa.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1184">
+              <caret line="74" column="21" lean-forward="false" selection-start-line="74" selection-start-column="6" selection-end-line="74" selection-end-column="21" />
+              <folding>
+                <element signature="e#57#67#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -162,16 +105,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>&quot;{}&quot;</find>
-      <find>tumejor</find>
-      <find>descargaTorrent</find>
-      <find>descargaFichero</find>
-      <find>help</find>
-      <find>id_db</find>
-      <find>'id.conf'</find>
-      <find>sync.conf</find>
-      <find>asistente_inicial</find>
-      <find>id</find>
       <find>sync</find>
       <find>cnf</find>
       <find>buttonTeorico</find>
@@ -187,8 +120,21 @@
       <find>fin</find>
       <find>dolp</find>
       <find>self.actuales</find>
-      <find>creaDirectorioTrabajo</find>
       <find>self.configuracion</find>
+      <find>creaDirectorioTrabajo</find>
+      <find>mifor</find>
+      <find>calen</find>
+      <find>self.rutlog</find>
+      <find>rutlog</find>
+      <find>self.descargaFichero</find>
+      <find>self.buscaTorrent</find>
+      <find>descargaTorrent</find>
+      <find>time</find>
+      <find>buscaTorrent</find>
+      <find>escapaParentesis</find>
+      <find>fallo</find>
+      <find>int(</find>
+      <find>muestraNotificaciones</find>
     </findStrings>
     <replaceStrings>
       <replace>'{}'</replace>
@@ -205,34 +151,34 @@
         <option value="/&lt;Generic SQL&gt; Fragment (notificaciones.py:2546).sql" />
         <option value="$PROJECT_DIR$/check_imdb.py" />
         <option value="$PROJECT_DIR$/kk.py" />
-        <option value="$PROJECT_DIR$/msgbox.py" />
         <option value="$PROJECT_DIR$/setup.py" />
-        <option value="$PROJECT_DIR$/test.py" />
-        <option value="$PROJECT_DIR$/acerca_de.py" />
-        <option value="$PROJECT_DIR$/buscar_series.py" />
-        <option value="$PROJECT_DIR$/notificaciones.py" />
-        <option value="$PROJECT_DIR$/lista_activa.py" />
-        <option value="$PROJECT_DIR$/listar_todas.py" />
         <option value="$PROJECT_DIR$/modulos/pushbullet2.py" />
         <option value="$PROJECT_DIR$/modulos/mail2.py" />
         <option value="$PROJECT_DIR$/modulos/tviso.py" />
         <option value="$PROJECT_DIR$/modulos/prueba.py" />
-        <option value="$PROJECT_DIR$/modulos/telegram2.py" />
-        <option value="$PROJECT_DIR$/modulos/telegram2_bot.py" />
         <option value="$PROJECT_DIR$/modulos/descomprime_rar.py" />
-        <option value="$PROJECT_DIR$/descarga_automatica.py" />
-        <option value="$PROJECT_DIR$/descarga_automatica_cli.py" />
         <option value="$PROJECT_DIR$/modulos/constantes.py" />
-        <option value="$PROJECT_DIR$/modulos/settings.py" />
         <option value="$PROJECT_DIR$/funcionesIniciales.py" />
-        <option value="$PROJECT_DIR$/newpct1_completa.py" />
         <option value="$PROJECT_DIR$/asistente_inicial.py" />
         <option value="$PROJECT_DIR$/modulos/connect_sqlite.py" />
-        <option value="$PROJECT_DIR$/Series.py" />
-        <option value="$PROJECT_DIR$/funciones.py" />
-        <option value="$PROJECT_DIR$/actualizar_insertar.py" />
+        <option value="$PROJECT_DIR$/acerca_de.py" />
+        <option value="$PROJECT_DIR$/buscar_series.py" />
         <option value="$PROJECT_DIR$/estado_series.py" />
+        <option value="$PROJECT_DIR$/listar_todas.py" />
+        <option value="$PROJECT_DIR$/msgbox.py" />
+        <option value="$PROJECT_DIR$/notificaciones.py" />
         <option value="$PROJECT_DIR$/preferencias.py" />
+        <option value="$PROJECT_DIR$/Series.py" />
+        <option value="$PROJECT_DIR$/lista_activa.py" />
+        <option value="$PROJECT_DIR$/modulos/telegram2.py" />
+        <option value="$PROJECT_DIR$/modulos/telegram2_bot.py" />
+        <option value="$PROJECT_DIR$/actualizar_insertar.py" />
+        <option value="$PROJECT_DIR$/test.py" />
+        <option value="$PROJECT_DIR$/descarga_automatica_cli.py" />
+        <option value="$PROJECT_DIR$/descarga_automatica.py" />
+        <option value="$PROJECT_DIR$/funciones.py" />
+        <option value="$PROJECT_DIR$/modulos/settings.py" />
+        <option value="$PROJECT_DIR$/newpct1_completa.py" />
       </list>
     </option>
   </component>
@@ -262,6 +208,33 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scratches" />
+      <pane id="Scope">
+        <subPane subId="Default">
+          <PATH>
+            <PATH_ELEMENT USER_OBJECT="Root">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT USER_OBJECT="Gestor-Series">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+          </PATH>
+        </subPane>
+        <subPane subId="Project Files">
+          <PATH>
+            <PATH_ELEMENT USER_OBJECT="Root">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT USER_OBJECT="Gestor-Series">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+          </PATH>
+        </subPane>
+      </pane>
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -286,33 +259,6 @@
             <PATH_ELEMENT>
               <option name="myItemId" value="modulos" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-        </subPane>
-      </pane>
-      <pane id="Scratches" />
-      <pane id="Scope">
-        <subPane subId="Default">
-          <PATH>
-            <PATH_ELEMENT USER_OBJECT="Root">
-              <option name="myItemId" value="" />
-              <option name="myItemType" value="" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT USER_OBJECT="Gestor-Series">
-              <option name="myItemId" value="" />
-              <option name="myItemType" value="" />
-            </PATH_ELEMENT>
-          </PATH>
-        </subPane>
-        <subPane subId="Project Files">
-          <PATH>
-            <PATH_ELEMENT USER_OBJECT="Root">
-              <option name="myItemId" value="" />
-              <option name="myItemType" value="" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT USER_OBJECT="Gestor-Series">
-              <option name="myItemId" value="" />
-              <option name="myItemType" value="" />
             </PATH_ELEMENT>
           </PATH>
         </subPane>
@@ -349,26 +295,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.Series">
-    <configuration default="false" name="funciones" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="/usr/bin/python3.5" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="Gestor-Series" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/funciones.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <method />
-    </configuration>
+  <component name="RunManager" selected="Python.newpct1_completa">
     <configuration default="false" name="Series" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -388,7 +315,7 @@
       <option name="EMULATE_TERMINAL" value="false" />
       <method />
     </configuration>
-    <configuration default="false" name="funcionesIniciales" type="PythonConfigurationType" factoryName="Python" temporary="true">
+    <configuration default="false" name="descarga_automatica" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -401,13 +328,13 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <module name="Gestor-Series" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/funcionesIniciales.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/descarga_automatica.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
       <method />
     </configuration>
-    <configuration default="false" name="actualizar_insertar" type="PythonConfigurationType" factoryName="Python" temporary="true">
+    <configuration default="false" name="descarga_automatica_cli" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -420,13 +347,13 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <module name="Gestor-Series" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/actualizar_insertar.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/descarga_automatica_cli.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
       <method />
     </configuration>
-    <configuration default="false" name="preferencias" type="PythonConfigurationType" factoryName="Python" temporary="true">
+    <configuration default="false" name="newpct1_completa" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -439,7 +366,26 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <module name="Gestor-Series" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/preferencias.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/newpct1_completa.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <method />
+    </configuration>
+    <configuration default="false" name="test" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="/usr/bin/python3.5" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="Gestor-Series" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/test.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -662,19 +608,19 @@
     </configuration>
     <list size="6">
       <item index="0" class="java.lang.String" itemvalue="Python.asistente_inicial" />
-      <item index="1" class="java.lang.String" itemvalue="Python.funciones" />
-      <item index="2" class="java.lang.String" itemvalue="Python.Series" />
-      <item index="3" class="java.lang.String" itemvalue="Python.funcionesIniciales" />
-      <item index="4" class="java.lang.String" itemvalue="Python.actualizar_insertar" />
-      <item index="5" class="java.lang.String" itemvalue="Python.preferencias" />
+      <item index="1" class="java.lang.String" itemvalue="Python.Series" />
+      <item index="2" class="java.lang.String" itemvalue="Python.descarga_automatica" />
+      <item index="3" class="java.lang.String" itemvalue="Python.descarga_automatica_cli" />
+      <item index="4" class="java.lang.String" itemvalue="Python.newpct1_completa" />
+      <item index="5" class="java.lang.String" itemvalue="Python.test" />
     </list>
     <recent_temporary>
       <list size="5">
-        <item index="0" class="java.lang.String" itemvalue="Python.Series" />
-        <item index="1" class="java.lang.String" itemvalue="Python.preferencias" />
-        <item index="2" class="java.lang.String" itemvalue="Python.actualizar_insertar" />
-        <item index="3" class="java.lang.String" itemvalue="Python.funciones" />
-        <item index="4" class="java.lang.String" itemvalue="Python.funcionesIniciales" />
+        <item index="0" class="java.lang.String" itemvalue="Python.newpct1_completa" />
+        <item index="1" class="java.lang.String" itemvalue="Python.Series" />
+        <item index="2" class="java.lang.String" itemvalue="Python.descarga_automatica" />
+        <item index="3" class="java.lang.String" itemvalue="Python.descarga_automatica_cli" />
+        <item index="4" class="java.lang.String" itemvalue="Python.test" />
       </list>
     </recent_temporary>
   </component>
@@ -744,38 +690,12 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/Series.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <element signature="e#57#67#0" expanded="true" />
-            <marker date="1491697383905" expanded="true" signature="1642:1791" ph="SELECT Nombr... Series" />
-            <marker date="1491697383905" expanded="true" signature="1642:1792" ph="SELECT Nombr... Series" />
-            <marker date="1491697383905" expanded="true" signature="8431:8491" ph="UPDATE serie... " />
-            <marker date="1491697383905" expanded="true" signature="9425:9485" ph="UPDATE serie... " />
-            <marker date="1491697383905" expanded="true" signature="18127:18195" ph="SELECT * FRO... Configuraciones" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/funciones.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="240">
-          <caret line="25" column="9" lean-forward="false" selection-start-line="25" selection-start-column="9" selection-end-line="25" selection-end-column="9" />
-          <folding>
-            <element signature="e#47#56#0" expanded="true" />
-            <marker date="1491697450766" expanded="true" signature="1753:1795" ph="SELECT * FRO... Configuraciones" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/asistente_inicial.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2288">
           <caret line="149" column="16" lean-forward="false" selection-start-line="149" selection-start-column="4" selection-end-line="149" selection-end-column="16" />
           <folding>
-            <element signature="e#47#57#0" expanded="true" />
+            <element signature="e#47#57#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -784,7 +704,13 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="5360">
           <caret line="344" column="7" lean-forward="false" selection-start-line="344" selection-start-column="4" selection-end-line="344" selection-end-column="7" />
-          <folding />
+          <folding>
+            <marker date="1491743118203" expanded="true" signature="4900:4924" ph="SELECT * FRO... ID_Estados" />
+            <marker date="1491743118203" expanded="true" signature="8312:8482" ph="UPDATE serie... " />
+            <marker date="1491743118203" expanded="true" signature="8774:8946" ph="INSERT INTO series... " />
+            <marker date="1491743118203" expanded="true" signature="9259:9431" ph="UPDATE serie... " />
+            <marker date="1491743118203" expanded="true" signature="9723:9895" ph="INSERT INTO series... " />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -803,7 +729,7 @@
         <state relative-caret-position="448">
           <caret line="29" column="28" lean-forward="true" selection-start-line="29" selection-start-column="2" selection-end-line="29" selection-end-column="28" />
           <folding>
-            <element signature="e#47#56#0" expanded="true" />
+            <element signature="e#47#56#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -813,9 +739,9 @@
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <marker date="1491603608415" expanded="true" signature="2552:2580" ph="SELECT * FRO... Notificaciones" />
-            <marker date="1491603608415" expanded="true" signature="5218:5288" ph="UPDATE Notif... " />
-            <marker date="1491603608415" expanded="true" signature="5395:5465" ph="UPDATE Notif... " />
+            <marker date="1491701050054" expanded="true" signature="2570:2598" ph="SELECT * FRO... Notificaciones" />
+            <marker date="1491701050054" expanded="true" signature="5236:5306" ph="UPDATE Notif... " />
+            <marker date="1491701050054" expanded="true" signature="5413:5483" ph="UPDATE Notif... " />
           </folding>
         </state>
       </provider>
@@ -826,11 +752,11 @@
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#57#67#0" expanded="true" />
-            <marker date="1491697383905" expanded="true" signature="1642:1791" ph="SELECT Nombr... Series" />
-            <marker date="1491697383905" expanded="true" signature="1642:1792" ph="SELECT Nombr... Series" />
-            <marker date="1491697383905" expanded="true" signature="8431:8491" ph="UPDATE serie... " />
-            <marker date="1491697383905" expanded="true" signature="9425:9485" ph="UPDATE serie... " />
-            <marker date="1491697383905" expanded="true" signature="18127:18195" ph="SELECT * FRO... Configuraciones" />
+            <marker date="1491739855292" expanded="true" signature="1642:1791" ph="SELECT Nombr... Series" />
+            <marker date="1491739855292" expanded="true" signature="1642:1792" ph="SELECT Nombr... Series" />
+            <marker date="1491739855292" expanded="true" signature="8431:8491" ph="UPDATE serie... " />
+            <marker date="1491739855292" expanded="true" signature="9425:9485" ph="UPDATE serie... " />
+            <marker date="1491739855292" expanded="true" signature="18130:18198" ph="SELECT * FRO... Configuraciones" />
           </folding>
         </state>
       </provider>
@@ -868,31 +794,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/buscar_series.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="314">
-          <caret line="60" column="33" lean-forward="true" selection-start-line="60" selection-start-column="33" selection-end-line="60" selection-end-column="33" />
-          <folding>
-            <marker date="1491602558096" expanded="true" signature="1197:1249" ph="SELECT Nombr... Series" />
-            <marker date="1491602558096" expanded="true" signature="2045:2088" ph="SELECT * FRO... Series" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/check_imdb.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="160">
-          <caret line="10" column="40" lean-forward="true" selection-start-line="10" selection-start-column="40" selection-end-line="10" selection-end-column="40" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/compila_ui.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="224">
-          <caret line="14" column="0" lean-forward="false" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/fatcow_rc.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -900,53 +801,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/notificaciones.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1008">
-          <caret line="69" column="15" lean-forward="false" selection-start-line="69" selection-start-column="15" selection-end-line="69" selection-end-column="15" />
-          <folding>
-            <marker date="1491603608415" expanded="true" signature="2552:2580" ph="SELECT * FRO... Notificaciones" />
-            <marker date="1491603608415" expanded="true" signature="5218:5288" ph="UPDATE Notif... " />
-            <marker date="1491603608415" expanded="true" signature="5395:5465" ph="UPDATE Notif... " />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/listar_todas.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="192">
-          <caret line="18" column="15" lean-forward="false" selection-start-line="18" selection-start-column="15" selection-end-line="18" selection-end-column="15" />
-          <folding>
-            <marker date="1491603857073" expanded="true" signature="1583:1592" ph="..." />
-            <marker date="1491603857073" expanded="true" signature="1732:1768" ph="SELECT * FRO... Series" />
-            <marker date="1491603857073" expanded="true" signature="3762:3879" ph="UPDATE serie... " />
-            <marker date="1491603857073" expanded="true" signature="4030:4101" ph="UPDATE serie... " />
-            <marker date="1491603857073" expanded="true" signature="4270:4327" ph="UPDATE serie... " />
-            <marker date="1491603857073" expanded="true" signature="4500:4574" ph="UPDATE serie... " />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/msgbox.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="256">
-          <caret line="20" column="0" lean-forward="true" selection-start-line="20" selection-start-column="0" selection-end-line="20" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/setup.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-240">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/acerca_de.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="602">
-          <caret line="47" column="0" lean-forward="false" selection-start-line="47" selection-start-column="0" selection-end-line="47" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -986,14 +844,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/modulos/mail2.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="496">
-          <caret line="32" column="0" lean-forward="true" selection-start-line="32" selection-start-column="0" selection-end-line="32" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/modulos/pushbullet2.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="496">
@@ -1009,34 +859,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="336">
-          <caret line="21" column="6" lean-forward="false" selection-start-line="21" selection-start-column="6" selection-end-line="21" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/modulos/tviso.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="400">
           <caret line="100" column="39" lean-forward="false" selection-start-line="100" selection-start-column="39" selection-end-line="100" selection-end-column="39" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/modulos/prueba.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="80">
-          <caret line="5" column="0" lean-forward="true" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/modulos/telegram2.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="205">
-          <caret line="34" column="0" lean-forward="false" selection-start-line="34" selection-start-column="0" selection-end-line="34" selection-end-column="0" />
-          <folding>
-            <marker date="1491638429409" expanded="true" signature="915:941" ph="SELECT * FRO... Credenciales" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1045,13 +871,6 @@
         <state relative-caret-position="205">
           <caret line="257" column="8" lean-forward="false" selection-start-line="257" selection-start-column="8" selection-end-line="257" selection-end-column="8" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/modulos/telegram2_bot.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="429">
-          <caret line="70" column="54" lean-forward="false" selection-start-line="70" selection-start-column="54" selection-end-line="70" selection-end-column="54" />
         </state>
       </provider>
     </entry>
@@ -1072,28 +891,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/descarga_automatica.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="336">
-          <caret line="300" column="0" lean-forward="true" selection-start-line="300" selection-start-column="0" selection-end-line="300" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/descarga_automatica_cli.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="274">
-          <caret line="33" column="12" lean-forward="false" selection-start-line="33" selection-start-column="12" selection-end-line="33" selection-end-column="12" />
-          <folding>
-            <element signature="e#57#66#0" expanded="true" />
-            <marker date="1491656384664" expanded="true" signature="1231:1326" ph="SELECT Nombr... Series" />
-            <marker date="1491656384664" expanded="true" signature="4493:4556" ph="UPDATE Serie... " />
-            <marker date="1491656384664" expanded="true" signature="8080:8129" ph="UPDATE serie... " />
-            <marker date="1491656384664" expanded="true" signature="11077:11105" ph="SELECT * FRO... notificaciones" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/modulos/__init__.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -1103,14 +900,6 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/funcionesIniciales.py" />
-    <entry file="file://$PROJECT_DIR$/lista_activa.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="112">
-          <caret line="7" column="0" lean-forward="false" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/modulos/constantes.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="112">
@@ -1119,106 +908,277 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/newpct1_completa.py">
+    <entry file="file://$PROJECT_DIR$/LICENSE">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="160">
-          <caret line="10" column="1" lean-forward="false" selection-start-line="10" selection-start-column="1" selection-end-line="10" selection-end-column="1" />
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/acerca_de.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-320">
+          <caret line="9" column="14" lean-forward="false" selection-start-line="9" selection-start-column="14" selection-end-line="9" selection-end-column="14" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/asistente_inicial.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="408">
+        <state relative-caret-position="585">
           <caret line="189" column="0" lean-forward="true" selection-start-line="189" selection-start-column="0" selection-end-line="189" selection-end-column="0" />
           <folding>
-            <element signature="e#47#57#0" expanded="true" />
+            <element signature="e#47#57#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/modulos/connect_sqlite.py">
+    <entry file="file://$PROJECT_DIR$/buscar_series.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="576">
-          <caret line="45" column="39" lean-forward="false" selection-start-line="45" selection-start-column="39" selection-end-line="45" selection-end-column="39" />
+        <state relative-caret-position="624">
+          <caret line="46" column="13" lean-forward="true" selection-start-line="46" selection-start-column="13" selection-end-line="46" selection-end-column="13" />
           <folding>
-            <element signature="e#47#61#0" expanded="true" />
+            <marker date="1491700524967" expanded="true" signature="1197:1249" ph="SELECT Nombr... Series" />
+            <marker date="1491700524967" expanded="true" signature="2030:2073" ph="SELECT * FRO... Series" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/funciones.py">
+    <entry file="file://$PROJECT_DIR$/check_imdb.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="288">
-          <caret line="66" column="0" lean-forward="true" selection-start-line="66" selection-start-column="0" selection-end-line="66" selection-end-column="0" />
-          <folding>
-            <element signature="e#47#56#0" expanded="true" />
-            <marker date="1491697450766" expanded="true" signature="1753:1795" ph="SELECT * FRO... Configuraciones" />
-          </folding>
+        <state relative-caret-position="160">
+          <caret line="10" column="40" lean-forward="true" selection-start-line="10" selection-start-column="40" selection-end-line="10" selection-end-column="40" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/modulos/settings.py">
+    <entry file="file://$PROJECT_DIR$/compila_ui.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="192">
-          <caret line="12" column="85" lean-forward="true" selection-start-line="12" selection-start-column="85" selection-end-line="12" selection-end-column="85" />
-          <folding>
-            <element signature="e#47#56#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="208">
+          <caret line="14" column="0" lean-forward="false" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/actualizar_insertar.py">
+    <entry file="file://$PROJECT_DIR$/requirements.txt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="992">
-          <caret line="254" column="56" lean-forward="false" selection-start-line="254" selection-start-column="56" selection-end-line="254" selection-end-column="56" />
+        <state relative-caret-position="0">
+          <caret line="0" column="14" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="14" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/estado_series.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="277">
-          <caret line="73" column="26" lean-forward="true" selection-start-line="73" selection-start-column="26" selection-end-line="73" selection-end-column="26" />
+        <state relative-caret-position="232">
+          <caret line="150" column="33" lean-forward="true" selection-start-line="150" selection-start-column="21" selection-end-line="150" selection-end-column="33" />
           <folding>
-            <element signature="e#47#57#0" expanded="true" />
-            <marker date="1491699075035" expanded="true" signature="1781:1856" ph="SELECT Nombr... Series" />
-            <marker date="1491699075035" expanded="true" signature="1960:2110" ph="SELECT ID, N... Series" />
-            <marker date="1491699075035" expanded="true" signature="1960:2111" ph="SELECT ID, N... Series" />
-            <marker date="1491699075035" expanded="true" signature="2207:2333" ph="SELECT ID, N... Series" />
-            <marker date="1491699075035" expanded="true" signature="2430:2638" ph="SELECT ID, N... Series" />
-            <marker date="1491699075035" expanded="true" signature="2891:2917" ph="SELECT * FRO... Credenciales" />
-            <marker date="1491699075035" expanded="true" signature="5215:5321" ph="UPDATE serie... " />
-            <marker date="1491699075035" expanded="true" signature="6630:6744" ph="UPDATE serie... " />
-            <marker date="1491699075035" expanded="true" signature="6923:6994" ph="UPDATE serie... " />
-            <marker date="1491699075035" expanded="true" signature="7155:7262" ph="UPDATE serie... " />
+            <element signature="e#47#57#0" expanded="false" />
+            <marker date="1491700864016" expanded="true" signature="1781:1856" ph="SELECT Nombr... Series" />
+            <marker date="1491700864016" expanded="true" signature="1960:2110" ph="SELECT ID, N... Series" />
+            <marker date="1491700864016" expanded="true" signature="1960:2111" ph="SELECT ID, N... Series" />
+            <marker date="1491700864016" expanded="true" signature="2207:2333" ph="SELECT ID, N... Series" />
+            <marker date="1491700864016" expanded="true" signature="2430:2638" ph="SELECT ID, N... Series" />
+            <marker date="1491700864016" expanded="true" signature="2891:2917" ph="SELECT * FRO... Credenciales" />
+            <marker date="1491700864016" expanded="true" signature="5186:5292" ph="UPDATE serie... " />
+            <marker date="1491700864016" expanded="true" signature="6601:6715" ph="UPDATE serie... " />
+            <marker date="1491700864016" expanded="true" signature="6894:6965" ph="UPDATE serie... " />
+            <marker date="1491700864016" expanded="true" signature="7126:7233" ph="UPDATE serie... " />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/listar_todas.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-880">
+          <caret line="56" column="11" lean-forward="false" selection-start-line="56" selection-start-column="11" selection-end-line="56" selection-end-column="11" />
+          <folding>
+            <marker date="1491700919344" expanded="true" signature="1608:1617" ph="..." />
+            <marker date="1491700919344" expanded="true" signature="1757:1793" ph="SELECT * FRO... Series" />
+            <marker date="1491700919344" expanded="true" signature="3787:3904" ph="UPDATE serie... " />
+            <marker date="1491700919344" expanded="true" signature="4055:4126" ph="UPDATE serie... " />
+            <marker date="1491700919344" expanded="true" signature="4295:4352" ph="UPDATE serie... " />
+            <marker date="1491700919344" expanded="true" signature="4525:4599" ph="UPDATE serie... " />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/modulos/connect_sqlite.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="160">
+          <caret line="28" column="30" lean-forward="false" selection-start-line="28" selection-start-column="4" selection-end-line="28" selection-end-column="30" />
+          <folding>
+            <element signature="e#47#61#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/modulos/prueba.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="48">
+          <caret line="5" column="0" lean-forward="true" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/msgbox.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="704">
+          <caret line="48" column="113" lean-forward="false" selection-start-line="48" selection-start-column="113" selection-end-line="48" selection-end-column="113" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/notificaciones.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-16">
+          <caret line="23" column="34" lean-forward="false" selection-start-line="23" selection-start-column="34" selection-end-line="23" selection-end-column="34" />
+          <folding>
+            <marker date="1491701050054" expanded="true" signature="2570:2598" ph="SELECT * FRO... Notificaciones" />
+            <marker date="1491701050054" expanded="true" signature="5236:5306" ph="UPDATE Notif... " />
+            <marker date="1491701050054" expanded="true" signature="5413:5483" ph="UPDATE Notif... " />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/preferencias.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="309">
-          <caret line="41" column="70" lean-forward="false" selection-start-line="41" selection-start-column="70" selection-end-line="41" selection-end-column="70" />
+        <state relative-caret-position="-144">
+          <caret line="64" column="86" lean-forward="true" selection-start-line="64" selection-start-column="86" selection-end-line="64" selection-end-column="86" />
           <folding>
-            <marker date="1491699668681" expanded="true" signature="2927:2956" ph="SELECT * FRO... Configuraciones" />
-            <marker date="1491699668681" expanded="true" signature="4424:4560" ph="INSERT INTO Configuraciones... " />
-            <marker date="1491699668681" expanded="true" signature="4832:4945" ph="UPDATE Confi... " />
+            <marker date="1491701349371" expanded="true" signature="2956:3057" ph="..." />
+            <marker date="1491701349371" expanded="true" signature="3000:3029" ph="SELECT * FRO... Configuraciones" />
+            <marker date="1491701349371" expanded="true" signature="3546:4001" ph="..." />
+            <marker date="1491701349371" expanded="true" signature="4497:4609" ph="INSERT INTO Configuraciones... " />
+            <marker date="1491701349371" expanded="true" signature="4881:4994" ph="UPDATE Confi... " />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lista_activa.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="357">
+          <caret line="28" column="0" lean-forward="true" selection-start-line="28" selection-start-column="0" selection-end-line="28" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/modulos/telegram2.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="304">
+          <caret line="21" column="0" lean-forward="false" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="0" />
+          <folding>
+            <marker date="1491741040363" expanded="true" signature="1070:1096" ph="SELECT * FRO... Credenciales" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/actualizar_insertar.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="400">
+          <caret line="332" column="14" lean-forward="false" selection-start-line="332" selection-start-column="10" selection-end-line="332" selection-end-column="14" />
+          <folding>
+            <marker date="1491743118203" expanded="true" signature="4900:4924" ph="SELECT * FRO... ID_Estados" />
+            <marker date="1491743118203" expanded="true" signature="8312:8482" ph="UPDATE serie... " />
+            <marker date="1491743118203" expanded="true" signature="8774:8946" ph="INSERT INTO series... " />
+            <marker date="1491743118203" expanded="true" signature="9259:9431" ph="UPDATE serie... " />
+            <marker date="1491743118203" expanded="true" signature="9723:9895" ph="INSERT INTO series... " />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/modulos/telegram2_bot.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="637">
+          <caret line="65" column="0" lean-forward="false" selection-start-line="65" selection-start-column="0" selection-end-line="65" selection-end-column="0" />
+          <folding>
+            <marker date="1491741848188" expanded="true" signature="1051:1119" ph="SELECT * FRO... Configuraciones" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/modulos/mail2.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="128">
+          <caret line="8" column="35" lean-forward="false" selection-start-line="8" selection-start-column="29" selection-end-line="8" selection-end-column="35" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="432">
+          <caret line="27" column="0" lean-forward="true" selection-start-line="27" selection-start-column="0" selection-end-line="27" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/descarga_automatica_cli.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1056">
+          <caret line="99" column="35" lean-forward="false" selection-start-line="99" selection-start-column="23" selection-end-line="99" selection-end-column="35" />
+          <folding>
+            <element signature="e#57#66#0" expanded="true" />
+            <marker date="1491757771280" expanded="true" signature="785:907" ph="SELECT Nombr... Series" />
+            <marker date="1491757771280" expanded="true" signature="3970:4033" ph="UPDATE Serie... " />
+            <marker date="1491757771280" expanded="true" signature="7531:7580" ph="UPDATE serie... " />
+            <marker date="1491757771280" expanded="true" signature="8451:8479" ph="SELECT * FRO... notificaciones" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/descarga_automatica.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="384">
+          <caret line="42" column="72" lean-forward="false" selection-start-line="42" selection-start-column="72" selection-end-line="42" selection-end-column="72" />
+          <folding>
+            <element signature="e#57#67#0" expanded="true" />
+            <marker date="1491757771256" expanded="true" signature="4142:4205" ph="UPDATE Serie... " />
+            <marker date="1491757771256" expanded="true" signature="7842:7891" ph="UPDATE serie... " />
+            <marker date="1491757771256" expanded="true" signature="9198:9293" ph="SELECT Nombr... Series" />
+            <marker date="1491757771256" expanded="true" signature="10108:10136" ph="SELECT * FRO... Notificaciones" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Series.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="371">
-          <caret line="434" column="40" lean-forward="true" selection-start-line="434" selection-start-column="40" selection-end-line="434" selection-end-column="40" />
+        <state relative-caret-position="736">
+          <caret line="313" column="78" lean-forward="true" selection-start-line="313" selection-start-column="78" selection-end-line="313" selection-end-column="78" />
           <folding>
             <element signature="e#57#67#0" expanded="true" />
-            <marker date="1491697383905" expanded="true" signature="1642:1791" ph="SELECT Nombr... Series" />
-            <marker date="1491697383905" expanded="true" signature="1642:1792" ph="SELECT Nombr... Series" />
-            <marker date="1491697383905" expanded="true" signature="8431:8491" ph="UPDATE serie... " />
-            <marker date="1491697383905" expanded="true" signature="9425:9485" ph="UPDATE serie... " />
-            <marker date="1491697383905" expanded="true" signature="18127:18195" ph="SELECT * FRO... Configuraciones" />
+            <marker date="1491739855292" expanded="true" signature="1642:1791" ph="SELECT Nombr... Series" />
+            <marker date="1491739855292" expanded="true" signature="1642:1792" ph="SELECT Nombr... Series" />
+            <marker date="1491739855292" expanded="true" signature="8431:8491" ph="UPDATE serie... " />
+            <marker date="1491739855292" expanded="true" signature="9425:9485" ph="UPDATE serie... " />
+            <marker date="1491739855292" expanded="true" signature="18130:18198" ph="SELECT * FRO... Configuraciones" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/funciones.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="121">
+          <caret line="202" column="17" lean-forward="false" selection-start-line="202" selection-start-column="17" selection-end-line="202" selection-end-column="17" />
+          <folding>
+            <element signature="e#47#56#0" expanded="true" />
+            <marker date="1491757771271" expanded="true" signature="1812:1854" ph="SELECT * FRO... Configuraciones" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/modulos/settings.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="64">
+          <caret line="7" column="17" lean-forward="false" selection-start-line="7" selection-start-column="17" selection-end-line="7" selection-end-column="17" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/newpct1_completa.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1184">
+          <caret line="74" column="21" lean-forward="false" selection-start-line="74" selection-start-column="6" selection-end-line="74" selection-end-column="21" />
+          <folding>
+            <element signature="e#57#67#0" expanded="true" />
           </folding>
         </state>
       </provider>

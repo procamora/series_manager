@@ -63,42 +63,6 @@ def checkError(codigo, stderr):
     return False
 
 
-def descargaTorrent(direcc, message):  # PARA NEWPCT1
-    """
-    Funcion que obtiene la url torrent del la dirreccion que recibe
-
-    :param str direcc: Dirreccion de la pagina web que contiene el torrent
-    :param obj message: instancia del mensaje recibido
-
-    :return str: Nos devuelve el string con la url del torrent
-    """
-    if re.search("newpct1", direcc):
-        bot.reply_to(message, 'Buscando torrent en newpct1')
-        session = requests.session()
-        page = session.get(direcc, verify=False).text
-        sopa = BeautifulSoup(page, 'html.parser')
-        return sopa.find('div', {"id": "tab1"}).a['href']
-
-    elif re.search("tumejortorrent", direcc):
-        # han cambiado la pagina, modifico tumejortorrent por newpct1
-        """
-        bot.reply_to(message, 'Buscando torrent en tumejortorrent')
-        session = requests.session()
-        page = session.get(direcc, verify=False).text
-        sopa = BeautifulSoup(page, 'html.parser')
-        # print(sopa.findAll('div', {"id": "tab1"}))
-        print(sopa.find_all("a", class_="btn-torrent")[0]['href'])
-        return sopa.find('div', {"id": "tab1"}).a['href']
-        """
-        return descargaTorrent(direcc.replace("tumejortorrent", "newpct1"), message)
-
-
-def descargaFichero(url, destino):
-    r = requests.get(url)
-    with open(destino, "wb") as code:
-        code.write(r.content)
-
-
 # Handle always first "/start" message when new chat with your bot is created
 
 

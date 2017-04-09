@@ -9,7 +9,7 @@ from modulos.connect_sqlite import conectionSQLite, ejecutaScriptSqlite
 from modulos.settings import modo_debug, ruta_db
 
 
-class MiFormulario(QtWidgets.QDialog):
+class ListarTodas(QtWidgets.QDialog):
     def __init__(self, parent=None, dbSeries=None):
         QtWidgets.QWidget.__init__(self, parent)
         self.ui = Ui_Dialog()
@@ -24,9 +24,9 @@ class MiFormulario(QtWidgets.QDialog):
 
         self.setWindowTitle('Modificaciones en masa')
         # esto permite selecionar multiples
-        self.ui.listWidget.setSelectionMode(
-            QtWidgets.QAbstractItemView.ExtendedSelection)
+        self.ui.listWidget.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
 
+        self.seriesTest = list(dict())
         self.sacaSeries()
 
         self.ui.radioButtonAct.clicked.connect(self.seriesActuales)
@@ -125,7 +125,7 @@ class MiFormulario(QtWidgets.QDialog):
                 self.queryCompleta += query
 
         if modo_debug:
-            print((self.queryCompleta))
+            print(self.queryCompleta)
 
     def aplicaDatos(self):
         """
@@ -133,7 +133,7 @@ class MiFormulario(QtWidgets.QDialog):
         """
 
         if modo_debug:
-            print((self.queryCompleta))
+            print(self.queryCompleta)
 
         ejecutaScriptSqlite(self.db, self.queryCompleta)
 
@@ -154,13 +154,13 @@ class MiFormulario(QtWidgets.QDialog):
 
     @staticmethod
     def getDatos(parent=None, dbSeries=None):
-        dialog = MiFormulario(parent, dbSeries)
+        dialog = ListarTodas(parent, dbSeries)
         dialog.exec_()
 
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
-    MiFormulario.getDatos(dbSeries=ruta_db)
+    ListarTodas.getDatos(dbSeries=ruta_db)
     return app
 
 

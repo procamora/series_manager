@@ -7,6 +7,7 @@ README
 + [ ] Hacer ventana grafica para la actualizacion por imdb
 + [ ] Hacer un modulo que compruebe los estados de las series y pregunte si actualizarlos, que funcione tanto por consola como por gui
 + [ ] En el uopdate del capuiitulo descargadoi poner tambien update de siguiendo y activa
++ [ ] Hacer ventana para añadir credenciales
 
 # Errores a correguir
 + [ ] Repasar todas las funciones de funciones y sustiruir donde se pueda name_db por ruta_db

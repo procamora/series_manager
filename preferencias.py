@@ -10,7 +10,7 @@ from modulos.settings import modo_debug, directorio_local, ruta_db
 import funciones
 
 
-class MiFormulario(QtWidgets.QDialog):
+class Preferencias(QtWidgets.QDialog):
     def __init__(self, parent=None, dbSeries=None):
         QtWidgets.QWidget.__init__(self, parent)
         self.ui = Ui_Dialog()
@@ -25,20 +25,22 @@ class MiFormulario(QtWidgets.QDialog):
         self.setWindowTitle('Preferencias de configuracion')
         self.ui.tabWidget.setCurrentIndex(0)
 
+        self.configuraciones = list(dict())
+        self.datodDb = dict()
         self.operacionesIniciales()
 
         # recogo todos los dias de la caja y le paso el indice del dia en el
         # que sale
         allItems = [self.ui.BoxId.itemText(i) for i in range(self.ui.BoxId.count())]
 
-        print((allItems))
+        print(allItems)
         with open(r'{}/id.conf'.format(self.ruta), 'r') as f:
             id_fich = f.readline().replace('/n', '')
 
         try:
             self.ui.BoxId.setCurrentIndex(allItems.index(id_fich))
         except ValueError:
-            if len(allItems) == 1: # si solo hay 1 es 'Otra'
+            if len(allItems) == 1:  # si solo hay 1 es 'otra'
                 self.ui.BoxId.setCurrentIndex(allItems.index(self.otra))
             else:
                 # si da error por algun motivo pongo el primero
@@ -132,7 +134,7 @@ class MiFormulario(QtWidgets.QDialog):
         if datos['ID'] == self.otra:
             print('insert')
             query = """INSERT INTO Configuraciones(UrlFeedNewpct, UrlFeedShowrss, RutaDescargas) VALUES ("{}", "{}", 
-            "{}", "{}", "{}", "{}", "{}")""".format(datos['Newpct'], datos['showrss'], datos['Ruta'])
+            "{}")""".format(datos['Newpct'], datos['showrss'], datos['Ruta'])
 
             if modo_debug:
                 print('update')
@@ -182,13 +184,13 @@ class MiFormulario(QtWidgets.QDialog):
 
     @staticmethod
     def getDatos(parent=None, dbSeries=None):
-        dialog = MiFormulario(parent, dbSeries)
+        dialog = Preferencias(parent, dbSeries)
         dialog.exec_()
 
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
-    MiFormulario.getDatos(dbSeries=ruta_db)
+    Preferencias.getDatos(dbSeries=ruta_db)
     return app
 
 

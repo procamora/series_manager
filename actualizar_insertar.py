@@ -12,7 +12,7 @@ from modulos.settings import modo_debug, ruta_db
 import funciones
 
 
-class MiFormulario(QtWidgets.QDialog):
+class ActualizarInsertar(QtWidgets.QDialog):
     def __init__(self, parent=None, dbSeries=None, datSerie=None):
         QtWidgets.QWidget.__init__(self, parent)
         self.ui = Ui_Dialog()
@@ -52,7 +52,8 @@ class MiFormulario(QtWidgets.QDialog):
             # recogo todos los dias de la caja y le paso el indice del dia en
             # el que sale
             allItems = [self.ui.BoxEmision.itemText(i) for i in range(self.ui.BoxEmision.count())]
-            self.ui.BoxEmision.setCurrentIndex(allItems.index(funciones.calculaDiaSemana()))
+            if len(allItems) > 0:
+                self.ui.BoxEmision.setCurrentIndex(allItems.index(funciones.calculaDiaSemana()))
 
         # Ocultar textos
         self.ui.lineTemp.hide()
@@ -160,10 +161,10 @@ class MiFormulario(QtWidgets.QDialog):
         else:
             self.ui.radioSeguirNo.click()
 
-        # recogo todos los dias de la caja y le paso el indice del dia en el
-        # que sale
+        # recogo todos los dias de la caja y le paso el indice del dia en el que sale
         allItems = [self.ui.BoxEmision.itemText(i) for i in range(self.ui.BoxEmision.count())]
-        self.ui.BoxEmision.setCurrentIndex(allItems.index(self.datSerie['Dia']))
+        if len(allItems) > 0:
+            self.ui.BoxEmision.setCurrentIndex(allItems.index(self.datSerie['Dia']))
 
         if self.datSerie['VOSE'] == 'Si':
             self.ui.radioVOSE_Si.click()
@@ -176,7 +177,8 @@ class MiFormulario(QtWidgets.QDialog):
             self.ui.radioAcabadaNo.click()
 
         allItems = [self.ui.BoxEstado.itemText(i) for i in range(self.ui.BoxEstado.count())]
-        self.ui.BoxEstado.setCurrentIndex(allItems.index(self.datSerie['Estado']))
+        if len(allItems) > 0:
+            self.ui.BoxEstado.setCurrentIndex(allItems.index(self.datSerie['Estado']))
 
         if self.datSerie['imdb_id'] is not None:
             self.ui.lineImdb.setText(self.datSerie['imdb_id'])
@@ -229,8 +231,7 @@ class MiFormulario(QtWidgets.QDialog):
 
         # Nombre vacia produce errores al descargar series
         if len(str(self.ui.lineTitulo.text())) != 0:
-            # HAGO ESTO PARA QUE EL UPDATE SE HAGA CON NONE EN CASO DE QUE NO
-            # LO PONGA
+            # HAGO ESTO PARA QUE EL UPDATE SE HAGA CON NONE EN CASO DE QUE NO LO PONGA
             if len(str(self.ui.lineImdb.text())) == 0:
                 if self.datSerie is not None:
                     query = '''UPDATE series SET Nombre="{}", Temporada={}, Capitulo={}, Siguiendo="{}", Dia="{}", 
@@ -286,7 +287,7 @@ class MiFormulario(QtWidgets.QDialog):
             except Exception as e:
                 print(e)
                 dat = {'title': 'Error en bd', 'text': str(e)}
-                msgbox.MiFormulario.getData(datos=dat)
+                msgbox.MsgBox.getData(datos=dat)
                 return False
         else:
             funciones.muestraMensaje(self.ui.label_Info, 'Titulo vacio', False)
@@ -322,7 +323,7 @@ class MiFormulario(QtWidgets.QDialog):
 
     @staticmethod
     def getDatos(parent=None, datSerie=None, dbSeries=None):
-        dialog = MiFormulario(parent, dbSeries, datSerie)
+        dialog = ActualizarInsertar(parent, dbSeries, datSerie)
         dialog.exec_()
 
 
@@ -332,7 +333,7 @@ def main():
     ser = None
     app = QtWidgets.QApplication(sys.argv)
     # hay que poner la base de datos como parametro
-    MiFormulario.getDatos(dbSeries=ruta_db, datSerie=ser)
+    ActualizarInsertar.getDatos(dbSeries=ruta_db, datSerie=ser)
     return app
 
 

@@ -9,7 +9,7 @@ from modulos.connect_sqlite import conectionSQLite, ejecutaScriptSqlite
 from modulos.settings import modo_debug, ruta_db
 
 
-class MiFormulario(QtWidgets.QDialog):
+class Notificaciones(QtWidgets.QDialog):
     def __init__(self, parent=None, dbSeries=None):
         QtWidgets.QWidget.__init__(self, parent)
         self.ui = Ui_Dialog()
@@ -21,29 +21,31 @@ class MiFormulario(QtWidgets.QDialog):
         self.db = dbSeries
         self.setWindowTitle('Notificaciones de la aplicacion')
 
+        self.datodDb = list(dict())
         self.operacionesIniciales()
 
         self.ui.checkBox_Telegram.clicked.connect(lambda
-                                                      x=self.ui.checkBox_Telegram,
-                                                      y=self.ui.lineEdit_Telegram: self.compruebaCheck(x, y))
+                                                  x=self.ui.checkBox_Telegram,
+                                                  y=self.ui.lineEdit_Telegram: self.compruebaCheck(x, y))
 
         self.ui.checkBox_PushBullet.clicked.connect(lambda
-                                                        x=self.ui.checkBox_PushBullet,
-                                                        y=self.ui.lineEdit_PushBullet: self.compruebaCheck(x, y))
+                                                    x=self.ui.checkBox_PushBullet,
+                                                    y=self.ui.lineEdit_PushBullet: self.compruebaCheck(x, y))
 
         self.ui.checkBox_Email.clicked.connect(lambda
-                                                   x=self.ui.checkBox_Email,
-                                                   y=self.ui.lineEdit_Email: self.compruebaCheck(x, y))
+                                               x=self.ui.checkBox_Email,
+                                               y=self.ui.lineEdit_Email: self.compruebaCheck(x, y))
 
         self.ui.checkBox_Hangouts.clicked.connect(lambda
-                                                      x=self.ui.checkBox_Hangouts,
-                                                      y=self.ui.lineEdit_Hangouts: self.compruebaCheck(x, y))
+                                                  x=self.ui.checkBox_Hangouts,
+                                                  y=self.ui.lineEdit_Hangouts: self.compruebaCheck(x, y))
 
         self.ui.pushButtonAplicar.clicked.connect(self.aplicaDatos)
         self.ui.pushButtonCerrar.clicked.connect(self.cancela)
         self.ui.pushButtonAceptar.clicked.connect(self.aceptaDatos)
 
-    def compruebaCheck(self, a, b):
+    @staticmethod
+    def compruebaCheck(a, b):
         """
         Compruueba se hay un check en el campo a y si lo hay desabilita el campo de texto b
         """
@@ -163,13 +165,13 @@ class MiFormulario(QtWidgets.QDialog):
 
     @staticmethod
     def getDatos(parent=None, dbSeries=None):
-        dialog = MiFormulario(parent, dbSeries)
+        dialog = Notificaciones(parent, dbSeries)
         dialog.exec_()
 
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
-    MiFormulario.getDatos(dbSeries=ruta_db)
+    Notificaciones.getDatos(dbSeries=ruta_db)
     return app
 
 

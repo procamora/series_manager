@@ -348,35 +348,35 @@ class Series(QtWidgets.QMainWindow):
         Muestra todas las series activas con un boton de sumar o restar capitulos
         """
 
-        lista_activa.MiFormulario.getDatos(dbSeries=self.database)
+        lista_activa.ListaActiva.getDatos(dbSeries=self.database)
 
     def menListar(self):
         """
         Muestra las series para hacer modificaciones en masa
         """
 
-        listar_todas.MiFormulario.getDatos(dbSeries=self.database)
+        listar_todas.ListarTodas.getDatos(dbSeries=self.database)
 
     def menActualizaSerie(self):
         """
         Busca una serie especifica en la bd y te abre la ventana de modificacion de la serie
         """
 
-        buscar_series.MiFormulario.getDatos(dbSeries=self.database)
+        buscar_series.BuscarSeries.getDatos(dbSeries=self.database)
 
     def menInsertar(self):
         """
         Abre una ventana para meter una nueva serie en la bd
         """
 
-        actualizar_insertar.MiFormulario.getDatos(dbSeries=self.database)
+        actualizar_insertar.ActualizarInsertar.getDatos(dbSeries=self.database)
 
     def RevisaEstadoSeries(self):
         """
         Revisa los estados de las series, si empiezan temporada, acaban temporadao acaban serie
         """
 
-        estado_series.MiFormulario.getDatos(dbSeries=self.database)
+        estado_series.EstadoSeries.getDatos(dbSeries=self.database)
 
     @staticmethod
     def menActualizarImdb():
@@ -391,9 +391,9 @@ class Series(QtWidgets.QMainWindow):
 
         if not os.path.exists(rutaDesc):
             dat = {'title': 'No existe el directorio', 'text': 'El directorio {} no existe'.format(rutaDesc)}
-            msgbox.MiFormulario.getData(datos=dat)
+            msgbox.MsgBox.getData(datos=dat)
         else:
-            descarga_automatica.MiFormulario.getDatos(dbSeries=self.database)
+            descarga_automatica.DescargaAutomatica.getDatos(dbSeries=self.database)
 
     @staticmethod
     def menCompletoNewpct1():
@@ -402,9 +402,9 @@ class Series(QtWidgets.QMainWindow):
 
         if not os.path.exists(rutaDesc):
             dat = {'title': 'No existe el directorio', 'text': 'El directorio {} no existe'.format(rutaDesc)}
-            msgbox.MiFormulario.getData(datos=dat)
+            msgbox.MsgBox.getData(datos=dat)
         else:
-            newpct1_completa.MiFormulario.getDatos()
+            newpct1_completa.Newpct1Completa.getDatos()
 
     @staticmethod
     def abrirDirectorioDatos():
@@ -420,10 +420,10 @@ class Series(QtWidgets.QMainWindow):
 
     # PREFERENCIAS
     def menPreferencias(self):
-        preferencias.MiFormulario.getDatos(dbSeries=self.database)
+        preferencias.Preferencias.getDatos(dbSeries=self.database)
 
     def menNotificaciones(self):
-        notificaciones.MiFormulario.getDatos(dbSeries=self.database)
+        notificaciones.Notificaciones.getDatos(dbSeries=self.database)
 
     def menSeleccionaLog(self, num):
         """
@@ -436,18 +436,19 @@ class Series(QtWidgets.QMainWindow):
             id_fich = f.readline().replace('/n', '')
 
         query = 'SELECT * FROM Configuraciones, Credenciales WHERE ID LIKE {} LIMIT 1'.format(id_fich)
-        ser = conectionSQLite(self.database, query, True)[0]
+        consultasLog = conectionSQLite(self.database, query, True)
 
-        if num == 'newpct1':
-            listaLog.append('{}/log/{}'.format(directorio_trabajo, ser['FicheroFeedNewpct']))
-        elif num == 'showrss':
-            listaLog.append('{}/log/{}'.format(directorio_trabajo, ser['FicheroFeedShowrss']))
-        elif num == 'Descargas':
-            listaLog.append('{}/log/{}'.format(directorio_trabajo, ser['FicheroDescargas']))
-        elif num == 'Todos':
-            listaLog.append('{}/log/{}'.format(directorio_trabajo, ser['FicheroFeedNewpct']))
-            listaLog.append('{}/log/{}'.format(directorio_trabajo, ser['FicheroFeedShowrss']))
-            listaLog.append('{}/log/{}'.format(directorio_trabajo, ser['FicheroDescargas']))
+        if len(consultasLog) > 0:
+            if num == 'newpct1':
+                listaLog.append('{}/log/{}'.format(directorio_trabajo, consultasLog[0]['FicheroFeedNewpct']))
+            elif num == 'showrss':
+                listaLog.append('{}/log/{}'.format(directorio_trabajo, consultasLog[0]['FicheroFeedShowrss']))
+            elif num == 'Descargas':
+                listaLog.append('{}/log/{}'.format(directorio_trabajo, consultasLog[0]['FicheroDescargas']))
+            elif num == 'Todos':
+                listaLog.append('{}/log/{}'.format(directorio_trabajo, consultasLog[0]['FicheroFeedNewpct']))
+                listaLog.append('{}/log/{}'.format(directorio_trabajo, consultasLog[0]['FicheroFeedShowrss']))
+                listaLog.append('{}/log/{}'.format(directorio_trabajo, consultasLog[0]['FicheroDescargas']))
 
         # print self.listaLog
         self.menVaciaLog(listaLog)
@@ -455,12 +456,13 @@ class Series(QtWidgets.QMainWindow):
     @staticmethod
     def menVaciaLog(listaLog):
         """
-        Borra los ficheros que estan la la lista
+        Borra los ficheros que estan la la lista (si existen)
         """
 
-        for i in listaLog:
-            with open(i, 'w'):
-                pass
+        for files in listaLog:
+            if os.path.exists(files):
+                with open(files, 'w'):
+                    pass
 
     @staticmethod
     def menAsistenteInicial():
@@ -468,7 +470,7 @@ class Series(QtWidgets.QMainWindow):
 
     @staticmethod
     def menAcercaDe():
-        acerca_de.MiFormulario.getDatos()
+        acerca_de.AcercaDe.getDatos()
 
 
 def main():

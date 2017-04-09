@@ -5,11 +5,8 @@
 """
 
 import sys
-import requests
 import time
 
-#from abrt_exception_handler3 import send
-from bs4 import BeautifulSoup
 from PyQt5 import QtWidgets, QtCore
 
 from ui.descarga_completa_ui import Ui_Dialog
@@ -36,8 +33,8 @@ class mythread(QtCore.QThread):
         if sendTg:
             self.telegram = TG2('33063767')
 
-        self.url = 'http://tumejortorrent.com/descargar-seriehd/{}/capitulo-{}{}/hdtv-720p-ac3-5-1/'
-        self.url2 = 'http://tumejortorrent.com/serie/{}/capitulo-{}{}/hdtv-720p-ac3-5-1/'
+        self.url = 'http://newpct1.com/descargar-seriehd/{}/capitulo-{}{}/hdtv-720p-ac3-5-1/'
+        self.url2 = 'http://newpct1.com/serie/{}/capitulo-{}{}/hdtv-720p-ac3-5-1/'
 
     def run(self):
         ruta = self.conf['RutaDescargas']
@@ -50,50 +47,32 @@ class mythread(QtCore.QThread):
             i = str(i)
             time.sleep(0.2)
             try:
-                fichero = '{}/{}_{}x{}.torrent'.format(
-                    ruta, self.serie, self.temp, i)
+                fichero = '{}/{}_{}x{}.torrent'.format(ruta, self.serie, self.temp, i)
                 try:  # si falla la primera url probamos con la segunda
+                    urlTorrent = funciones.descargaUrlTorrent(self.url.format(self.serie, self.temp, i))
                     if modo_debug:
                         print(self.url.format(self.serie, self.temp, i))
-                        print(i, "Bien: ", self.descargaTorrent(
-                            self.url.format(self.serie, self.temp, i)))
-                    funciones.descargaFichero(
-                        self.descargaTorrent(self.url.format(self.serie, self.temp, i)), fichero)
-                except:
+                        print(i, "Bien: ", urlTorrent)
+                    funciones.descargaFichero(urlTorrent, fichero)
+                except 'NoneType':
+                    urlTorrent = funciones.descargaUrlTorrent(self.url2.format(self.serie, self.temp, i))
                     if modo_debug:
-                        print(i, "Mal: ", self.descargaTorrent(
-                            self.url2.format(self.serie, self.temp, i)))
-                    funciones.descargaFichero(
-                        self.descargaTorrent(self.url2.format(self.serie, self.temp, i)), fichero)
+                        print(i, "Mal: ", urlTorrent)
+                    funciones.descargaFichero(urlTorrent, fichero)
 
                 if self.sendTg:
                     self.telegram.sendFile(fichero)
                     # fichero = '{}/{}x{}.torrent'.format(ruta, self.serie, i)
-                self.textEdit.append(
-                    '{} {}x{}'.format(self.serie, self.temp, i))
+                self.textEdit.append('{} {}x{}'.format(self.serie, self.temp, i))
 
             except Exception as e:
-                print(e)
+                print('FALLO NO CAPTURADO', e)
                 self.textEdit.append(str(e))
 
-    def descargaTorrent(self, direcc):  # PARA NEWPCT1
-        """
-        Funcion que obtiene la url torrent del la dirreccion que recibe
-
-        :param str direcc: Dirreccion de la pagina web que contiene el torrent
-
-        :return str: Nos devuelve el string con la url del torrent
-        """
-
-        session = requests.session()
-        page = session.get(direcc, verify=False).text
-        # page = urllib.urlopen(direcc).read()
-        sopa = BeautifulSoup(page, 'html.parser')
-        print(sopa.find_all("a", class_="btn-torrent"))
-        return sopa.find_all("a", class_="btn-torrent")[0]['href']
+        print("fin")
 
 
-class MiFormulario(QtWidgets.QDialog):
+class Newpct1Completa(QtWidgets.QDialog):
     def __init__(self, parent=None):
         QtWidgets.QWidget.__init__(self, parent)
         self.ui = Ui_Dialog()
@@ -135,7 +114,8 @@ class MiFormulario(QtWidgets.QDialog):
 
     def campoTemporada(self):
         """
-        Si en la lista de temporadas seleccionamos otra se abre un line edit para poner el numero de temporada que no esta, si lo cambiamos se oculta
+        Si en la lista de temporadas seleccionamos otra se abre un line edit para poner el numero de temporada que 
+        no esta, si lo cambiamos se oculta
         """
 
         if self.ui.BoxTemporada.currentText() == self.Otra:
@@ -149,7 +129,8 @@ class MiFormulario(QtWidgets.QDialog):
 
     def campoCapitulos(self):
         """
-        Si en la lista de temporadas seleccionamos otra se abre un line edit para poner el numero de temporada que no esta, si lo cambiamos se oculta
+        Si en la lista de temporadas seleccionamos otra se abre un line edit para poner el numero de temporada que 
+        no esta, si lo cambiamos se oculta
         """
 
         if self.ui.BoxCapitulos.currentText() == self.Otra:
@@ -204,24 +185,24 @@ class MiFormulario(QtWidgets.QDialog):
             capitulo = int(self.ui.lineCap.text())
             temporada = int(self.ui.lineTemp.text())
 
-            self.thread = mythread(
-                self.ui.progressBar, serie, capitulo, temporada, self.ui.textEdit, self.envioTg)
-            self.thread.total.connect(self.ui.progressBar.setMaximum)
-            self.thread.update.connect(self.update)
-            # self.thread.finished.connect(self.close)
-            self.thread.start()
+            thread = mythread(self.ui.progressBar, serie, capitulo, temporada, self.ui.textEdit, self.envioTg)
+            thread.total.connect(self.ui.progressBar.setMaximum)
+            thread.update.connect(self.update)
+            # thread.finished.connect(self.close)
+            thread.start()
+            print("final thread")
         else:
             self.ui.textEdit.append('Introduce una nombre')
 
     @staticmethod
     def getDatos(parent=None):
-        dialog = MiFormulario(parent)
+        dialog = Newpct1Completa(parent)
         dialog.exec_()
 
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
-    MiFormulario.getDatos()
+    Newpct1Completa.getDatos()
     return app
 
 

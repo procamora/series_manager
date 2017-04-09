@@ -7,7 +7,7 @@ from PyQt5 import QtGui, QtWidgets
 from ui.acerca_de_ui import Ui_Dialog
 
 
-class MiFormulario(QtWidgets.QDialog):
+class AcercaDe(QtWidgets.QDialog):
     def __init__(self, parent=None):
         # super(MiFormulario, self).__init__()
         # uic.loadUi('ui/AcercaDe.ui', self)
@@ -27,12 +27,12 @@ class MiFormulario(QtWidgets.QDialog):
     <head>
     <head/>
     <body>
-        <p>Version 4.1.0</p>
-        <p>Python 3.4.4</p>
-        <p>PyQt Version 4.11.4</p>
-        <p>Qt Version 4.8.7</p>
+        <p>Version 2.1.0</p>
+        <p>Python 3.5.3</p>
+        <p>PyQt Version 5.7.4</p>
+        <p>Qt Version 5.7.1</p>
         <p><br/></p>
-        <p>&#169; 2015 Pablo Rocamora All Rights Reserved</p>
+        <p>&#169; 2017 Pablo Rocamora All Rights Reserved</p>
         <p>
             <a href="mailto:pablojoserocamora@gmail.com">pablojoserocamora@gmail.com</a>
         </p>
@@ -45,13 +45,13 @@ class MiFormulario(QtWidgets.QDialog):
 
     @staticmethod
     def getDatos(parent=None):
-        dialog = MiFormulario(parent)
+        dialog = AcercaDe(parent)
         dialog.exec_()
 
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
-    MiFormulario.getDatos()
+    AcercaDe.getDatos()
 
     return app
 

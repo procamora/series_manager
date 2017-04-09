@@ -6,6 +6,10 @@ import datetime
 import unicodedata
 import requests
 import glob
+import re
+
+import feedparser
+from bs4 import BeautifulSoup
 
 from modulos.connect_sqlite import conectionSQLite, ejecutaScriptSqlite, dumpDatabase
 from modulos.settings import directorio_trabajo, directorio_local, nombre_db, ruta_db, sync_sqlite, sync_gdrive, \
@@ -196,6 +200,72 @@ def descargaFichero(url, destino, libreria='requests'):
         wget.download(url, destino)
 
 
+def descargaUrlTorrent(direcc, bot=None, message=None):  # PARA NEWPCT1
+    """
+    Funcion que obtiene la url torrent del la dirreccion que recibe,hay que tener en cuenta que la url que recibe es la 
+    del feed y que no es la apgina que contiene el torrent, pero como todas tienen la misma forma se modifica la url 
+    poniendole descarga-torrent
+
+    :param str direcc: Dirreccion de la pagina web que contiene el torrent
+    :param obj bot: bot 
+    :param obj message: instancia del mensaje recibido
+
+    :return str: Nos devuelve el string con la url del torrent
+    """
+
+    if re.search("newpct1", direcc):
+        if bot is not None and message is not None:
+            bot.reply_to(message, 'Buscando torrent en newpct1')
+        session = requests.session()
+        page = session.get(direcc.replace('newpct1.com/', 'newpct1.com/descarga-torrent/'), verify=False).text
+        sopa = BeautifulSoup(page, 'html.parser')
+        return sopa.find('div', {"id": "tab1"}).a['href']
+
+    elif re.search("tumejortorrent", direcc):
+        # han cambiado la pagina, modifico tumejortorrent por newpct1
+        """
+        bot.reply_to(message, 'Buscando torrent en tumejortorrent')
+        session = requests.session()
+        page = session.get(direcc, verify=False).text
+        sopa = BeautifulSoup(page, 'html.parser')
+        # print(sopa.findAll('div', {"id": "tab1"}))
+        print(sopa.find_all("a", class_="btn-torrent")[0]['href'])
+        return sopa.find('div', {"id": "tab1"}).a['href']
+        """
+        return descargaUrlTorrent(direcc.replace("tumejortorrent", "newpct1"), message)
+
+
+def buscaTorrentAntiguo(direcc):  # para newpct
+    """
+    Funcion que obtiene la url torrent del la dirreccion que recibe
+
+    :param str direcc: Dirreccion de la pagina web que contiene el torrent
+
+    :return str: Nos devuelve el string con la url del torrent
+    """
+
+    session = requests.session()
+    page = session.get(direcc, verify=False).text
+    sopa = BeautifulSoup(page, 'html.parser')
+
+    return sopa.find('span', id="content-torrent").a['href']
+
+
+def feedParser(url):
+    """
+    Da un fallo en fedora 23, por eso hace falta esta funcion
+    https://github.com/kurtmckee/feedparser/issues/30
+    """
+
+    try:
+        return feedparser.parse(url)
+    except TypeError:
+        if 'drv_libxml2' in feedparser.PREFERRED_XML_PARSERS:
+            feedparser.PREFERRED_XML_PARSERS.remove('drv_libxml2')
+            return feedparser.parse(url)
+        else:
+            raise
+
 def muestraMensaje(label, texto='Texto plantilla', estado=True):
     """
     Muestra una determinada label con rojo o verde (depende del estado) y con el texto indicado
@@ -207,6 +277,12 @@ def muestraMensaje(label, texto='Texto plantilla', estado=True):
     else:
         label.setStyleSheet('color: red')
 
+
+def escapaParentesis(texto):
+    """
+    No he probado si funciona con series como powers
+    """
+    return texto.replace('(', '\\(').replace(')', '\\)')
 
 def internetOn():
     try:

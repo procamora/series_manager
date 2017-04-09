@@ -10,7 +10,7 @@ from modulos.connect_sqlite import conectionSQLite, ejecutaScriptSqlite
 from modulos.settings import modo_debug, ruta_db
 
 
-class MiFormulario(QtWidgets.QDialog):
+class EstadoSeries(QtWidgets.QDialog):
     def __init__(self, parent=None, dbSeries=None):
         QtWidgets.QWidget.__init__(self, parent)
         self.ui = Ui_Dialog()
@@ -93,9 +93,7 @@ class MiFormulario(QtWidgets.QDialog):
             self.ui.listWidget.addItem(item)
             self.ui.pushButtonAnadir.setVisible(False)
 
-        try:  # si no hay ninguno, da fallo
-            # establezco por defecto el ultimo, que es el que tiene el valor
-            # del item
+        try:  # si no hay ninguno, da fallo establezco por defecto el ultimo, que es el que tiene el valordel item
             self.ui.listWidget.setCurrentItem(item)
         except:
             pass
@@ -187,7 +185,7 @@ class MiFormulario(QtWidgets.QDialog):
                 self.QueryCompleta += '\n' + query
 
         if modo_debug:
-            print((self.QueryCompleta))
+            print(self.QueryCompleta)
 
     def aceptaDatos(self):
         if self.aplicaDatos():
@@ -195,13 +193,13 @@ class MiFormulario(QtWidgets.QDialog):
 
     @staticmethod
     def getDatos(parent=None, dbSeries=None):
-        dialog = MiFormulario(parent, dbSeries)
+        dialog = EstadoSeries(parent, dbSeries)
         dialog.exec_()
 
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
-    MiFormulario.getDatos(dbSeries=ruta_db)
+    EstadoSeries.getDatos(dbSeries=ruta_db)
     return app
 
 

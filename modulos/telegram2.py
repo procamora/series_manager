@@ -5,29 +5,36 @@ import json
 import requests
 
 try:  # Ejecucion desde Series.py
-    from .settings import modo_debug, ruta_db, directorio_local
+    from .settings import modo_debug, ruta_db, directorio_local, sync_sqlite
     from .connect_sqlite import conectionSQLite, ejecutaScriptSqlite
 except:  # Ejecucion local
-    from settings import modo_debug, ruta_db, directorio_local
+    from settings import modo_debug, ruta_db, directorio_local, sync_sqlite
     from connect_sqlite import conectionSQLite, ejecutaScriptSqlite
 
 
 class TG2():
     def __init__(self, chat_id):
-        self.api = self.datosIniciales()['api_telegram']
+        datosIniciales = self.datosIniciales()
+        if datosIniciales is not None:
+            self.api = datosIniciales['api_telegram']
+        else:
+            return
+
         self.url = 'https://api.telegram.org/bot{0}/{1}'
         self.chat_id = chat_id
-        # Esto hace que no salga la advertencia por fallo al verificar el
-        # certificado
+        # Esto hace que no salga la advertencia por fallo al verificar el certificado
         requests.packages.urllib3.disable_warnings()
 
-    def datosIniciales(self):
-        with open(r'{}/id.conf'.format(directorio_local), 'r') as f:
+    @staticmethod
+    def datosIniciales():
+        with open(r'{}/{}'.format(directorio_local, sync_sqlite), 'r') as f:
             id_fich = f.readline().replace('/n', '')
 
-        query = 'SELECT * FROM Credenciales'.format(
-            id_fich)
-        return conectionSQLite(ruta_db, query, True)[0]
+        query = 'SELECT * FROM Credenciales'.format(id_fich)
+        consulta = conectionSQLite(ruta_db, query, True)
+        if len(consulta) > 0:
+            return consulta[0]
+        return None
 
     def makeRequest(self, method_name, method='post', params=None, files=None):
         """
@@ -56,7 +63,8 @@ class TG2():
 
         return json.loads(result.text)['ok']
 
-    def getMethodType(self, data_type):
+    @staticmethod
+    def getMethodType(data_type):
         data_type = str(type(data_type))
         dic = {
             "<class 'str'>": 'sendMessage',
