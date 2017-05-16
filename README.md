@@ -2,6 +2,7 @@ README
 ======
 
 # IMPLEMENTACIONES FUTURAS
++ [ ] Usar API tviso
 + [ ] Hacer una plantilla por defecto de la configuracion minimo de sql, si uso lade la ultima por fecha a veces falla, ya que no esta subida a github
 + [x] Poner label en preferencias
 + [ ] Hacer ventana grafica para la actualizacion por imdb
