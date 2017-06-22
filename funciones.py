@@ -212,6 +212,9 @@ def descargaUrlTorrent(direcc, bot=None, message=None):  # PARA NEWPCT1
 
     :return str: Nos devuelve el string con la url del torrent
     """
+    
+    if modo_debug:
+        print(direcc)
 
     if re.search("newpct1", direcc):
         if bot is not None and message is not None:

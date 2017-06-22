@@ -63,9 +63,11 @@ sudo apt-get install python3-pip python3-pyqt5 python3-pyqt5.qtsql pyqt5-dev-too
 
 **Fedora**:
 
-sudo dnf install python3-pip python3-PyQt4.x86_64 PyQt4-devel
+sudo dnf install python3-pip python3-PyQt5 PyQt5-devel
+
+
 ### Probar si este es el nuevo comando
-dnf install qt5-designer-5.6.1-2.fc23.x86_64
+dnf install qt5-designer
 
 2. Instalar las librerias necesarias para python 3.
 
@@ -75,8 +77,11 @@ pip3 install -r requirements.txt
 #### Comandos restantes
 
 librerías para generar ficheros
-#Testear si hace falta en fedora, sino añadirla directamente a la lista de comando de debian
+
+# Testear si hace falta en fedora, sino añadirla directamente a la lista de comando de debian
+
 `sudo apt-get install pyqt4-dev-tools`
+
 `dnf install qt5-designer-5.6.1-2.fc23.x86_64`
 
 Para generar el fichero de imágenes:
@@ -87,7 +92,7 @@ para generar los ficheros ui
 
 `pyuic5 fichero.ui -o fichero.py`
 
-# documentacion de co
+# documentacion
 compila_ui.py
 
 

@@ -25,7 +25,7 @@ class mythread(QtCore.QThread):
         super(mythread, self).__init__(parent)
 
         self.conf = funciones.dbConfiguarion()
-        self.serie = serie
+        self.serie = serie.replace(' ', '-') # ruta correcta
         self.cap = capitulo
         self.temp = temporada
         self.textEdit = textEdit
