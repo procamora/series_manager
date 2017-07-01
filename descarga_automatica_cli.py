@@ -24,9 +24,10 @@ import funciones
 class DescargaAutomaticaCli():
     def __init__(self, dbSeries=None):
         if funciones.internetOn():
-            self.otra = 'otra'  # campo otra del formulario
-            self.estadoI = 'Ok'  # estado inicial
-            self.db = dbSeries
+            if dbSeries is None:  # en herencia no mando ruta
+                self.db = ruta_db
+            else:
+                self.db = dbSeries
 
             self.notificaciones = self.muestraNotificaciones()  # variable publica
 
@@ -56,9 +57,13 @@ class DescargaAutomaticaCli():
             except TypeError:  # Para el fallo en fedora
                 self.feedShow = funciones.feedParser(urlShow)
 
-            self.run()
+            self.consultaSeries = conectionSQLite(self.db, self.query, True)
 
     def run(self):
+        SerieActualNew = str()
+        SerieActualShow = str()
+        SerieActualTemp = str()
+
         fichNewpct = self.conf['FicheroFeedNewpct']
         fichShowrss = self.conf['FicheroFeedShowrss']
         self.rutlog = r'{}/log'.format(directorio_trabajo)
@@ -78,13 +83,7 @@ class DescargaAutomaticaCli():
         with open('{}/{}'.format(self.rutlog, fichShowrss), 'r') as f:
             self.ultimaSerieShow = f.readline()
 
-        series = conectionSQLite(self.db, self.query, True)
-
-        SerieActualNew = str()
-        SerieActualShow = str()
-        SerieActualTemp = str()
-
-        for i in series:
+        for i in self.consultaSeries:
             try:
                 print(('Revisa: {}'.format(i['Nombre'])))
                 SerieActualTemp = self.parseaFeed(
@@ -121,9 +120,9 @@ class DescargaAutomaticaCli():
         # Guardar ultima serie del feed
         if SerieActualShow is not None and SerieActualNew is not None:
             with open('{}/{}'.format(self.rutlog, fichNewpct), 'w') as f:
-                f.write(SerieActualNew)
+                f.write(funciones.eliminaTildes(SerieActualNew))
             with open('{}/{}'.format(self.rutlog, fichShowrss), 'w') as f:
-                f.write(SerieActualShow)
+                f.write(funciones.eliminaTildes(SerieActualShow))
         else:
             print('PROBLEMA CON if SerieActualShow is not None and SerieActualNew is not None:')
 
@@ -146,24 +145,25 @@ class DescargaAutomaticaCli():
             cap = '0' + str(cap)
 
         for i in d.entries:
+            self.titleSerie = funciones.eliminaTildes(i.title)
             # cuando llegamos al ultimo capitulo pasamos a la siguiente serie
-            if i.title == ultimaSerie:
+            if self.titleSerie == ultimaSerie:
                 # retornamos el valor que luego usaremos en ultima serie para guardarlo en el fichero
-                return d.entries[0].title
+                return funciones.eliminaTildes(d.entries[0].title)
 
             regex_vose = '(?i){} {}.*'.format(funciones.escapaParentesis(serie.lower()), tem)
             regex_cast = '(?i){}( \(Proper\))? - Temporada( )?\d+ \[HDTV 720p?\]\[Cap\.{}\d+(_\d+)?\]\[A.*'.format(
                 funciones.escapaParentesis(serie.lower()), tem)
 
             if modo_debug:
-                print(regex_cast, i.title)
+                print(regex_cast, self.titleSerie)
 
             estado = False
             if vose == 'Si':
-                if re.search(regex_vose, i.title):
+                if re.search(regex_vose, self.titleSerie):
                     estado = True
             else:
-                if re.search(regex_cast, i.title):
+                if re.search(regex_cast, self.titleSerie):
                     estado = True
 
             if estado:
@@ -172,23 +172,25 @@ class DescargaAutomaticaCli():
                 else:
                     torrent = funciones.descargaUrlTorrent(i.link)
 
-                if not os.path.exists('{}{}.torrent'.format(ruta, i.title)):
+                if not os.path.exists('{}{}.torrent'.format(ruta, self.titleSerie)):
                     ficheroDescargas = self.conf['FicheroDescargas']
 
                     with open('{}/{}'.format(self.rutlog, ficheroDescargas), 'a') as f:
-                        f.write('{} {}\n'.format(time.strftime('%Y%m%d'), i.title))
+                        f.write('{} {}\n'.format(time.strftime('%Y%m%d'), self.titleSerie))
 
                     if vose == 'Si':
+                        self.accionExtra(self.titleSerie)
                         # creo un string para solo mandar una notificacion
-                        self.listaNotificaciones += '{}\n'.format(i.title)
+                        self.listaNotificaciones += '{}\n'.format(self.titleSerie)
                     else:
                         # En pelis que son VOSE no se si da fallo, esto solo es para no VOSE
-                        varNom = i.title.split('-')[0]
-                        varEpi = i.title.split('][')[1]
+                        varNom = self.titleSerie.split('-')[0]
+                        varEpi = self.titleSerie.split('][')[1]
+                        self.accionExtra('{} {}'.format(varNom, varEpi))
                         # creo un string para solo mandar una notificacion
                         self.listaNotificaciones += '{} {}\n'.format(varNom, varEpi)
 
-                    funciones.descargaFichero(torrent, r'{}/{}.torrent'.format(ruta, i.title))
+                    funciones.descargaFichero(torrent, r'{}/{}.torrent'.format(ruta, self.titleSerie))
                     # Diccionario con todos los capitulos descargados, para actualizar la bd con los capitulos por
                     # donde voy regex para coger el capitulo unicamente
                     self.actualizaDia += """\nUPDATE series SET Dia="{}" WHERE Nombre LIKE "{}";""".format(
@@ -205,8 +207,21 @@ class DescargaAutomaticaCli():
 
                 print(('DESCARGANDO: {}'.format(serie)))
 
-        return d.entries[0].title
+        return funciones.eliminaTildes(d.entries[0].title)
 
+    def accionExtra(self, serie):
+        """
+        Metodo que no hace nada en esta clase pero que en herencia es 
+        usado para usar el entorno ggrafico que QT
+        :return: 
+        """
+        pass
+
+    def getSeries(self):
+        return self.consultaSeries
+
+    def getSerieActual(self):
+        return self.titleSerie
 
     @staticmethod
     def muestraNotificaciones():
@@ -234,7 +249,7 @@ class DescargaAutomaticaCli():
 
 
 def main():
-    DescargaAutomaticaCli(dbSeries=ruta_db)
+    DescargaAutomaticaCli(dbSeries=ruta_db).run()
 
 
 if __name__ == '__main__':
