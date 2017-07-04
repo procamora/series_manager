@@ -144,8 +144,9 @@ class DescargaAutomaticaCli():
             cap = '0' + str(cap)
 
         for i in d.entries:
-            self.titleSerie = funciones.eliminaTildes(i.title.encode("utf-8"))
+            self.titleSerie = funciones.eliminaTildes(i.title)
             # cuando llegamos al ultimo capitulo pasamos a la siguiente serie
+            #print(self.titleSerie, ".........", ultimaSerie, ".FIN")
             if self.titleSerie == ultimaSerie:
                 # retornamos el valor que luego usaremos en ultima serie para guardarlo en el fichero
                 return funciones.eliminaTildes(d.entries[0].title)
