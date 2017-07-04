@@ -31,7 +31,7 @@ class DescargaAutomaticaCli():
 
             self.notificaciones = self.muestraNotificaciones()  # variable publica
 
-            self.query = """SELECT Nombre, Temporada, Capitulo, VOSE FROM Series WHERE Siguiendo = "Si" 
+            self.query = """SELECT Nombre, Temporada, Capitulo, VOSE FROM Series WHERE Siguiendo = "Si"
                           ORDER BY Nombre ASC"""
             self.series = conectionSQLite(self.db, self.query, True)
 
@@ -85,7 +85,7 @@ class DescargaAutomaticaCli():
 
         for i in self.consultaSeries:
             try:
-                print(('Revisa: {}'.format(i['Nombre'])))
+                print(('Revisa: {}'.format(funciones.eliminaTildes(i['Nombre']))))
                 SerieActualTemp = self.parseaFeed(
                     i['Nombre'], i['Temporada'], i['Capitulo'], i['VOSE'])
                 if i['VOSE'] == 'Si':
@@ -93,7 +93,7 @@ class DescargaAutomaticaCli():
                 else:
                     SerieActualNew = SerieActualTemp
             except Exception as e:
-                print('FALLO: ', e)
+                print(i['Nombre'].encode("utf-8"), ' FALLO: ', e)
 
         if len(self.ultimaSerieNew) != 0:  # or len(self.ultimaSerieShow) != 0:
             print(self.actualizaDia)
@@ -128,7 +128,6 @@ class DescargaAutomaticaCli():
 
     def parseaFeed(self, serie, tem, cap, vose):
         """Solo funciona con series de 2 digitos por la expresion regular"""
-
         cap = str(cap)
         ruta = str(self.conf['RutaDescargas'])  # es unicode
         if vose == 'Si':
@@ -145,7 +144,7 @@ class DescargaAutomaticaCli():
             cap = '0' + str(cap)
 
         for i in d.entries:
-            self.titleSerie = funciones.eliminaTildes(i.title)
+            self.titleSerie = funciones.eliminaTildes(i.title.encode("utf-8"))
             # cuando llegamos al ultimo capitulo pasamos a la siguiente serie
             if self.titleSerie == ultimaSerie:
                 # retornamos el valor que luego usaremos en ultima serie para guardarlo en el fichero
@@ -167,21 +166,21 @@ class DescargaAutomaticaCli():
                     estado = True
 
             if estado:
+                titleSerie = self.titleSerie.encode("utf-8") # conversion necesaria para usar como str
                 if vose == 'Si':
                     torrent = i.link
                 else:
                     torrent = funciones.descargaUrlTorrent(i.link)
 
-                if not os.path.exists('{}{}.torrent'.format(ruta, self.titleSerie)):
+                if not os.path.exists('{}{}.torrent'.format(ruta, titleSerie)):
                     ficheroDescargas = self.conf['FicheroDescargas']
-
                     with open('{}/{}'.format(self.rutlog, ficheroDescargas), 'a') as f:
-                        f.write('{} {}\n'.format(time.strftime('%Y%m%d'), self.titleSerie))
+                        f.write('{} {}\n'.format(time.strftime('%Y%m%d'), titleSerie))
 
                     if vose == 'Si':
-                        self.accionExtra(self.titleSerie)
+                        self.accionExtra(titleSerie)
                         # creo un string para solo mandar una notificacion
-                        self.listaNotificaciones += '{}\n'.format(self.titleSerie)
+                        self.listaNotificaciones += '{}\n'.format(titleSerie)
                     else:
                         # En pelis que son VOSE no se si da fallo, esto solo es para no VOSE
                         varNom = self.titleSerie.split('-')[0]
@@ -189,8 +188,7 @@ class DescargaAutomaticaCli():
                         self.accionExtra('{} {}'.format(varNom, varEpi))
                         # creo un string para solo mandar una notificacion
                         self.listaNotificaciones += '{} {}\n'.format(varNom, varEpi)
-
-                    funciones.descargaFichero(torrent, r'{}/{}.torrent'.format(ruta, self.titleSerie))
+                    funciones.descargaFichero(torrent, r'{}/{}.torrent'.format(ruta, titleSerie))
                     # Diccionario con todos los capitulos descargados, para actualizar la bd con los capitulos por
                     # donde voy regex para coger el capitulo unicamente
                     self.actualizaDia += """\nUPDATE series SET Dia="{}" WHERE Nombre LIKE "{}";""".format(
@@ -211,9 +209,9 @@ class DescargaAutomaticaCli():
 
     def accionExtra(self, serie):
         """
-        Metodo que no hace nada en esta clase pero que en herencia es 
+        Metodo que no hace nada en esta clase pero que en herencia es
         usado para usar el entorno ggrafico que QT
-        :return: 
+        :return:
         """
         pass
 
@@ -232,7 +230,7 @@ class DescargaAutomaticaCli():
         Datos = conectionSQLite(ruta_db, queryN, True)
 
         global tg3, pb3, ml3, api_ml3
-
+        print(Datos)
         for i in Datos:
             if i['Activo'] == 'True':
                 if i['Nombre'] == 'Telegram':
