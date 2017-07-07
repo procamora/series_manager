@@ -61,7 +61,7 @@ def descomprime(fichero):
 def main(ruta):
     a = telegram2.TG2('33063767')
     for i in glob.glob(ruta):
-        print(i)
+        #print(i)
         try:
             a.sendTg(
                 'Empieza proceos descomprimir: {}'.format(i.split('/')[-1]))
@@ -76,4 +76,4 @@ def main(ruta):
 
 
 if __name__ == '__main__':
-    main('/media/128/*/*.rar')
+    main('/media/640Gb/*/*.rar')

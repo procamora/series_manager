@@ -93,7 +93,7 @@ class DescargaAutomaticaCli():
                 else:
                     SerieActualNew = SerieActualTemp
             except Exception as e:
-                print(i['Nombre'].encode("utf-8"), ' FALLO: ', e)
+                print(i['Nombre'], ' FALLO: ', e)
 
         if len(self.ultimaSerieNew) != 0:  # or len(self.ultimaSerieShow) != 0:
             print(self.actualizaDia)
@@ -167,13 +167,18 @@ class DescargaAutomaticaCli():
                     estado = True
 
             if estado:
-                titleSerie = self.titleSerie.encode("utf-8") # conversion necesaria para usar como str
+                titleSerie = self.titleSerie # conversion necesaria para usar como str
                 if vose == 'Si':
                     torrent = i.link
                 else:
                     torrent = funciones.descargaUrlTorrent(i.link)
 
-                if not os.path.exists('{}{}.torrent'.format(ruta, titleSerie)):
+                try: # arreglar problema codificacion de algunas series
+                    print(titleSerie)
+                except:
+                    titleSerie = titleSerie.replace(u"\uFFFD", "?")
+
+                if not os.path.exists(u'{}{}.torrent'.format(ruta, titleSerie)):
                     ficheroDescargas = self.conf['FicheroDescargas']
                     with open('{}/{}'.format(self.rutlog, ficheroDescargas), 'a') as f:
                         f.write('{} {}\n'.format(time.strftime('%Y%m%d'), titleSerie))
@@ -189,7 +194,7 @@ class DescargaAutomaticaCli():
                         self.accionExtra('{} {}'.format(varNom, varEpi))
                         # creo un string para solo mandar una notificacion
                         self.listaNotificaciones += '{} {}\n'.format(varNom, varEpi)
-                    funciones.descargaFichero(torrent, r'{}/{}.torrent'.format(ruta, titleSerie))
+                    funciones.descargaFichero(torrent, r'{}/{}.torrent'.format(ruta, str(titleSerie)))
                     # Diccionario con todos los capitulos descargados, para actualizar la bd con los capitulos por
                     # donde voy regex para coger el capitulo unicamente
                     self.actualizaDia += """\nUPDATE series SET Dia="{}" WHERE Nombre LIKE "{}";""".format(
