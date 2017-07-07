@@ -222,7 +222,9 @@ def descargaUrlTorrent(direcc, bot=None, message=None):  # PARA NEWPCT1
         session = requests.session()
         page = session.get(direcc.replace('newpct1.com/', 'newpct1.com/descarga-torrent/'), verify=False).text
         sopa = BeautifulSoup(page, 'html.parser')
-        return sopa.find('div', {"id": "tab1"}).a['href']
+        return sopa.find('a', {"class": "btn-torrent"})['href']
+        #return sopa.find('div', {"id": "tab1"}).a['href']
+
 
     elif re.search("tumejortorrent", direcc):
         # han cambiado la pagina, modifico tumejortorrent por newpct1
