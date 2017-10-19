@@ -23,6 +23,8 @@ README
 + [ ] En todos los botones aceptar/aplicar mostrar mensaje
 + [ ] Repasar library.zip en linux
 + [ ] Al actualizar/insertar relacionar los campos estado y siguiendo, (si le doy a finalizar que el estado sea finalizar)
++ [ ] url descarga torrent usa ahora javascript para obtener la url, modificar codigo descarga, ahora esta solucionado de forma provisional
++ [ ] showrss ha modificado metodo obtencion de url torrent, modificar codigo
 
 
 ## Requerimientos

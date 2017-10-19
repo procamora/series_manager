@@ -9,6 +9,7 @@
 import re
 import subprocess
 import os
+import tempfile
 
 import requests
 import telebot  # Importamos la librería
@@ -62,6 +63,53 @@ def checkError(codigo, stderr):
         return True
     return False
 
+# FIXME cambiar por la funcion en el fichero funciones
+def descargaTorrent(direcc, message):  # PARA NEWPCT1
+    """
+    Funcion que obtiene la url torrent del la dirreccion que recibe
+
+    :param str direcc: Dirreccion de la pagina web que contiene el torrent
+
+    :return str: Nos devuelve el string con la url del torrent
+    """
+    if re.search("newpct1", direcc):
+        bot.reply_to(message, 'Buscando torrent en newpct1')
+        session = requests.session()
+        page = session.get(direcc, verify=False).text
+        sopa = BeautifulSoup(page, 'html.parser')
+        try:
+            result = sopa.find('a', {"class": "btn-torrent"})['href']
+            if result != "javascript:void(0);":
+                return result
+            else: #FIXME USAR selenium para simular navegador 
+                """ si tiene puesto en href "javascript:void(0);" llamara a la funcion openTorrent() que tiene en la variable
+                window.location.href la url del torrent a descaegar, por lo que lo buscamos a pelo en el html y eliminamos
+                lo sobrante, feo pero funcional
+                """
+                javascript = re.findall('window\.location\.href\ =\ \".*\"\;', page)
+                return javascript[0].replace("window.location.href = \"", "").replace("\";", "")
+        except:
+            return None
+
+    elif re.search("tumejortorrent", direcc):
+        # han cambiado la pagina, modifico tumejortorrent por newpct1
+        """
+        bot.reply_to(message, 'Buscando torrent en tumejortorrent')
+        session = requests.session()
+        page = session.get(direcc, verify=False).text
+        sopa = BeautifulSoup(page, 'html.parser')
+        # print(sopa.findAll('div', {"id": "tab1"}))
+        print(sopa.find_all("a", class_="btn-torrent")[0]['href'])
+        return sopa.find('div', {"id": "tab1"}).a['href']
+        """
+        return descargaTorrent(direcc.replace("tumejortorrent", "newpct1"), message)
+
+
+def descargaFichero(url, destino):
+    r = requests.get(url)
+    with open(destino, "wb") as code:
+        code.write(r.content)
+
 
 # Handle always first "/start" message when new chat with your bot is created
 
@@ -100,7 +148,7 @@ def command_system(message):
 def send_cgs(message):
     bot.reply_to(message, 'Ejecutado con gs')
 
-    comando = 'cd /home/pi/Gestor-de-Series/ && /usr/bin/python3 /home/pi/Gestor-de-Series/descarga_automatica_cli.py'
+    comando = 'cd /home/osmc/Gestor-de-Series/ && /usr/bin/python3 /home/osmc/Gestor-de-Series/descarga_automatica_cli.py'
     ejecucion = subprocess.Popen(comando, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = ejecucion.communicate()
     # stdout = formatea(stdout) # sino stdout esta en bytes
@@ -144,7 +192,7 @@ def send_mount(message):
 def send_descomprime(message):
     bot.reply_to(message, 'Ejecutado unrar')
 
-    comando = "cd /home/pi/Gestor-de-Series/modulos/ && /usr/bin/python3 /home/pi/Gestor-de-Series/modulos/descomprime_rar.py"
+    comando = "cd /home/osmc/Gestor-de-Series/modulos/ && /usr/bin/python3 /home/osmc/Gestor-de-Series/modulos/descomprime_rar.py"
     ejecucion = subprocess.Popen(comando, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = ejecucion.communicate()
     # stdout = formatea(stdout) # sino stdout esta en bytes
@@ -299,30 +347,30 @@ def handle_magnet(message):
         send_show_torrent(message)
 
 
-@bot.message_handler(regexp="^(http://)?www.(newpct1|tumejortorrent).com/.*")
+@bot.message_handler(regexp="^(http:\/\/)?(www.)?(newpct1|tumejortorrent).com\/.*")
 def handle_newpct1(message):
+    # si no envio yo la url no continuo
+    if message.chat.id != administrador:
+        return
     # buscamos el genero
     regexGenero = re.search('descarga-torrent', message.text)
     if regexGenero:  # si hay find continua, sino retorno None el re.search
         urlPeli = message.text
     else:
-        urlPeli = re.sub('(http://)?www.newpct1.com/', 'http://www.newpct1.com/descarga-torrent/', message.text)
+        urlPeli = re.sub('(http://)?(www.)?newpct1.com/', 'http://www.newpct1.com/descarga-torrent/', message.text)
 
     url = descargaTorrent(urlPeli, message)
     if url is not None:
-        fich = '/tmp/{}.torrent'.format(message.chat.id)
-        descargaFichero(url, fich)
+        with tempfile.NamedTemporaryFile(mode='rb', dir=credenciales['RutaDescargas'], suffix='.torrent', delete=False) as fp:
+            descargaFichero(url, fp.name)
+            file_data = open(fp.name, 'rb')
+            bot.send_document(message.chat.id, file_data)
 
-        file_data = open(fich, 'rb')
-        bot.send_document(message.chat.id, file_data)
-        if message.chat.id == administrador:
-            os.rename(fich, '{}/file.torrent'.format(credenciales['RutaDescargas']))
-        else:
-            pass
         with open('/tmp/descarga_torrent.log', "a") as f:
             f.write('{}, {}, {} -> {}\n'.format(message.chat.id, message.chat.first_name, message.chat.username,
                                                 message.text))
-
+    else:
+        bot.reply_to(message, 'descargaTorrent retorna None')
 
 @bot.message_handler(func=lambda message: message.chat.id == administrador, content_types=["text"])
 def my_text(message):
@@ -367,7 +415,7 @@ def my_document(message):
         # bot.send_message(message.chat.id, 'https://api.telegram.org/file/bot{0}/{1}'.format(TOKEN, file_info.file_path))
         file = requests.get(
             'https://api.telegram.org/file/bot{0}/{1}'.format(credenciales['api_telegram'], file_info.file_path))
-        with open('/home/pi/Downloads/{}.torrent'.format(message.document.file_id), "wb") as code:
+        with open('/home/osmc/Downloads/{}.torrent'.format(message.document.file_id), "wb") as code:
             code.write(file.content)
         bot.reply_to(message, 'Descargando torrent: "{}"'.format(message.document.file_name))
         send_show_torrent(message)

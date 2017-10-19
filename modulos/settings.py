@@ -9,7 +9,7 @@ except:  # Ejecucion local
     from constantes import sync_gdrive, sync_sqlite, nombre_db
 
 
-modo_debug = True
+modo_debug = False
 gdrive = 0
 sistema = platform.system()
 

@@ -222,8 +222,20 @@ def descargaUrlTorrent(direcc, bot=None, message=None):  # PARA NEWPCT1
         session = requests.session()
         page = session.get(direcc.replace('newpct1.com/', 'newpct1.com/descarga-torrent/'), verify=False).text
         sopa = BeautifulSoup(page, 'html.parser')
-        return sopa.find('a', {"class": "btn-torrent"})['href']
-        #return sopa.find('div', {"id": "tab1"}).a['href']
+        try:
+            result = sopa.find('a', {"class": "btn-torrent"})['href']
+            if result != "javascript:void(0);":
+                return result
+            else: # FIXME USAR selenium para simular navegador 
+                """ si tiene puesto en href "javascript:void(0);" llamara a la funcion openTorrent() que tiene en la variable
+                window.location.href la url del torrent a descaegar, por lo que lo buscamos a pelo en el html y eliminamos
+                lo sobrante, feo pero funcional
+                """
+                javascript = re.findall('window\.location\.href\ =\ \".*\"\;', page)
+                return javascript[0].replace("window.location.href = \"", "").replace("\";", "")
+                #return sopa.find('div', {"id": "tab1"}).a['href']
+        except:
+            return None
 
 
     elif re.search("tumejortorrent", direcc):
