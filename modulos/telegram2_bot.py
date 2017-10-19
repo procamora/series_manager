@@ -10,6 +10,7 @@ import re
 import subprocess
 import os
 import tempfile
+import sys
 
 import requests
 import telebot  # Importamos la librería
