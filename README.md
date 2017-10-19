@@ -3,34 +3,34 @@ README
 
 # IMPLEMENTACIONES FUTURAS
 + [ ] Usar API tviso
-+ [ ] Hacer una plantilla por defecto de la configuracion minimo de sql, si uso lade la ultima por fecha a veces falla, ya que no esta subida a github
++ [ ] Hacer una plantilla por defecto de la configuración mínimo de sql, si uso la de la ultima por fecha a veces falla, ya que no esta subida a github
 + [x] Poner label en preferencias
-+ [ ] Hacer ventana grafica para la actualizacion por imdb
++ [ ] Hacer ventana gráfica para la actualización por imdb
 + [ ] Hacer un modulo que compruebe los estados de las series y pregunte si actualizarlos, que funcione tanto por consola como por gui
-+ [ ] En el uopdate del capuiitulo descargadoi poner tambien update de siguiendo y activa
++ [ ] En el update del capitulo descargado poner también update de siguiendo y activa
 + [ ] Hacer ventana para añadir credenciales
 
-# Errores a correguir
-+ [ ] Repasar todas las funciones de funciones y sustiruir donde se pueda name_db por ruta_db
+# Errores a corregir
++ [ ] Repasar todas las funciones de funciones y sustituir donde se pueda name_db por ruta_db
 + [ ] lista activa QSqlDatabasePrivate::addDatabase: duplicate connection name 'qt_sql_default_connection', old connection removed.
 + [ ] Revisar todo PyQt5
 + [ ] Investigar los Requerimientos necesarios para instalar todo en linux/windows
-+ [ ] en descarga automatica poner con self.MuestraNotificaciones y que no sea variable global
-+ [ ] Cada dia un mensaje de las series para ese dia
-+ [ ] En actualizar un boton que ponga directamente el dia de hoy al dia que hubiese puesto y revisar que al insertar aparezca el dia en el que se inserta
++ [ ] en descarga automática poner con self.MuestraNotificaciones y que no sea variable global
++ [ ] Cada día un mensaje de las series para ese día
++ [ ] En actualizar un botón que ponga directamente el día de hoy al día que hubiese puesto y revisar que al insertar aparezca el día en el que se inserta
 + [ ] Arreglar problema de importar librerías, hago un cambio y no funciona hasta que vuelvo a abrir la aplicación
 + [ ] Hacer botón aplicar y guardar, uno aplica y muestro todo correcto y otro aplica y cierra (SIGUIENTE)
 + [ ] En todos los botones aceptar/aplicar mostrar mensaje
 + [ ] Repasar library.zip en linux
 + [ ] Al actualizar/insertar relacionar los campos estado y siguiendo, (si le doy a finalizar que el estado sea finalizar)
-+ [ ] url descarga torrent usa ahora javascript para obtener la url, modificar codigo descarga, ahora esta solucionado de forma provisional
-+ [ ] showrss ha modificado metodo obtencion de url torrent, modificar codigo
++ [ ] url descarga torrent usa ahora javascript para obtener la url, modificar código descarga, ahora esta solucionado de forma provisional
++ [ ] showrss ha modificado método obtención de url torrent, modificar código
 
 
 ## Requerimientos
 
 Para compilar el código fuente, se requieren algunas bibliotecas externas.
-Las librerías que he usado con sus respectivas versiones a dia de hoy (29/08/2016) son:
+Las librerías que he usado con sus respectivas versiones a día de hoy (29/08/2016) son:
 
 * Python > 3.4
 * BeautifulSoup4 (4.5.1)
@@ -38,7 +38,9 @@ Las librerías que he usado con sus respectivas versiones a dia de hoy (29/08/20
 * imdbpie (4.0.2)
 * requests (2.10.0)
 * PyQt5
-#No necesarias
+
+### No necesarias
+
 * mechanize (0.2.5)
 * pushbullet.py (0.8.1)
 * mailer (0.8.1)
@@ -47,7 +49,7 @@ Las librerías que he usado con sus respectivas versiones a dia de hoy (29/08/20
 
 #### Instalación en Windows:
 
-1. Tener instalado python 3.5 y pip3 en el sistema, y que ambos esten el el path de windows.
+1. Tener instalado python 3.5 y pip3 en el sistema, y que ambos estén el el path de windows.
 poner url de python  3.5
 2. Instalar las librerias necesarias para python 3.
 
