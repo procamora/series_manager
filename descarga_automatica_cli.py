@@ -4,18 +4,18 @@
 """
 
 """
-import re
 import os
+import re
 import time
 
 import feedparser
 
+from modulos import funciones
 from modulos.connect_sqlite import conectionSQLite, ejecutaScriptSqlite
-from modulos.pushbullet2 import PB2
-from modulos.telegram2 import TG2
 from modulos.mail2 import ML2
+from modulos.pushbullet2 import PB2
 from modulos.settings import modo_debug, directorio_trabajo, ruta_db
-import funciones
+from modulos.telegram2 import TG2
 
 
 # https://gist.github.com/kaotika/e8ca5c340ec94f599fb2

@@ -6,27 +6,25 @@
 # https://github.com/eternnoir/pyTelegramBotAPI/blob/master/telebot/types.py
 
 
+import os
 import re
 import subprocess
-import os
 import tempfile
-import sys
 
 import requests
 import telebot  # Importamos la librería
-from telebot import types  # Y los tipos especiales de esta
 from bs4 import BeautifulSoup
+from telebot import types  # Y los tipos especiales de esta
 
 try:  # Ejecucion desde Series.py
     from .settings import modo_debug, ruta_db, directorio_local, directorio_trabajo
     from .connect_sqlite import conectionSQLite, ejecutaScriptSqlite
 except:  # Ejecucion local
-    from settings import modo_debug, ruta_db, directorio_local, directorio_trabajo
-    from connect_sqlite import conectionSQLite, ejecutaScriptSqlite
+    from modulos.settings import modo_debug, ruta_db, directorio_local, directorio_trabajo
+    from modulos.connect_sqlite import conectionSQLite, ejecutaScriptSqlite
 
-if '../' not in sys.path:
-    sys.path.append('../')
-import funciones
+from modulos import funciones
+
 
 def datosIniciales():
     with open(r'{}/id.conf'.format(directorio_local), 'r') as f:
@@ -322,7 +320,7 @@ def handle_newpct1(message):
     else:
         urlPeli = re.sub('(http://)?(www.)?newpct1.com/', 'http://www.newpct1.com/descarga-torrent/', message.text)
 
-    url = descargaUrlTorrent(urlPeli, message)
+    url = funciones.descargaUrlTorrent(urlPeli, message)
     if url is not None:
         with tempfile.NamedTemporaryFile(mode='rb', dir=credenciales['RutaDescargas'], suffix='.torrent', delete=False) as fp:
             descargaFichero(url, fp.name)

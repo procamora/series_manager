@@ -1,31 +1,33 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # SISTEMA
-import sys
-import os
-import re
-import platform
 import functools
+import os
+import platform
+import re
 import subprocess
+import sys
+
 # TERCEROS
 from PyQt5 import QtGui, QtWidgets, QtCore
-# PROPIAS
-from ui.series_ui import Ui_MainWindow
+
+import acerca_de
+import actualizar_insertar
 import asistente_inicial
+import buscar_series
+import descarga_automatica
+import estado_series
 import lista_activa
 import listar_todas
-import buscar_series
-import actualizar_insertar
-import preferencias
-import notificaciones
-import acerca_de
-import estado_series
 import msgbox
-import descarga_automatica
 import newpct1_completa
+import notificaciones
+import preferencias
+from modulos import funciones
 from modulos.connect_sqlite import conectionSQLite, ejecutaScriptSqlite
 from modulos.settings import directorio_trabajo, sistema, nombre_db, directorio_local, modo_debug, ruta_db
-import funciones
+# PROPIAS
+from ui.series_ui import Ui_MainWindow
 
 
 class Series(QtWidgets.QMainWindow):

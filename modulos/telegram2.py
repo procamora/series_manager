@@ -8,8 +8,8 @@ try:  # Ejecucion desde Series.py
     from .settings import modo_debug, ruta_db, directorio_local, sync_sqlite
     from .connect_sqlite import conectionSQLite, ejecutaScriptSqlite
 except:  # Ejecucion local
-    from settings import modo_debug, ruta_db, directorio_local, sync_sqlite
-    from connect_sqlite import conectionSQLite, ejecutaScriptSqlite
+    from modulos.settings import modo_debug, ruta_db, directorio_local, sync_sqlite
+    from modulos.connect_sqlite import conectionSQLite, ejecutaScriptSqlite
 
 
 class TG2():

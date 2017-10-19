@@ -4,10 +4,10 @@ import sys
 
 from PyQt5 import QtWidgets
 
-from ui.preferencias_ui import Ui_Dialog
+from modulos import funciones
 from modulos.connect_sqlite import conectionSQLite
 from modulos.settings import modo_debug, directorio_local, ruta_db
-import funciones
+from ui.preferencias_ui import Ui_Dialog
 
 
 class Preferencias(QtWidgets.QDialog):

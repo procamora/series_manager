@@ -8,12 +8,12 @@ import sys
 
 from PyQt5 import QtWidgets, QtCore
 
-from modulos.connect_sqlite import conectionSQLite, ejecutaScriptSqlite
-from ui.descarga_automatica_ui import Ui_Dialog
-import msgbox
 import descarga_automatica_cli
+import msgbox
+from modulos import funciones
+from modulos.connect_sqlite import conectionSQLite, ejecutaScriptSqlite
 from modulos.settings import modo_debug, directorio_trabajo, ruta_db
-import funciones
+from ui.descarga_automatica_ui import Ui_Dialog
 
 
 # https://gist.github.com/kaotika/e8ca5c340ec94f599fb2

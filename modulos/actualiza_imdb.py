@@ -15,7 +15,7 @@ except: #Ejecucion local
 
 if '../' not in sys.path:
     sys.path.append('../')
-from funciones import dbConfiguarion
+from modulos.funciones import dbConfiguarion
 
 class actualizaImdb():
     def __init__(self):

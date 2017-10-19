@@ -9,10 +9,10 @@ import time
 
 from PyQt5 import QtWidgets, QtCore
 
-from ui.descarga_completa_ui import Ui_Dialog
+from modulos import funciones
 from modulos.settings import modo_debug
 from modulos.telegram2 import TG2
-import funciones
+from ui.descarga_completa_ui import Ui_Dialog
 
 
 # https://gist.github.com/kaotika/e8ca5c340ec94f599fb2

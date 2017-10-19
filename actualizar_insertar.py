@@ -4,12 +4,12 @@ import sys
 
 from PyQt5 import QtWidgets
 
-from ui.actualizar_insertar_ui import Ui_Dialog
-import msgbox
-from modulos.connect_sqlite import conectionSQLite
 import modulos.actualiza_imdb
+import msgbox
+from modulos import funciones
+from modulos.connect_sqlite import conectionSQLite
 from modulos.settings import modo_debug, ruta_db
-import funciones
+from ui.actualizar_insertar_ui import Ui_Dialog
 
 
 class ActualizarInsertar(QtWidgets.QDialog):
