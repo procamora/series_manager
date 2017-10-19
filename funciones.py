@@ -221,6 +221,7 @@ def descargaUrlTorrent(direcc, bot=None, message=None):  # PARA NEWPCT1
             bot.reply_to(message, 'Buscando torrent en newpct1')
         session = requests.session()
         page = session.get(direcc.replace('newpct1.com/', 'newpct1.com/descarga-torrent/'), verify=False).text
+        #page = session.get(direcc, verify=False).text
         sopa = BeautifulSoup(page, 'html.parser')
         try:
             result = sopa.find('a', {"class": "btn-torrent"})['href']

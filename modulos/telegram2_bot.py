@@ -23,6 +23,9 @@ except:  # Ejecucion local
     from settings import modo_debug, ruta_db, directorio_local, directorio_trabajo
     from connect_sqlite import conectionSQLite, ejecutaScriptSqlite
 
+if '../' not in sys.path:
+    sys.path.append('../')
+import funciones
 
 def datosIniciales():
     with open(r'{}/id.conf'.format(directorio_local), 'r') as f:
@@ -62,47 +65,6 @@ def checkError(codigo, stderr):
             print("Error:")
         return True
     return False
-
-# FIXME cambiar por la funcion en el fichero funciones
-def descargaTorrent(direcc, message):  # PARA NEWPCT1
-    """
-    Funcion que obtiene la url torrent del la dirreccion que recibe
-
-    :param str direcc: Dirreccion de la pagina web que contiene el torrent
-
-    :return str: Nos devuelve el string con la url del torrent
-    """
-    if re.search("newpct1", direcc):
-        bot.reply_to(message, 'Buscando torrent en newpct1')
-        session = requests.session()
-        page = session.get(direcc, verify=False).text
-        sopa = BeautifulSoup(page, 'html.parser')
-        try:
-            result = sopa.find('a', {"class": "btn-torrent"})['href']
-            if result != "javascript:void(0);":
-                return result
-            else: #FIXME USAR selenium para simular navegador 
-                """ si tiene puesto en href "javascript:void(0);" llamara a la funcion openTorrent() que tiene en la variable
-                window.location.href la url del torrent a descaegar, por lo que lo buscamos a pelo en el html y eliminamos
-                lo sobrante, feo pero funcional
-                """
-                javascript = re.findall('window\.location\.href\ =\ \".*\"\;', page)
-                return javascript[0].replace("window.location.href = \"", "").replace("\";", "")
-        except:
-            return None
-
-    elif re.search("tumejortorrent", direcc):
-        # han cambiado la pagina, modifico tumejortorrent por newpct1
-        """
-        bot.reply_to(message, 'Buscando torrent en tumejortorrent')
-        session = requests.session()
-        page = session.get(direcc, verify=False).text
-        sopa = BeautifulSoup(page, 'html.parser')
-        # print(sopa.findAll('div', {"id": "tab1"}))
-        print(sopa.find_all("a", class_="btn-torrent")[0]['href'])
-        return sopa.find('div', {"id": "tab1"}).a['href']
-        """
-        return descargaTorrent(direcc.replace("tumejortorrent", "newpct1"), message)
 
 
 def descargaFichero(url, destino):
@@ -359,7 +321,7 @@ def handle_newpct1(message):
     else:
         urlPeli = re.sub('(http://)?(www.)?newpct1.com/', 'http://www.newpct1.com/descarga-torrent/', message.text)
 
-    url = descargaTorrent(urlPeli, message)
+    url = descargaUrlTorrent(urlPeli, message)
     if url is not None:
         with tempfile.NamedTemporaryFile(mode='rb', dir=credenciales['RutaDescargas'], suffix='.torrent', delete=False) as fp:
             descargaFichero(url, fp.name)
@@ -370,7 +332,7 @@ def handle_newpct1(message):
             f.write('{}, {}, {} -> {}\n'.format(message.chat.id, message.chat.first_name, message.chat.username,
                                                 message.text))
     else:
-        bot.reply_to(message, 'descargaTorrent retorna None')
+        bot.reply_to(message, 'descargaUrlTorrent retorna None')
 
 @bot.message_handler(func=lambda message: message.chat.id == administrador, content_types=["text"])
 def my_text(message):
