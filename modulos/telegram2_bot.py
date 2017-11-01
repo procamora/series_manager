@@ -20,10 +20,10 @@ try:  # Ejecucion desde Series.py
     from .settings import modo_debug, ruta_db, directorio_local, directorio_trabajo
     from .connect_sqlite import conectionSQLite, ejecutaScriptSqlite
 except:  # Ejecucion local
-    from modulos.settings import modo_debug, ruta_db, directorio_local, directorio_trabajo
-    from modulos.connect_sqlite import conectionSQLite, ejecutaScriptSqlite
+    from settings import modo_debug, ruta_db, directorio_local, directorio_trabajo
+    from connect_sqlite import conectionSQLite, ejecutaScriptSqlite
 
-from modulos import funciones
+import funciones
 
 
 def datosIniciales():

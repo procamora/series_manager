@@ -11,10 +11,14 @@ import re
 import feedparser
 from bs4 import BeautifulSoup
 
-from modulos.connect_sqlite import conectionSQLite, ejecutaScriptSqlite, dumpDatabase
-from modulos.settings import directorio_trabajo, directorio_local, nombre_db, ruta_db, sync_sqlite, sync_gdrive, \
+try:
+    from .connect_sqlite import conectionSQLite, ejecutaScriptSqlite, dumpDatabase
+    from .settings import directorio_trabajo, directorio_local, nombre_db, ruta_db, sync_sqlite, sync_gdrive, \
     modo_debug
-
+except:
+    from connect_sqlite import conectionSQLite, ejecutaScriptSqlite, dumpDatabase
+    from settings import directorio_trabajo, directorio_local, nombre_db, ruta_db, sync_sqlite, sync_gdrive, \
+    modo_debug
 
 def creaDirectorioTrabajo():
     """
@@ -175,6 +179,7 @@ def eliminaTildes(cadena):
 
 
 def descargaFichero(url, destino, libreria='requests'):
+    print("destino ",destino)
     if libreria == 'urllib':
         import urllib
         # print "downloading with urllib"
