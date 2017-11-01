@@ -20,6 +20,7 @@ from modulos.telegram2 import TG2
 
 # https://gist.github.com/kaotika/e8ca5c340ec94f599fb2
 
+SERIE_DEBUG="Atlantis"
 
 class DescargaAutomaticaCli():
     def __init__(self, dbSeries=None):
@@ -151,11 +152,11 @@ class DescargaAutomaticaCli():
                 # retornamos el valor que luego usaremos en ultima serie para guardarlo en el fichero
                 return funciones.eliminaTildes(d.entries[0].title)
 
-            regex_vose = '(?i){} {}.*'.format(funciones.escapaParentesis(serie.lower()), tem)
+            regex_vose = '(?i){} ({}|{}|{}).*'.format(funciones.escapaParentesis(serie.lower()), tem, tem+1, tem+2)
             regex_cast = '(?i){}( \(Proper\))? - Temporada( )?\d+ \[HDTV 720p?\]\[Cap\.{}\d+(_\d+)?\]\[A.*'.format(
                 funciones.escapaParentesis(serie.lower()), tem)
 
-            if modo_debug:
+            if modo_debugi and serie == SERIE_DEBUG:
                 print(regex_cast, self.titleSerie)
 
             estado = False
