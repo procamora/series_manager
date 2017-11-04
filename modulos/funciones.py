@@ -221,11 +221,14 @@ def descargaUrlTorrent(direcc, bot=None, message=None):  # PARA NEWPCT1
     if modo_debug:
         print(direcc)
 
-    if re.search("newpct1", direcc):
+    regexRecursion = "(tumejortorrent|newpct1|newpct)"
+
+    if re.search("torrentlocura", direcc):
+        print(direcc)
         if bot is not None and message is not None:
-            bot.reply_to(message, 'Buscando torrent en newpct1')
+            bot.reply_to(message, 'Buscando torrent en torrentlocura.com')
         session = requests.session()
-        page = session.get(direcc.replace('newpct1.com/', 'newpct1.com/descarga-torrent/'), verify=False).text
+        page = session.get(direcc.replace('torrentlocura.com/', 'torrentlocura.com/descarga-torrent/'), verify=False).text
         #page = session.get(direcc, verify=False).text
         sopa = BeautifulSoup(page, 'html.parser')
         try:
@@ -244,18 +247,8 @@ def descargaUrlTorrent(direcc, bot=None, message=None):  # PARA NEWPCT1
             return None
 
 
-    elif re.search("tumejortorrent", direcc):
-        # han cambiado la pagina, modifico tumejortorrent por newpct1
-        """
-        bot.reply_to(message, 'Buscando torrent en tumejortorrent')
-        session = requests.session()
-        page = session.get(direcc, verify=False).text
-        sopa = BeautifulSoup(page, 'html.parser')
-        # print(sopa.findAll('div', {"id": "tab1"}))
-        print(sopa.find_all("a", class_="btn-torrent")[0]['href'])
-        return sopa.find('div', {"id": "tab1"}).a['href']
-        """
-        return descargaUrlTorrent(direcc.replace("tumejortorrent", "newpct1"), message)
+    elif re.search(regexRecursion, direcc):
+        return descargaUrlTorrent(re.sub(regexRecursion, "torrentlocura", direcc), message)
 
 
 def buscaTorrentAntiguo(direcc):  # para newpct

@@ -308,19 +308,20 @@ def handle_magnet(message):
         send_show_torrent(message)
 
 
-@bot.message_handler(regexp="^(http:\/\/)?(www.)?(newpct1|tumejortorrent).com\/.*")
+@bot.message_handler(regexp="^(http:\/\/)?(www.)?(newpct|newpct1|tumejortorrent|torrentlocura).com\/.*")
 def handle_newpct1(message):
     # si no envio yo la url no continuo
     if message.chat.id != administrador:
         return
+    # ya no es necesario, lo implementa descargaUrlTorrent
     # buscamos el genero
-    regexGenero = re.search('descarga-torrent', message.text)
-    if regexGenero:  # si hay find continua, sino retorno None el re.search
-        urlPeli = message.text
-    else:
-        urlPeli = re.sub('(http://)?(www.)?newpct1.com/', 'http://www.newpct1.com/descarga-torrent/', message.text)
+    #regexGenero = re.search('descarga-torrent', message.text)
+    #if regexGenero:  # si hay find continua, sino retorno None el re.search
+    #    urlPeli = message.text
+    #else:
+    #    urlPeli = re.sub('(http://)?(www.)?newpct1.com/', 'http://www.newpct1.com/descarga-torrent/', message.text)
 
-    url = funciones.descargaUrlTorrent(urlPeli, message)
+    url = funciones.descargaUrlTorrent(message.text, message)
     if url is not None:
         with tempfile.NamedTemporaryFile(mode='rb', dir=credenciales['RutaDescargas'], suffix='.torrent', delete=False) as fp:
             descargaFichero(url, fp.name)
