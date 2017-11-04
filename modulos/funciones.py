@@ -224,7 +224,6 @@ def descargaUrlTorrent(direcc, bot=None, message=None):  # PARA NEWPCT1
     regexRecursion = "(tumejortorrent|newpct1|newpct)"
 
     if re.search("torrentlocura", direcc):
-        print(direcc)
         if bot is not None and message is not None:
             bot.reply_to(message, 'Buscando torrent en torrentlocura.com')
         session = requests.session()

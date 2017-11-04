@@ -33,8 +33,8 @@ class mythread(QtCore.QThread):
         if sendTg:
             self.telegram = TG2('33063767')
 
-        self.url = 'http://newpct1.com/descargar-seriehd/{}/capitulo-{}{}/hdtv-720p-ac3-5-1/'
-        self.url2 = 'http://newpct1.com/serie/{}/capitulo-{}{}/hdtv-720p-ac3-5-1/'
+        self.url = 'http://torrentlocura.com/descargar-seriehd/{}/capitulo-{}{}/hdtv-720p-ac3-5-1/'
+        self.url2 = 'http://torrentlocura.com/serie/{}/capitulo-{}{}/hdtv-720p-ac3-5-1/'
 
     def run(self):
         ruta = self.conf['RutaDescargas']
@@ -48,31 +48,48 @@ class mythread(QtCore.QThread):
             time.sleep(0.2)
             try:
                 fichero = '{}/{}_{}x{}.torrent'.format(ruta, self.serie, self.temp, i)
-                try:  # si falla la primera url probamos con la segunda
-                    urlTorrent = funciones.descargaUrlTorrent(self.url.format(self.serie, self.temp, i))
-                    if modo_debug:
-                        print(self.url.format(self.serie, self.temp, i))
-                        print(i, "Bien: ", urlTorrent)
-                    funciones.descargaFichero(urlTorrent, fichero)
-                except 'NoneType':
-                    urlTorrent = funciones.descargaUrlTorrent(self.url2.format(self.serie, self.temp, i))
-                    if modo_debug:
-                        print(i, "Mal: ", urlTorrent)
-                    funciones.descargaFichero(urlTorrent, fichero)
-
-                if self.sendTg:
-                    self.telegram.sendFile(fichero)
-                    # fichero = '{}/{}x{}.torrent'.format(ruta, self.serie, i)
-                self.textEdit.append('{} {}x{}'.format(self.serie, self.temp, i))
+                # al ser un or si la primera retorna true no comprueba la segunda
+                if(self.tryGetUrl(self.url, i, fichero) or self.tryGetUrl(self.url2, i, fichero)):
+                    if self.sendTg:
+                        self.telegram.sendFile(fichero)
+                        # fichero = '{}/{}x{}.torrent'.format(ruta, self.serie, i)
+                    self.textEdit.append('{} {}x{}'.format(self.serie, self.temp, i))
+                else:
+                    self.textEdit.append('No encontrada: {} {}x{}'.format(self.serie, self.temp, i))
+                    
+                if modo_debug:
+                    print()
 
             except Exception as e:
-                print('FALLO NO CAPTURADO', e)
-                self.textEdit.append(str(e))
+                print('FALLO DESCONOCIDO!!', e)
+                self.textEdit.append("Error:{}".format(str(e)))
+                raise
 
         print("fin")
 
+    def tryGetUrl(self, url, capitulo, fichero):
+        urlFormat = url.format(self.serie, self.temp, capitulo)
+        if modo_debug:
+            print(urlFormat)
+        try:
+            urlTorrent = funciones.descargaUrlTorrent(urlFormat)
+            if modo_debug:
+                print(urlFormat)
+                print(capitulo, "Bien: ", urlTorrent)
 
-class Newpct1Completa(QtWidgets.QDialog):
+            if (urlTorrent is None):
+                return False
+
+            funciones.descargaFichero(urlTorrent, fichero)
+            return True
+
+        except Exception as e:
+            print("fallo: ", urlFormat, e, file=sys.stderr)
+            return False
+
+
+
+class torrentlocuraCompleta(QtWidgets.QDialog):
     def __init__(self, parent=None):
         QtWidgets.QWidget.__init__(self, parent)
         self.ui = Ui_Dialog()
@@ -196,13 +213,13 @@ class Newpct1Completa(QtWidgets.QDialog):
 
     @staticmethod
     def getDatos(parent=None):
-        dialog = Newpct1Completa(parent)
+        dialog = torrentlocuraCompleta(parent)
         dialog.exec_()
 
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
-    Newpct1Completa.getDatos()
+    torrentlocuraCompleta.getDatos()
     return app
 
 
