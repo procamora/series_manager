@@ -88,6 +88,9 @@ class actualizaImdb():
                 print(e)
 
 
+    """
+    busca las series que tienen vacios los cambios de imdb y los actualiza por primera vez
+    """
     def actulizaCompleto(self):
         query = 'SELECT * FROM Series WHERE imdb_seguir LIKE "Si" AND (imdb_id IS NULL OR imdb_Finaliza IS NULL) AND NOT imdb_id IS NULL'  # para nuevas series con mod completa
         series =  conectionSQLite(self.nombre_db, query, True)
@@ -178,7 +181,7 @@ def main():
     print('actualizaSerie')
     #a.actualizaSerie('tt3551096')
     #"""				# actualizar_insertar series que no tienen datos de capitulo/temporada de imdb
-    #a.series_finalizadas()
+    a.series_finalizadas()
 
 
 if __name__ == '__main__':

@@ -1,6 +1,6 @@
 beautifulsoup4
 feedparser
-imdbpie
+imdbpie==4.0.2
 requests
 #mechanize
 pushbullet.py

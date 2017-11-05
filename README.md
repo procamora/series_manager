@@ -39,6 +39,8 @@ Las librerías que he usado con sus respectivas versiones a día de hoy (29/08/2
 * requests (2.10.0)
 * PyQt5
 
+> Importante: La libreria imdbpie ha cambiado, por lo que la ultima version valida es la 4.0.2, posteriores no funcion
+
 ### No necesarias
 
 * mechanize (0.2.5)
