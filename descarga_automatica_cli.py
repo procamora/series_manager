@@ -20,7 +20,7 @@ from modulos.telegram2 import TG2
 
 # https://gist.github.com/kaotika/e8ca5c340ec94f599fb2
 
-SERIE_DEBUG="ninguna"
+SERIE_DEBUG="NoAtlantis"
 
 class DescargaAutomaticaCli():
     def __init__(self, dbSeries=None):
@@ -156,8 +156,9 @@ class DescargaAutomaticaCli():
             regex_cast = '(?i){}( \(Proper\))?( )*- Temporada( )?\d+ \[HDTV 720p?\]\[Cap\.({}|{}|{})\d+(_\d+)?\]\[A.*'.format(
                 funciones.escapaParentesis(serie.lower()), tem, tem+1, tem+2)
 
-            if modo_debug and serie.lower() == SERIE_DEBUG.lower():
+            if serie.lower() == SERIE_DEBUG.lower():
                 print(regex_cast, self.titleSerie)
+                print(i.link)
 
             estado = False
             if vose == 'Si':
