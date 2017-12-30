@@ -61,6 +61,10 @@ class TG2():
         result = requests.request(method, request_url, params=params, files=files, timeout=(
             connect_timeout, read_timeout))
 
+        if modo_debug:
+            print(requests.request(method, request_url, params=params, files=files, timeout=(
+            connect_timeout, read_timeout)))
+
         return json.loads(result.text)['ok']
 
     @staticmethod

@@ -94,7 +94,7 @@ class DescargaAutomaticaCli():
                 else:
                     SerieActualNew = SerieActualTemp
             except Exception as e:
-                print(i['Nombre'], ' FALLO: ', e)
+                print('################' ,i['Nombre'], ' FALLO: ', e)
 
         if len(self.ultimaSerieNew) != 0:  # or len(self.ultimaSerieShow) != 0:
             print(self.actualizaDia)

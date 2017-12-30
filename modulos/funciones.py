@@ -205,7 +205,7 @@ def descargaFichero(url, destino, libreria='requests'):
         wget.download(url, destino)
 
 
-def descargaUrlTorrent(direcc, bot=None, message=None):  # PARA NEWPCT1
+def descargaUrlTorrent(direcc, bot=None, message=None):
     """
     Funcion que obtiene la url torrent del la dirreccion que recibe,hay que tener en cuenta que la url que recibe es la 
     del feed y que no es la apgina que contiene el torrent, pero como todas tienen la misma forma se modifica la url 
@@ -227,27 +227,38 @@ def descargaUrlTorrent(direcc, bot=None, message=None):  # PARA NEWPCT1
         if bot is not None and message is not None:
             bot.reply_to(message, 'Buscando torrent en torrentlocura.com')
         session = requests.session()
-        page = session.get(direcc.replace('torrentlocura.com/', 'torrentlocura.com/descarga-torrent/'), verify=False).text
-        #page = session.get(direcc, verify=False).text
-        sopa = BeautifulSoup(page, 'html.parser')
-        try:
-            result = sopa.find('a', {"class": "btn-torrent"})['href']
-            if result != "javascript:void(0);":
-                return result
-            else: # FIXME USAR selenium para simular navegador 
-                """ si tiene puesto en href "javascript:void(0);" llamara a la funcion openTorrent() que tiene en la variable
-                window.location.href la url del torrent a descaegar, por lo que lo buscamos a pelo en el html y eliminamos
-                lo sobrante, feo pero funcional
-                """
-                javascript = re.findall('window\.location\.href\ =\ \".*\"\;', page)
-                return javascript[0].replace("window.location.href = \"", "").replace("\";", "")
-                #return sopa.find('div', {"id": "tab1"}).a['href']
-        except:
-            return None
 
+        comp1 = descargaUrlTorrentAux(session.get(direcc.replace('torrentlocura.com/', 'torrentlocura.com/descarga-torrent/'), verify=False).text)
+        if comp1 is not None:
+            return comp1
+
+        # opcion 2
+        comp2 = descargaUrlTorrentAux(session.get(direcc.replace('torrentlocura.com/', 'torrentlocura.com/descargar-seriehd/'), verify=False).text)
+        if comp2 is not None:
+            return comp2
+
+        return None
 
     elif re.search(regexRecursion, direcc):
         return descargaUrlTorrent(re.sub(regexRecursion, "torrentlocura", direcc), message)
+
+
+def descargaUrlTorrentAux(page):
+    sopa = BeautifulSoup(page, 'html.parser')
+    try:
+        result = sopa.find('a', {"class": "btn-torrent"})['href']
+        if result != "javascript:void(0);":
+            return result
+        else: # FIXME USAR selenium para simular navegador 
+            """ si tiene puesto en href "javascript:void(0);" llamara a la funcion openTorrent() que tiene en la variable
+            window.location.href la url del torrent a descaegar, por lo que lo buscamos a pelo en el html y eliminamos
+            lo sobrante, feo pero funcional
+            """
+            javascript = re.findall('window\.location\.href\ =\ \".*\"\;', page)
+            return javascript[0].replace("window.location.href = \"", "").replace("\";", "")
+            #return sopa.find('div', {"id": "tab1"}).a['href']
+    except:
+        return None
 
 
 def buscaTorrentAntiguo(direcc):  # para newpct
