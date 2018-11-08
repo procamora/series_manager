@@ -3,7 +3,7 @@
 import os
 import time
 import datetime
-import unicodedata
+import unidecode
 import requests
 import glob
 import re
@@ -175,7 +175,9 @@ def eliminaTildes(cadena):
     """	http:/guimi.net/blogs/hiparco/funcion-para-eliminar-acentos-en-python/5"""
     # s = ''.join((c for c in unicodedata.normalize('NFD',unicode(cadena)) if unicodedata.category(c) != 'Mn'))
     # return s.decode()
-    return ''.join((c for c in unicodedata.normalize('NFD', str(cadena)) if unicodedata.category(c) != 'Mn'))
+    #return ''.join((c for c in unicodedata.normalize('NFD', str(cadena)) if unicodedata.category(c) != 'Mn'))
+    # https://stackoverflow.com/questions/517923/what-is-the-best-way-to-remove-accents-in-a-python-unicode-string
+    return unidecode.unidecode(cadena)
 
 
 def descargaFichero(url, destino, libreria='requests'):
@@ -244,8 +246,8 @@ def descargaUrlTorrent(direcc, bot=None, message=None):
 
 
 def descargaUrlTorrentAux(page):
-    sopa = BeautifulSoup(page, 'html.parser')
     try:
+        sopa = BeautifulSoup(page, 'html.parser')
         result = sopa.find('a', {"class": "btn-torrent"})['href']
         if result != "javascript:void(0);":
             return result

@@ -109,7 +109,7 @@ def command_system(message):
 def send_cgs(message):
     bot.reply_to(message, 'Ejecutado con gs')
 
-    comando = 'cd /home/osmc/Gestor-de-Series/ && /usr/bin/python3 /home/osmc/Gestor-de-Series/descarga_automatica_cli.py'
+    comando = 'cd /home/pi/Gestor-de-Series/ && /usr/bin/python3 /home/pi/Gestor-de-Series/descarga_automatica_cli.py'
     ejecucion = subprocess.Popen(comando, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = ejecucion.communicate()
     # stdout = formatea(stdout) # sino stdout esta en bytes
@@ -153,7 +153,7 @@ def send_mount(message):
 def send_descomprime(message):
     bot.reply_to(message, 'Ejecutado unrar')
 
-    comando = "cd /home/osmc/Gestor-de-Series/modulos/ && /usr/bin/python3 /home/osmc/Gestor-de-Series/modulos/descomprime_rar.py"
+    comando = "cd /home/pi/Gestor-de-Series/modulos/ && /usr/bin/python3 /home/pi/Gestor-de-Series/modulos/descomprime_rar.py"
     ejecucion = subprocess.Popen(comando, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = ejecucion.communicate()
     # stdout = formatea(stdout) # sino stdout esta en bytes
@@ -324,9 +324,12 @@ def handle_newpct1(message):
     url = funciones.descargaUrlTorrent(message.text, message)
     if url is not None:
         with tempfile.NamedTemporaryFile(mode='rb', dir=credenciales['RutaDescargas'], suffix='.torrent', delete=False) as fp:
-            descargaFichero(url, fp.name)
-            file_data = open(fp.name, 'rb')
-            bot.send_document(message.chat.id, file_data)
+            try:
+                descargaFichero(url, fp.name)
+                file_data = open(fp.name, 'rb')
+                bot.send_document(message.chat.id, file_data)
+            except:
+                bot.reply_to(message, 'Ha ocurrido un error al descargar')
 
         with open('/tmp/descarga_torrent.log', "a") as f:
             f.write('{}, {}, {} -> {}\n'.format(message.chat.id, message.chat.first_name, message.chat.username,
@@ -377,7 +380,7 @@ def my_document(message):
         # bot.send_message(message.chat.id, 'https://api.telegram.org/file/bot{0}/{1}'.format(TOKEN, file_info.file_path))
         file = requests.get(
             'https://api.telegram.org/file/bot{0}/{1}'.format(credenciales['api_telegram'], file_info.file_path))
-        with open('/home/osmc/Downloads/{}.torrent'.format(message.document.file_id), "wb") as code:
+        with open('/home/pi/Downloads/{}.torrent'.format(message.document.file_id), "wb") as code:
             code.write(file.content)
         bot.reply_to(message, 'Descargando torrent: "{}"'.format(message.document.file_name))
         send_show_torrent(message)
@@ -394,4 +397,4 @@ def handle_resto(message):
 
 # Con esto, le decimos al bot que siga funcionando incluso si encuentra
 # algun fallo.
-bot.polling(none_stop=True)
+bot.polling(none_stop=False)
