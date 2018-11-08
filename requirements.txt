@@ -8,3 +8,5 @@ mailer
 #pyqt5
 rarfile
 pyTelegramBotAPI
+unidecode
+telethon
