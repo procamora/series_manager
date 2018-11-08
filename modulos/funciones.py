@@ -219,6 +219,9 @@ def descargaUrlTorrent(direcc, bot=None, message=None):
 
     :return str: Nos devuelve el string con la url del torrent
     """
+   
+    if not re.match("^(http:\/\/).*", direcc):
+        direcc = 'http://' + direcc
     
     if modo_debug:
         print(direcc)
@@ -233,7 +236,7 @@ def descargaUrlTorrent(direcc, bot=None, message=None):
         comp1 = descargaUrlTorrentAux(session.get(direcc.replace('torrentlocura.com/', 'torrentlocura.com/descarga-torrent/'), verify=False).text)
         if comp1 is not None:
             return comp1
-
+                            
         # opcion 2
         comp2 = descargaUrlTorrentAux(session.get(direcc.replace('torrentlocura.com/', 'torrentlocura.com/descargar-seriehd/'), verify=False).text)
         if comp2 is not None:
