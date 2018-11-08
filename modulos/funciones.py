@@ -249,7 +249,9 @@ def descargaUrlTorrentAux(page):
     try:
         sopa = BeautifulSoup(page, 'html.parser')
         result = sopa.find('a', {"class": "btn-torrent"})['href']
-        if result != "javascript:void(0);":
+        # Si obtenemos una url es correcto sino buscamos en el codigo html
+        if re.match("^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$", result):
+            print(result)
             return result
         else: # FIXME USAR selenium para simular navegador 
             """ si tiene puesto en href "javascript:void(0);" llamara a la funcion openTorrent() que tiene en la variable
