@@ -172,7 +172,7 @@ def fechaToNumero(dia):
 
 
 def eliminaTildes(cadena):
-    """	http:/guimi.net/blogs/hiparco/funcion-para-eliminar-acentos-en-python/5"""
+    """ http:/guimi.net/blogs/hiparco/funcion-para-eliminar-acentos-en-python/5"""
     # s = ''.join((c for c in unicodedata.normalize('NFD',unicode(cadena)) if unicodedata.category(c) != 'Mn'))
     # return s.decode()
     #return ''.join((c for c in unicodedata.normalize('NFD', str(cadena)) if unicodedata.category(c) != 'Mn'))
@@ -181,7 +181,6 @@ def eliminaTildes(cadena):
 
 
 def descargaFichero(url, destino, libreria='requests'):
-    print("destino ",destino)
     if libreria == 'urllib':
         import urllib
         # print "downloading with urllib"
@@ -223,6 +222,10 @@ def descargaUrlTorrent(direcc, bot=None, message=None):
     if modo_debug:
         print(direcc)
 
+    if not re.match("^(http:\/\/).*", direcc):
+        direcc = 'http://' + direcc
+
+
     regexRecursion = "(tumejortorrent|newpct1|newpct)"
 
     if re.search("torrentlocura", direcc):
@@ -251,7 +254,7 @@ def descargaUrlTorrentAux(page):
         result = sopa.find('a', {"class": "btn-torrent"})['href']
         # Si obtenemos una url es correcto sino buscamos en el codigo html
         if re.match("^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$", result):
-            print(result)
+            #print(result)
             return result
         else: # FIXME USAR selenium para simular navegador 
             """ si tiene puesto en href "javascript:void(0);" llamara a la funcion openTorrent() que tiene en la variable
