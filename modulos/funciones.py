@@ -4,9 +4,11 @@ import os
 import time
 import datetime
 import unidecode
-import requests
 import glob
 import re
+import requests
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 import feedparser
 from bs4 import BeautifulSoup
@@ -219,13 +221,13 @@ def descargaUrlTorrent(direcc, bot=None, message=None):
     :return str: Nos devuelve el string con la url del torrent
     """
    
-    if not re.match("^(http:\/\/).*", direcc):
+    if not re.match(r"^(http:\/\/).*", direcc):
         direcc = 'http://' + direcc
     
     if modo_debug:
         print(direcc)
 
-    if not re.match("^(http:\/\/).*", direcc):
+    if not re.match(r"^(http:\/\/).*", direcc):
         direcc = 'http://' + direcc
 
 
@@ -256,7 +258,7 @@ def descargaUrlTorrentAux(page):
         sopa = BeautifulSoup(page, 'html.parser')
         result = sopa.find('a', {"class": "btn-torrent"})['href']
         # Si obtenemos una url es correcto sino buscamos en el codigo html
-        if re.match("^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$", result):
+        if re.match(r"^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$", result):
             #print(result)
             return result
         else: # FIXME USAR selenium para simular navegador 
@@ -264,10 +266,68 @@ def descargaUrlTorrentAux(page):
             window.location.href la url del torrent a descaegar, por lo que lo buscamos a pelo en el html y eliminamos
             lo sobrante, feo pero funcional
             """
-            javascript = re.findall('window\.location\.href\ =\ \".*\"\;', page)
+            javascript = re.findall(r'window\.location\.href\ =\ \".*\"\;', page)
             return javascript[0].replace("window.location.href = \"", "").replace("\";", "")
             #return sopa.find('div', {"id": "tab1"}).a['href']
     except:
+        return None
+
+
+def descargaUrlTorrentPctnew(direcc, bot=None, message=None):
+    """
+    Funcion que obtiene la url torrent del la dirreccion que recibe,hay que tener en cuenta que la url que recibe es la 
+    del feed y que no es la apgina que contiene el torrent, pero como todas tienen la misma forma se modifica la url 
+    poniendole descarga-torrent
+
+    :param str direcc: Dirreccion de la pagina web que contiene el torrent
+    :param obj bot: bot 
+    :param obj message: instancia del mensaje recibido
+
+    :return str: Nos devuelve el string con la url del torrent
+    """
+   
+    if not re.match(r"^(https?:\/\/).*", direcc):
+        direcc = 'https://' + direcc
+    
+    if modo_debug:
+        print(direcc)
+
+    if re.search("pctnew", direcc):
+        if bot is not None and message is not None:
+            bot.reply_to(message, 'Buscando torrent en pctnew.com')
+        session = requests.session()
+
+        myUrl = direcc.replace('pctnew.com/', 'pctnew.com/descarga-torrent/')
+        print(myUrl)
+        comp1 = descargaUrlTorrentAuxPctnew(session.get(myUrl, verify=False).text)
+        if comp1 is not None:
+            return comp1
+                            
+        # opcion 2
+        comp2 = descargaUrlTorrentAuxPctnew(session.get(direcc.replace('pctnew.com/', 'pctnew.com/descargar-seriehd/'), verify=False).text)
+        if comp2 is not None:
+            return comp2
+
+        return None
+
+
+def descargaUrlTorrentAuxPctnew(page):
+    try:
+        sopa = BeautifulSoup(page, 'html.parser')
+        result = sopa.find('a', {"class": "btn-torrent"})['href']
+        # Si obtenemos una url es correcto sino buscamos en el codigo html
+        if re.match(r"^(https?:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$", result):
+            #print(result)
+            return result
+        else: # FIXME USAR selenium para simular navegador 
+            """ si tiene puesto en href "javascript:void(0);" llamara a la funcion openTorrent() que tiene en la variable
+            window.location.href la url del torrent a descaegar, por lo que lo buscamos a pelo en el html y eliminamos
+            lo sobrante, feo pero funcional
+            """
+            javascript = re.findall(r'window\.location\.href\ =\ \".*\"\;', page)
+            return javascript[0].replace("window.location.href = \"", "").replace("\";", "")
+            #return sopa.find('div', {"id": "tab1"}).a['href']
+    except Exception as e:
         return None
 
 

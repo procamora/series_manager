@@ -54,7 +54,8 @@ dicc_botones = {
 def formatea(texto):
     if texto is not None:
         text = texto.decode('utf-8')
-        return text.replace('\n', '')
+        return str(text)
+        #return text.replace('\n', '')
     return texto
 
 
@@ -244,7 +245,7 @@ def send_show_torrent(message):
     elif len(stdout) != 0:
         for line in stdout:
             line = re.sub(
-                '\[AC3 5\.1-Castellano-AC3 5.1 Ingles\+Subs\]|\[ES-EN\]|\[AC3 5.1 Español Castellano\]|\[HDTV 720p?\]|(\d+\.?\d+|None)( )+(MB|GB|kB|Unknown).*(Up & Down|Downloading|Queued|Idle|Uploading)( )*| - Temporada \d+ |(\d+\.\d+)( )+(\d+\.\d+)',
+                r'\[AC3 5\.1-Castellano-AC3 5.1 Ingles\+Subs\]|\[ES-EN\]|\[AC3 5.1 Español Castellano\]|\[HDTV 720p?\]|(\d+\.?\d+|None)( )+(MB|GB|kB|Unknown).*(Up & Down|Downloading|Queued|Idle|Uploading)( )*| - Temporada \d+ |(\d+\.\d+)( )+(\d+\.\d+)',
                 '', stdout)
         bot.reply_to(message, line)
     else:
@@ -289,7 +290,7 @@ def handle_cmd(message):
         bot.reply_to(message, 'Comando aun no implementado')
 
 
-@bot.message_handler(func=lambda message: message.chat.id == administrador, regexp="^magnet:\?xt=urn.*")
+@bot.message_handler(func=lambda message: message.chat.id == administrador, regexp=r"^magnet:\?xt=urn.*")
 def handle_magnet(message):
     bot.reply_to(message, 'Ejecutado add torrent')
 
@@ -308,7 +309,7 @@ def handle_magnet(message):
         send_show_torrent(message)
 
 
-@bot.message_handler(regexp="^(http:\/\/)?(www.)?(newpct|newpct1|tumejortorrent|torrentlocura).com\/.*")
+@bot.message_handler(regexp=r"^(http:\/\/)?(www.)?(newpct|newpct1|tumejortorrent|torrentlocura).com\/.*")
 def handle_newpct1(message):
     # si no envio yo la url no continuo
     if message.chat.id != administrador:
@@ -336,6 +337,35 @@ def handle_newpct1(message):
                                                 message.text))
     else:
         bot.reply_to(message, 'descargaUrlTorrent retorna None')
+
+@bot.message_handler(regexp=r"^(https:\/\/)?(www.)?(pctnew).com\/.*")
+def handle_pctnew(message):
+    # si no envio yo la url no continuo
+    if message.chat.id != administrador:
+        return
+    # ya no es necesario, lo implementa descargaUrlTorrent
+    # buscamos el genero
+    #regexGenero = re.search('descarga-torrent', message.text)
+    #if regexGenero:  # si hay find continua, sino retorno None el re.search
+    #    urlPeli = message.text
+    #else:
+    #    urlPeli = re.sub('(http://)?(www.)?newpct1.com/', 'http://www.newpct1.com/descarga-torrent/', message.text)
+
+    url = funciones.descargaUrlTorrentPctnew(message.text, message)
+    if url is not None:
+        with tempfile.NamedTemporaryFile(mode='rb', dir=credenciales['RutaDescargas'], suffix='.torrent', delete=False) as fp:
+            try:
+                descargaFichero(url, fp.name)
+                file_data = open(fp.name, 'rb')
+                bot.send_document(message.chat.id, file_data)
+            except:
+                bot.reply_to(message, 'Ha ocurrido un error al descargar')
+
+        with open('/tmp/descarga_torrent.log', "a") as f:
+            f.write('{}, {}, {} -> {}\n'.format(message.chat.id, message.chat.first_name, message.chat.username,
+                                                message.text))
+    else:
+        bot.reply_to(message, 'descargaUrlTorrentPctnew retorna None')
 
 @bot.message_handler(func=lambda message: message.chat.id == administrador, content_types=["text"])
 def my_text(message):
