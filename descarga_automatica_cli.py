@@ -11,6 +11,8 @@ import time
 
 import feedparser
 import requests
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 from bs4 import BeautifulSoup
 
 from modulos import funciones
@@ -30,8 +32,26 @@ class feed:
         self.title = title
         self.link = link
 
-        epiList = re.findall(r'Temporada \d+ Capitulo \d+', title)
-        lista = re.findall(r'\d+', epiList[0])
+        regex = r'.*Temporada \d+ Capitulo \d+.*'
+
+        if re.match(regex, title):
+            epiList = re.search(regex, title).group(0)
+        else:
+            regex = r'.*Temporada (\d+).*'
+            if re.match(regex, title):
+                temp = re.search(regex, title).group(1)
+            else:
+                temp = 1
+
+            regex = r'.*Capitulos? (\d+) al (\d+).*'
+            if re.match(regex, title):
+                cap = re.search(regex, title).group(2)
+            else:
+                cap = 1
+
+            epiList = 'Temporada {} Capitulo {}'.format(temp, cap)
+
+        lista = re.findall(r'\d+', epiList)
 
         self.name = title.split('-')[0]
         self.temp = lista[0]
@@ -48,7 +68,8 @@ class feedparserPropio:
         self.entries.append(f)
 
     @staticmethod
-    def parse(url='http://torrentlocura.com/ultimas-descargas/', category='1469', dat='Hoy'):
+    def parse(url='https://pctnew.com/ultimas-descargas/', category='1469', dat='Hoy'):
+    #def parse(url='https://torrentlocura.com/ultimas-descargas/', category='1469', dat='Hoy'):
         """
         category='1469' series en hd
         """
@@ -62,11 +83,11 @@ class feedparserPropio:
         #sopa = BeautifulSoup(fichero, 'html.parser')
         result = sopa.findAll('ul', {"class": "noticias-series"})
 
-
         f = feedparserPropio()
         for ul in result:
-            for li in ul.findAll('li'):
-                f.add(li.a['title'], li.a['href'])
+            for li in ul.findAll('li'):                
+                f.add(li.div.find('h2').text, li.a['href'])
+                #f.add(li.a['title'], li.a['href'])
 
         #for i in f.entries:
         #    print(i.title)
@@ -230,7 +251,7 @@ class DescargaAutomaticaCli():
                 if vose == 'Si':
                     torrent = i.link
                 else:
-                    torrent = funciones.descargaUrlTorrent(i.link)
+                    torrent = funciones.descargaUrlTorrentPctnew(i.link)
 
                 try: # arreglar problema codificacion de algunas series
                     print(titleSerie)
@@ -311,3 +332,5 @@ def main():
 
 if __name__ == '__main__':
     main()
+    #feed('Extant - Temporada 3  Capitulos 5 al 12', 'https://pctnew.com/descargar/serie-en-hd/romper-stomper/temporada-1/capitulo-04/')
+    #feed('Strike Back - Temporada 7 Capitulo 10', 'https://pctnew.com/descargar/serie-en-hd/romper-stomper/temporada-1/capitulo-04/')
