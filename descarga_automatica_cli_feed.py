@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 """
-# Como ha dejado de funcionar el feed de torrentlocura he creado uno nuevo haciendo scraping web de la pagina de ultimos capitulos
 
 """
 import os
@@ -10,8 +9,6 @@ import re
 import time
 
 import feedparser
-import requests
-from bs4 import BeautifulSoup
 
 from modulos import funciones
 from modulos.connect_sqlite import conectionSQLite, ejecutaScriptSqlite
@@ -21,60 +18,9 @@ from modulos.settings import modo_debug, directorio_trabajo, ruta_db
 from modulos.telegram2 import TG2
 
 
-SERIE_DEBUG="The Flashd"
-
 # https://gist.github.com/kaotika/e8ca5c340ec94f599fb2
 
-class feed:
-    def __init__(self, title, link):
-        self.title = title
-        self.link = link
-
-        epiList = re.findall('Temporada \d+ Capitulo \d+', title)
-        lista = re.findall('\d+', epiList[0])
-
-        self.name = title.split('-')[0]
-        self.temp = lista[0]
-        self.epi = lista[1]
-        self.cap = "{}x{}".format(self.temp, self.epi)
-
-
-class feedparserPropio:
-    def __init__(self):
-        self.entries = list()
-
-    def add(self, title, link):
-        f = feed(title.strip(), link)
-        self.entries.append(f)
-
-    @staticmethod
-    def parse(url='http://torrentlocura.com/ultimas-descargas/', category='1469', dat='Semana'):
-        """
-        category='1469' series en hd
-        """
-        formdata = {'categoryIDR': category, 'date': dat }
-        req_headers = { 'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; WOW64; rv:35.0) Gecko/20100101 Firefox/35.0', 'Content-Type': 'application/x-www-form-urlencoded' }
-
-        session = requests.session()
-        login = session.post(url, data=formdata, headers=req_headers, verify=False)
-
-        sopa = BeautifulSoup(login.text, 'html.parser')
-        #sopa = BeautifulSoup(fichero, 'html.parser')
-        result = sopa.findAll('ul', {"class": "noticias-series"})
-
-
-        f = feedparserPropio()
-        for ul in result:
-            for li in ul.findAll('li'):
-                f.add(li.a['title'], li.a['href'])
-
-        #for i in f.entries:
-        #    print(i.title)
-        #    print(i.cap)
-        #    print()
-
-        return f
-
+SERIE_DEBUG="NoAtlantis"
 
 class DescargaAutomaticaCli():
     def __init__(self, dbSeries=None):
@@ -102,13 +48,10 @@ class DescargaAutomaticaCli():
             self.consultaUpdate = str()
             self.rutlog = str()
 
-            self.feedNew = feedparserPropio.parse()
-            """
             try:
                 self.feedNew = feedparser.parse(urlNew)
             except TypeError:  # Para el fallo en fedora
                 self.feedNew = funciones.feedParser(urlNew)
-            """
 
             try:
                 self.feedShow = feedparser.parse(urlShow)
@@ -154,7 +97,7 @@ class DescargaAutomaticaCli():
                 print('################' ,i['Nombre'], ' FALLO: ', e)
 
         if len(self.ultimaSerieNew) != 0:  # or len(self.ultimaSerieShow) != 0:
-            #print(self.actualizaDia)
+            print(self.actualizaDia)
             # actualiza los dias en los que sale el capitulo
             ejecutaScriptSqlite(self.db, self.actualizaDia)
 
@@ -167,6 +110,7 @@ class DescargaAutomaticaCli():
 
         # capitulos que descargo
         for i in self.capDescargado.items():
+            # print (i)
             query = 'UPDATE Series SET Capitulo_Descargado={} WHERE Nombre LIKE "{}";\n'.format(str(i[1]), i[0])
             self.consultaUpdate += query
 
@@ -206,11 +150,10 @@ class DescargaAutomaticaCli():
             #print(self.titleSerie, ".........", ultimaSerie, ".FIN")
             if self.titleSerie == ultimaSerie:
                 # retornamos el valor que luego usaremos en ultima serie para guardarlo en el fichero
-                return funciones.eliminaTildes(d.entries[0].title) #FIXME DESCOMENTAR
+                return funciones.eliminaTildes(d.entries[0].title)
 
             regex_vose = '(?i){} ({}|{}|{}).*'.format(funciones.escapaParentesis(serie.lower()), tem, tem+1, tem+2)
-            #regex_cast = '(?i){}( \(Proper\))?( )*- Temporada( )?\d+ \[HDTV 720p?\]\[Cap\.({}|{}|{})\d+(_\d+)?\]\[A.*'.format(
-            regex_cast = '(?i){}.*Temporada( )?({}|{}|{}).*Capitulo( )?\d+.*'.format(
+            regex_cast = '(?i){}( \(Proper\))?( )*- Temporada( )?\d+ \[HDTV 720p?\]\[Cap\.({}|{}|{})\d+(_\d+)?\]\[A.*'.format(
                 funciones.escapaParentesis(serie.lower()), tem, tem+1, tem+2)
 
             if serie.lower() == SERIE_DEBUG.lower():
@@ -247,18 +190,27 @@ class DescargaAutomaticaCli():
                         # creo un string para solo mandar una notificacion
                         self.listaNotificaciones += '{}\n'.format(titleSerie)
                     else:
-                        self.accionExtra('{} {}'.format(i.name, i.cap))
+                        # En pelis que son VOSE no se si da fallo, esto solo es para no VOSE
+                        varNom = self.titleSerie.split('-')[0]
+                        varEpi = self.titleSerie.split('][')[1]
+                        self.accionExtra('{} {}'.format(varNom, varEpi))
                         # creo un string para solo mandar una notificacion
-                        self.listaNotificaciones += '{} {}\n'.format(i.name, i.cap)
-
+                        self.listaNotificaciones += '{} {}\n'.format(varNom, varEpi)
                     funciones.descargaFichero(torrent, r'{}/{}.torrent'.format(ruta, str(titleSerie)))
                     # Diccionario con todos los capitulos descargados, para actualizar la bd con los capitulos por
                     # donde voy regex para coger el capitulo unicamente
                     self.actualizaDia += """\nUPDATE series SET Dia="{}" WHERE Nombre LIKE "{}";""".format(
                         funciones.calculaDiaSemana(), serie)
 
-                    self.capDescargado[serie] = i.epi
-                   
+                    capituloActual = varEpi[-2:]  # mas eficiente, el otro metodo falla con multiples series: 206_209
+                    # capituloActual = int(re.sub('Cap\.{}'.format(tem), '', varEpi))
+                    if serie not in self.capDescargado:
+                        self.capDescargado[serie] = capituloActual
+                    else:
+                        # REVISAR, CREO QUE ESTA MAL NO ES 4X05 ES 405
+                        if self.capDescargado[serie] < capituloActual:
+                            self.capDescargado[serie] = capituloActual
+
                 print(('DESCARGANDO: {}'.format(serie)))
 
         return funciones.eliminaTildes(d.entries[0].title)
@@ -302,11 +254,8 @@ class DescargaAutomaticaCli():
         return Datos
 
 
-
-
 def main():
     DescargaAutomaticaCli(dbSeries=ruta_db).run()
-    #feedparserPropio.parse()
 
 
 if __name__ == '__main__':
