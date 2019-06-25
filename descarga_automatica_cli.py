@@ -12,6 +12,7 @@ import time
 import feedparser
 import requests
 import urllib3
+
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 from bs4 import BeautifulSoup
 
@@ -22,8 +23,8 @@ from modulos.pushbullet2 import PB2
 from modulos.settings import modo_debug, directorio_trabajo, ruta_db
 from modulos.telegram2 import TG2
 
+SERIE_DEBUG = "The Flashd"
 
-SERIE_DEBUG="The Flashd"
 
 # https://gist.github.com/kaotika/e8ca5c340ec94f599fb2
 
@@ -68,28 +69,29 @@ class feedparserPropio:
         self.entries.append(f)
 
     @staticmethod
-    def parse(url='https://pctnew.com/ultimas-descargas/', category='1469', dat='Hoy'):
-    #def parse(url='https://torrentlocura.com/ultimas-descargas/', category='1469', dat='Hoy'):
+    def parse(url='https://dontorrent.com/ultimos', category='1469', dat='Hoy'):
+        # def parse(url='https://torrentlocura.com/ultimas-descargas/', category='1469', dat='Hoy'):
         """
         category='1469' series en hd
         """
-        formdata = {'categoryIDR': category, 'date': dat }
-        req_headers = { 'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; WOW64; rv:35.0) Gecko/20100101 Firefox/35.0', 'Content-Type': 'application/x-www-form-urlencoded' }
+        formdata = {'categoryIDR': category, 'date': dat}
+        req_headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; WOW64; rv:35.0) Gecko/20100101 Firefox/35.0',
+                       'Content-Type': 'application/x-www-form-urlencoded'}
 
         session = requests.session()
         login = session.post(url, data=formdata, headers=req_headers, verify=False)
 
         sopa = BeautifulSoup(login.text, 'html.parser')
-        #sopa = BeautifulSoup(fichero, 'html.parser')
+        # sopa = BeautifulSoup(fichero, 'html.parser')
         result = sopa.findAll('ul', {"class": "noticias-series"})
 
         f = feedparserPropio()
         for ul in result:
-            for li in ul.findAll('li'):                
+            for li in ul.findAll('li'):
                 f.add(li.div.find('h2').text, li.a['href'])
-                #f.add(li.a['title'], li.a['href'])
+                # f.add(li.a['title'], li.a['href'])
 
-        #for i in f.entries:
+        # for i in f.entries:
         #    print(i.title)
         #    print(i.cap)
         #    print()
@@ -100,6 +102,9 @@ class feedparserPropio:
 class DescargaAutomaticaCli():
     def __init__(self, dbSeries=None):
         if funciones.internetOn():
+            self._logger = funciones.getLogger(modo_debug)
+            self._logger.debug('Start')
+
             if dbSeries is None:  # en herencia no mando ruta
                 self.db = ruta_db
             else:
@@ -164,7 +169,7 @@ class DescargaAutomaticaCli():
 
         for i in self.consultaSeries:
             try:
-                print(('Revisa: {}'.format(funciones.eliminaTildes(i['Nombre']))))
+                self._logger.info(('Revisa: {}'.format(funciones.eliminaTildes(i['Nombre']))))
                 SerieActualTemp = self.parseaFeed(
                     i['Nombre'], i['Temporada'], i['Capitulo'], i['VOSE'])
                 if i['VOSE'] == 'Si':
@@ -172,10 +177,10 @@ class DescargaAutomaticaCli():
                 else:
                     SerieActualNew = SerieActualTemp
             except Exception as e:
-                print('################' ,i['Nombre'], ' FALLO: ', e)
+                self._logger.error('################ {} FALLO {}'.format(i['Nombre'], e))
 
         if len(self.ultimaSerieNew) != 0:  # or len(self.ultimaSerieShow) != 0:
-            #print(self.actualizaDia)
+            # self._logger.info(self.actualizaDia)
             # actualiza los dias en los que sale el capitulo
             ejecutaScriptSqlite(self.db, self.actualizaDia)
 
@@ -191,7 +196,8 @@ class DescargaAutomaticaCli():
             query = 'UPDATE Series SET Capitulo_Descargado={} WHERE Nombre LIKE "{}";\n'.format(str(i[1]), i[0])
             self.consultaUpdate += query
 
-        print(self.consultaUpdate)
+        self._logger.info(self.consultaUpdate)
+
         # actualiza el ultimo capitulo que he descargado
         ejecutaScriptSqlite(self.db, self.consultaUpdate)
 
@@ -202,7 +208,7 @@ class DescargaAutomaticaCli():
             with open('{}/{}'.format(self.rutlog, fichShowrss), 'w') as f:
                 f.write(funciones.eliminaTildes(SerieActualShow))
         else:
-            print('PROBLEMA CON if SerieActualShow is not None and SerieActualNew is not None:')
+            self._logger.error('PROBLEMA CON if SerieActualShow is not None and SerieActualNew is not None:')
 
     def parseaFeed(self, serie, tem, cap, vose):
         """Solo funciona con series de 2 digitos por la expresion regular"""
@@ -224,19 +230,19 @@ class DescargaAutomaticaCli():
         for i in d.entries:
             self.titleSerie = funciones.eliminaTildes(i.title)
             # cuando llegamos al ultimo capitulo pasamos a la siguiente serie
-            #print(self.titleSerie, ".........", ultimaSerie, ".FIN")
+            # self._logger.info(self.titleSerie, ".........", ultimaSerie, ".FIN")
             if self.titleSerie == ultimaSerie:
                 # retornamos el valor que luego usaremos en ultima serie para guardarlo en el fichero
-                return funciones.eliminaTildes(d.entries[0].title) #FIXME DESCOMENTAR
+                return funciones.eliminaTildes(d.entries[0].title)  # FIXME DESCOMENTAR
 
-            regex_vose = '(?i){} ({}|{}|{}).*'.format(funciones.escapaParentesis(serie.lower()), tem, tem+1, tem+2)
-            #regex_cast = '(?i){}( \(Proper\))?( )*- Temporada( )?\d+ \[HDTV 720p?\]\[Cap\.({}|{}|{})\d+(_\d+)?\]\[A.*'.format(
+            regex_vose = '(?i){} ({}|{}|{}).*'.format(funciones.escapaParentesis(serie.lower()), tem, tem + 1, tem + 2)
+            # regex_cast = '(?i){}( \(Proper\))?( )*- Temporada( )?\d+ \[HDTV 720p?\]\[Cap\.({}|{}|{})\d+(_\d+)?\]\[A.*'.format(
             regex_cast = r'(?i){}.*Temporada( )?({}|{}|{}).*Capitulo( )?\d+.*'.format(
-                funciones.escapaParentesis(serie.lower()), tem, tem+1, tem+2)
+                funciones.escapaParentesis(serie.lower()), tem, tem + 1, tem + 2)
 
             if serie.lower() == SERIE_DEBUG.lower():
-                print(regex_cast, self.titleSerie)
-                print(i.link)
+                self._logger.info(regex_cast, self.titleSerie)
+                self._logger.info(i.link)
 
             estado = False
             if vose == 'Si':
@@ -247,14 +253,14 @@ class DescargaAutomaticaCli():
                     estado = True
 
             if estado:
-                titleSerie = self.titleSerie # conversion necesaria para usar como str
+                titleSerie = self.titleSerie  # conversion necesaria para usar como str
                 if vose == 'Si':
                     torrent = i.link
                 else:
                     torrent = funciones.descargaUrlTorrentPctnew(i.link)
 
-                try: # arreglar problema codificacion de algunas series
-                    print(titleSerie)
+                try:  # arreglar problema codificacion de algunas series
+                    self._logger.info(titleSerie)
                 except:
                     titleSerie = titleSerie.replace(u"\uFFFD", "?")
 
@@ -279,8 +285,8 @@ class DescargaAutomaticaCli():
                         funciones.calculaDiaSemana(), serie)
 
                     self.capDescargado[serie] = i.epi
-                   
-                print(('DESCARGANDO: {}'.format(serie)))
+
+                self._logger.info(('DESCARGANDO: {}'.format(serie)))
 
         return funciones.eliminaTildes(d.entries[0].title)
 
@@ -323,14 +329,52 @@ class DescargaAutomaticaCli():
         return Datos
 
 
-
-
 def main():
     DescargaAutomaticaCli(dbSeries=ruta_db).run()
-    #feedparserPropio.parse()
+    # feedparserPropio.parse()
 
+
+def parse(url='https://dontorrent.com/series/hd', category='1469', dat='Hoy'):
+    # def parse(url='https://torrentlocura.com/ultimas-descargas/', category='1469', dat='Hoy'):
+    """
+    category='1469' series en hd
+    """
+    req_headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; WOW64; rv:35.0) Gecko/20100101 Firefox/35.0',
+                   'Content-Type': 'application/x-www-form-urlencoded'}
+
+    session = requests.session()
+    login = session.get(url, headers=req_headers, verify=False)
+
+    sopa = BeautifulSoup(login.text, 'html.parser')
+    # sopa = BeautifulSoup(fichero, 'html.parser')
+    days = sopa.findAll('div', {"class": "card-body"})
+    #result = sopa.findAll('ul', {"class": "noticias-series"})
+
+    #f = feedparserPropio()
+    for day in days:
+        print(day)
+        print("%%%%%%%%%%%%%%%%%%%%\n%%%%%%%%%%%%%%%%%%")
+        print("%%%%%%%%%%%%%%%%%%%%\n%%%%%%%%%%%%%%%%%%")
+        print("%%%%%%%%%%%%%%%%%%%%\n%%%%%%%%%%%%%%%%%%")
+        print("%%%%%%%%%%%%%%%%%%%%\n%%%%%%%%%%%%%%%%%%")
+        for serie in day.findAll('a'):
+            if not re.match('[A-Z]|TODOS', serie.text):
+                print(serie.text)
+                print(serie.contents)
+                print(serie['href'])
+                print("****")
+            #f.add(li.div.find('h2').text, li.a['href'])
+            # f.add(li.a['title'], li.a['href'])
+
+    # for i in f.entries:
+    #    print(i.title)
+    #    print(i.cap)
+    #    print()
+
+    #return f
 
 if __name__ == '__main__':
-    main()
-    #feed('Extant - Temporada 3  Capitulos 5 al 12', 'https://pctnew.com/descargar/serie-en-hd/romper-stomper/temporada-1/capitulo-04/')
-    #feed('Strike Back - Temporada 7 Capitulo 10', 'https://pctnew.com/descargar/serie-en-hd/romper-stomper/temporada-1/capitulo-04/')
+    #main()
+    # feed('Extant - Temporada 3  Capitulos 5 al 12', 'https://pctnew.com/descargar/serie-en-hd/romper-stomper/temporada-1/capitulo-04/')
+    # feed('Strike Back - Temporada 7 Capitulo 10', 'https://pctnew.com/descargar/serie-en-hd/romper-stomper/temporada-1/capitulo-04/')
+    parse(url='https://dontorrent.com/series/hd')

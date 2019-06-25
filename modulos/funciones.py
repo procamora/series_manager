@@ -7,20 +7,52 @@ import unidecode
 import glob
 import re
 import requests
+import logging
 import urllib3
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-
 import feedparser
+import colorlog  # https://medium.com/@galea/python-logging-example-with-color-formatting-file-handlers-6ee21d363184
+
 from bs4 import BeautifulSoup
 
 try:
     from .connect_sqlite import conectionSQLite, ejecutaScriptSqlite, dumpDatabase
     from .settings import directorio_trabajo, directorio_local, nombre_db, ruta_db, sync_sqlite, sync_gdrive, \
-    modo_debug
+        modo_debug
 except:
     from connect_sqlite import conectionSQLite, ejecutaScriptSqlite, dumpDatabase
     from settings import directorio_trabajo, directorio_local, nombre_db, ruta_db, sync_sqlite, sync_gdrive, \
-    modo_debug
+        modo_debug
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+
+def getLogger(verbose, name='Series'):
+    # Desabilita log de modulos
+    # for _ in ("boto", "elasticsearch", "urllib3"):
+    #    logging.getLogger(_).setLevel(logging.CRITICAL)
+
+    logFormat = '%(levelname)s - %(module)s - %(message)s'
+
+    bold_seq = '\033[1m'
+    colorlog_format = (
+        f'{bold_seq} '
+        '%(log_color)s '
+        f'{logFormat}'
+    )
+
+    colorlog.basicConfig(format=colorlog_format)
+    # logging.basicConfig(format=colorlog_format)
+    log = logging.getLogger(name)
+
+    if verbose:
+        log.setLevel(logging.DEBUG)
+        log.debug('logging in mode DEBUG')
+    else:
+        log.setLevel(logging.INFO)
+        log.info('logging in mode INFO')
+
+    return log
+
 
 def creaDirectorioTrabajo():
     """
@@ -177,7 +209,7 @@ def eliminaTildes(cadena):
     """ http:/guimi.net/blogs/hiparco/funcion-para-eliminar-acentos-en-python/5"""
     # s = ''.join((c for c in unicodedata.normalize('NFD',unicode(cadena)) if unicodedata.category(c) != 'Mn'))
     # return s.decode()
-    #return ''.join((c for c in unicodedata.normalize('NFD', str(cadena)) if unicodedata.category(c) != 'Mn'))
+    # return ''.join((c for c in unicodedata.normalize('NFD', str(cadena)) if unicodedata.category(c) != 'Mn'))
     # https://stackoverflow.com/questions/517923/what-is-the-best-way-to-remove-accents-in-a-python-unicode-string
     return unidecode.unidecode(cadena)
 
@@ -220,16 +252,15 @@ def descargaUrlTorrent(direcc, bot=None, message=None):
 
     :return str: Nos devuelve el string con la url del torrent
     """
-   
+
     if not re.match(r"^(http:\/\/).*", direcc):
         direcc = 'http://' + direcc
-    
+
     if modo_debug:
         print(direcc)
 
     if not re.match(r"^(http:\/\/).*", direcc):
         direcc = 'http://' + direcc
-
 
     regexRecursion = "(tumejortorrent|newpct1|newpct)"
 
@@ -238,12 +269,15 @@ def descargaUrlTorrent(direcc, bot=None, message=None):
             bot.reply_to(message, 'Buscando torrent en torrentlocura.com')
         session = requests.session()
 
-        comp1 = descargaUrlTorrentAux(session.get(direcc.replace('torrentlocura.com/', 'torrentlocura.com/descarga-torrent/'), verify=False).text)
+        comp1 = descargaUrlTorrentAux(
+            session.get(direcc.replace('torrentlocura.com/', 'torrentlocura.com/descarga-torrent/'), verify=False).text)
         if comp1 is not None:
             return comp1
-                            
+
         # opcion 2
-        comp2 = descargaUrlTorrentAux(session.get(direcc.replace('torrentlocura.com/', 'torrentlocura.com/descargar-seriehd/'), verify=False).text)
+        comp2 = descargaUrlTorrentAux(
+            session.get(direcc.replace('torrentlocura.com/', 'torrentlocura.com/descargar-seriehd/'),
+                        verify=False).text)
         if comp2 is not None:
             return comp2
 
@@ -258,17 +292,19 @@ def descargaUrlTorrentAux(page):
         sopa = BeautifulSoup(page, 'html.parser')
         result = sopa.find('a', {"class": "btn-torrent"})['href']
         # Si obtenemos una url es correcto sino buscamos en el codigo html
-        if re.match(r"^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$", result):
-            #print(result)
+        if re.match(
+                r"^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$",
+                result):
+            # print(result)
             return result
-        else: # FIXME USAR selenium para simular navegador 
+        else:  # FIXME USAR selenium para simular navegador
             """ si tiene puesto en href "javascript:void(0);" llamara a la funcion openTorrent() que tiene en la variable
             window.location.href la url del torrent a descaegar, por lo que lo buscamos a pelo en el html y eliminamos
             lo sobrante, feo pero funcional
             """
             javascript = re.findall(r'window\.location\.href\ =\ \".*\"\;', page)
             return javascript[0].replace("window.location.href = \"", "").replace("\";", "")
-            #return sopa.find('div', {"id": "tab1"}).a['href']
+            # return sopa.find('div', {"id": "tab1"}).a['href']
     except:
         return None
 
@@ -285,10 +321,10 @@ def descargaUrlTorrentPctnew(direcc, bot=None, message=None):
 
     :return str: Nos devuelve el string con la url del torrent
     """
-   
+
     if not re.match(r"^(https?:\/\/).*", direcc):
         direcc = 'https://' + direcc
-    
+
     if modo_debug:
         print(direcc)
 
@@ -302,9 +338,10 @@ def descargaUrlTorrentPctnew(direcc, bot=None, message=None):
         comp1 = descargaUrlTorrentAuxPctnew(session.get(myUrl, verify=False).text)
         if comp1 is not None:
             return comp1
-                            
+
         # opcion 2
-        comp2 = descargaUrlTorrentAuxPctnew(session.get(direcc.replace('pctnew.com/', 'pctnew.com/descargar-seriehd/'), verify=False).text)
+        comp2 = descargaUrlTorrentAuxPctnew(
+            session.get(direcc.replace('pctnew.com/', 'pctnew.com/descargar-seriehd/'), verify=False).text)
         if comp2 is not None:
             return comp2
 
@@ -316,17 +353,19 @@ def descargaUrlTorrentAuxPctnew(page):
         sopa = BeautifulSoup(page, 'html.parser')
         result = sopa.find('a', {"class": "btn-torrent"})['href']
         # Si obtenemos una url es correcto sino buscamos en el codigo html
-        if re.match(r"^(https?:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$", result):
-            #print(result)
+        if re.match(
+                r"^(https?:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$",
+                result):
+            # print(result)
             return result
-        else: # FIXME USAR selenium para simular navegador 
+        else:  # FIXME USAR selenium para simular navegador
             """ si tiene puesto en href "javascript:void(0);" llamara a la funcion openTorrent() que tiene en la variable
             window.location.href la url del torrent a descaegar, por lo que lo buscamos a pelo en el html y eliminamos
             lo sobrante, feo pero funcional
             """
             javascript = re.findall(r'window\.location\.href\ =\ \".*\"\;', page)
             return javascript[0].replace("window.location.href = \"", "").replace("\";", "")
-            #return sopa.find('div', {"id": "tab1"}).a['href']
+            # return sopa.find('div', {"id": "tab1"}).a['href']
     except Exception as e:
         return None
 
@@ -362,6 +401,7 @@ def feedParser(url):
         else:
             raise
 
+
 def muestraMensaje(label, texto='Texto plantilla', estado=True):
     """
     Muestra una determinada label con rojo o verde (depende del estado) y con el texto indicado
@@ -379,6 +419,7 @@ def escapaParentesis(texto):
     No he probado si funciona con series como powers
     """
     return texto.replace('(', '\\(').replace(')', '\\)')
+
 
 def internetOn():
     try:

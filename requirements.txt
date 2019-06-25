@@ -10,3 +10,5 @@ rarfile
 pyTelegramBotAPI
 unidecode
 telethon
+colorlog
+urllib3
