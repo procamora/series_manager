@@ -2,56 +2,31 @@
 # -*- coding: utf-8 -*-
 import datetime
 import glob
-import logging
 import os
 import re
 import time
 
-import colorlog  # https://medium.com/@galea/python-logging-example-with-color-formatting-file-handlers-6ee21d363184
 import feedparser
 import requests
 import unidecode
 import urllib3
 from bs4 import BeautifulSoup
 
+from app import logger
+
 try:
     from .connect_sqlite import conectionSQLite, ejecutaScriptSqlite, dumpDatabase
     from .settings import directorio_trabajo, directorio_local, nombre_db, ruta_db, sync_sqlite, sync_gdrive, \
         modo_debug
 except:
-    from connect_sqlite import conectionSQLite, ejecutaScriptSqlite, dumpDatabase
-    from settings import directorio_trabajo, directorio_local, nombre_db, ruta_db, sync_sqlite, sync_gdrive, \
+    from app.modulos.connect_sqlite import conectionSQLite, ejecutaScriptSqlite, dumpDatabase
+    from app.modulos.settings import directorio_trabajo, directorio_local, nombre_db, ruta_db, sync_sqlite, sync_gdrive, \
         modo_debug
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
-def getLogger(verbose, name='Series'):
-    # Desabilita log de modulos
-    # for _ in ("boto", "elasticsearch", "urllib3"):
-    #    logging.getLogger(_).setLevel(logging.CRITICAL)
 
-    logFormat = '%(levelname)s - %(module)s - %(message)s'
-
-    bold_seq = '\033[1m'
-    colorlog_format = (
-        f'{bold_seq} '
-        '%(log_color)s '
-        f'{logFormat}'
-    )
-
-    colorlog.basicConfig(format=colorlog_format)
-    # logging.basicConfig(format=colorlog_format)
-    log = logging.getLogger(name)
-
-    if verbose:
-        log.setLevel(logging.DEBUG)
-        log.debug('logging in mode DEBUG')
-    else:
-        log.setLevel(logging.INFO)
-        log.info('logging in mode INFO')
-
-    return log
 
 
 def creaDirectorioTrabajo():
@@ -63,18 +38,17 @@ def creaDirectorioTrabajo():
     """
 
     if not os.path.exists(directorio_trabajo):
-        if modo_debug:
-            print("NO EXISTE DIRECTORIO TRABAJO")
+        logger.debug("NO EXISTE DIRECTORIO TRABAJO")
         os.mkdir(directorio_trabajo)
         plantillaDatabase()
         plantillaFicheroConf()
     else:
         ruta_id = '{}/{}'.format(directorio_local, sync_sqlite)
         if not os.path.exists(ruta_db) or os.stat(ruta_db).st_size == 0:
-            print(1)
+            logger.info(1)
             plantillaDatabase()
         if not os.path.exists(ruta_id) or os.stat(ruta_id).st_size == 0:
-            print(2)
+            logger.info(2)
             plantillaFicheroConf()
 
 
@@ -98,11 +72,10 @@ def dbConfiguarion():
         with open(r'{}/{}'.format(directorio_local, sync_sqlite), 'r') as f:
             id_db = f.readline()
     except:
-        print('fallo en dbConfiguarion')
+        logger.warning('fallo en dbConfiguarion')
         id_db = 1
 
     query = 'SELECT * FROM Configuraciones WHERE id IS {}'.format(id_db)
-    # print u'{}/{}'.format(creaDirectorioTrabajo(),name_db)
     consulta = conectionSQLite('{}/{}'.format(directorio_trabajo, nombre_db), query, True)[0]
     return consulta
 
@@ -116,8 +89,7 @@ def plantillaFicheroConf():
 
     fichero_conf = '{}/{}'.format(directorio_local, sync_sqlite)
     if os.path.exists(sync_sqlite):
-        if modo_debug:
-            print(sync_sqlite, fichero_conf)
+        logger.debug(sync_sqlite, fichero_conf)
         os.rename(sync_sqlite, fichero_conf)
     else:
         if os.path.exists(fichero_conf):
@@ -139,8 +111,7 @@ def plantillaDatabase():
     fichero_db = '{}/{}'.format(directorio_trabajo, nombre_db)
 
     if not os.path.exists(fichero_db) or not os.stat(fichero_db).st_size > 50000:  # estructura pesa 72Kb
-        if modo_debug:
-            print("creando db")
+        logger.debug("creando db")
         with open(cambiaBarras(ficheros_sql[-1]), 'r') as f:
             plantilla = f.read()
         ejecutaScriptSqlite(fichero_db, plantilla)
@@ -156,7 +127,7 @@ def crearBackUpCompletoDB():
         with open('{}/SQL/{}.sql'.format(directorio_local, time.strftime("%Y%m%d")), 'w') as f:
             f.write(data)
     except:
-        print('error al hacer backup')
+        logger.error('error al hacer backup')
 
 
 def calculaDiaSemana():
@@ -217,27 +188,23 @@ def eliminaTildes(cadena):
 def descargaFichero(url, destino, libreria='requests'):
     if libreria == 'urllib':
         import urllib
-        # print "downloading with urllib"
         urllib.urlretrieve(url, destino)
 
     if libreria == 'urllib2':
         import urllib2
-        # print "downloading with urllib2"
         f = urllib2.urlopen(url)
         data = f.read()
         with open(destino, "wb") as code:
             code.write(data)
 
     if libreria == 'requests':
-        # print "downloading with requests"
         r = requests.get(url, verify=False)
-        print('Descargo el fichero: {}'.format(destino))
+        logger.debug('Descargo el fichero: {}'.format(destino))
         with open(destino, "wb") as code:
             code.write(r.content)
 
     if libreria == 'wget':
         import wget
-        # print "downloading with wget"
         wget.download(url, destino)
 
 
@@ -258,8 +225,7 @@ def __descargaUrlTorrent(direcc, bot=None, message=None):
     if not re.match(r"^(http:\/\/).*", direcc):
         direcc = 'http://' + direcc
 
-    if modo_debug:
-        print(direcc)
+    logger.debug(direcc)
 
     if not re.match(r"^(http:\/\/).*", direcc):
         direcc = 'http://' + direcc
@@ -298,7 +264,6 @@ def __descargaUrlTorrentAux(page):
         if re.match(
                 r"^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$",
                 result):
-            # print(result)
             return result
         else:  # FIXME USAR selenium para simular navegador
             """ si tiene puesto en href "javascript:void(0);" llamara a la funcion openTorrent() que tiene en la variable
@@ -329,8 +294,7 @@ def __descargaUrlTorrentPctnew(direcc, bot=None, message=None):
     if not re.match(r"^(https?:\/\/).*", direcc):
         direcc = 'https://' + direcc
 
-    if modo_debug:
-        print(direcc)
+    logger.debug(direcc)
 
     if re.search("pctnew", direcc):
         if bot is not None and message is not None:
@@ -338,13 +302,13 @@ def __descargaUrlTorrentPctnew(direcc, bot=None, message=None):
         session = requests.session()
 
         myUrl = direcc.replace('pctnew.com/', 'pctnew.com/descarga-torrent/')
-        print(myUrl)
-        comp1 = descargaUrlTorrentAuxPctnew(session.get(myUrl, verify=False).text)
+        logger.debug(myUrl)
+        comp1 = __descargaUrlTorrentAuxPctnew(session.get(myUrl, verify=False).text)
         if comp1 is not None:
             return comp1
 
         # opcion 2
-        comp2 = descargaUrlTorrentAuxPctnew(
+        comp2 = __descargaUrlTorrentAuxPctnew(
             session.get(direcc.replace('pctnew.com/', 'pctnew.com/descargar-seriehd/'), verify=False).text)
         if comp2 is not None:
             return comp2
@@ -361,7 +325,6 @@ def __descargaUrlTorrentAuxPctnew(page):
         if re.match(
                 r"^(https?:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$",
                 result):
-            # print(result)
             return result
         else:  # FIXME USAR selenium para simular navegador
             """ si tiene puesto en href "javascript:void(0);" llamara a la funcion openTorrent() que tiene en la variable
@@ -408,9 +371,6 @@ def descargaUrlTorrentDonTorrent(direcc, bot=None, message=None):
     if not re.match(r"^(https?:\/\/).*", direcc):
         direcc = 'https://' + direcc
 
-    # if modo_debug:
-    #    print(direcc)
-
     if re.search("dontorrent", direcc):
         if bot is not None and message is not None:
             bot.reply_to(message, 'Buscando torrent en pctnew.com')
@@ -431,7 +391,6 @@ def descargaUrlTorrentDonTorrent(direcc, bot=None, message=None):
         for i in urls:
             newUrls.append('https://dontorrent.com{}'.format(i[0]))
 
-        # print(newUrls)
         return newUrls
 
 

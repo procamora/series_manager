@@ -27,6 +27,7 @@ from app.views import newpct1_completa
 from app.views import notificaciones
 from app.views import preferencias
 from app.views.ui.series_ui import Ui_MainWindow
+from app import logger
 
 
 class Series(QtWidgets.QMainWindow):
@@ -67,8 +68,7 @@ class Series(QtWidgets.QMainWindow):
 
         for texto, i in zip(listadoFinal, list(range(0, len(listadoFinal)))):  # el encabezado lo tengo encima
             self.creaListaSerie(i, texto)
-            if modo_debug:
-                print(i, texto)
+            logger.debug(i, texto)
 
         self.ui.pushButtonAceptar.setVisible(False)
         self.ui.pushButtonAplicar.setText("Guardar")
@@ -168,13 +168,11 @@ class Series(QtWidgets.QMainWindow):
 
         if capT > cap:
             for i in range(0, capT - cap):
-                if modo_debug:
-                    print('Suma: {}'.format(str(i)))
+                logger.debug('Suma: {}'.format(str(i)))
                 self.sumarSerie(capitulo, dat)
         else:
             for i in range(0, capT - cap):
-                if modo_debug:
-                    print('Resta: {}'.format(str(i)))
+                logger.debug('Resta: {}'.format(str(i)))
                 self.restarSerie(capitulo, dat)
 
     def sumarSerie(self, n, dat):
@@ -195,8 +193,7 @@ class Series(QtWidgets.QMainWindow):
 
         query = """UPDATE series SET Capitulo=Capitulo+1 WHERE Nombre LIKE "{}";""".format(dat["Nombre"])
         self.queryCompleta += '\n' + query
-        if modo_debug:
-            print(query)
+        logger.debug(query)
 
     def restarSerie(self, n, dat):
         """
@@ -216,8 +213,7 @@ class Series(QtWidgets.QMainWindow):
 
         query = 'UPDATE series SET Capitulo=Capitulo-1 WHERE Nombre LIKE "{}";'.format(dat["Nombre"])
         self.queryCompleta += '\n' + query
-        if modo_debug:
-            print(query)
+        logger.debug(query)
 
     def cancela(self):
         """
@@ -234,8 +230,7 @@ class Series(QtWidgets.QMainWindow):
         asi evitamos que se ejecute dos veces la misma lista
         """
 
-        if modo_debug:
-            print(self.queryCompleta)
+        logger.debug(self.queryCompleta)
 
         ejecutaScriptSqlite(self.db, self.queryCompleta)
 
@@ -256,8 +251,7 @@ class Series(QtWidgets.QMainWindow):
             for j in series:
                 if j['Dia'] == i:
                     lista.append(j)
-        if modo_debug:
-            print(lista)
+        logger.debug(lista)
         return lista
 
     def aceptaDatos(self):
@@ -384,7 +378,7 @@ class Series(QtWidgets.QMainWindow):
     def menActualizarImdb():
         import app.modulos.actualiza_imdb as actualiza_imdb
         a = actualiza_imdb.actualizaImdb()
-        print('actulizaCompleto')
+        logger.info('actulizaCompleto')
         a.actulizaCompleto()
 
     def menNewpct1(self):
@@ -424,7 +418,7 @@ class Series(QtWidgets.QMainWindow):
 
             if entornoGrafico is not None:
                 comando = '{} "{}"'.format(entornoGrafico, directorio_trabajo)  # no esta revisado
-                print(entornoGrafico)
+                logger.info(entornoGrafico)
 
         ejecucion = subprocess.Popen(comando, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         ejecucion.communicate()  # no se lanza un hilo, hasta que no se cierre la ventana no sepuede seguir usando
@@ -489,7 +483,7 @@ def main():
     contador = 0
     while not asistente_inicial.AsistenteInicial.checkIntegridadFicheros():
         contador += 1
-        print("Intento {} de 3".format(contador))
+        logger.info("Intento {} de 3".format(contador))
         if contador == 3:
             return
 

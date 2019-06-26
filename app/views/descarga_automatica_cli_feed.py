@@ -16,6 +16,7 @@ from app.modulos.mail2 import ML2
 from app.modulos.pushbullet2 import PB2
 from app.modulos.settings import modo_debug, directorio_trabajo, ruta_db
 from app.modulos.telegram2 import TG2
+from app import logger
 
 
 # https://gist.github.com/kaotika/e8ca5c340ec94f599fb2
@@ -86,7 +87,7 @@ class DescargaAutomaticaCli():
 
         for i in self.consultaSeries:
             try:
-                print(('Revisa: {}'.format(funciones.eliminaTildes(i['Nombre']))))
+                logger.info(('Revisa: {}'.format(funciones.eliminaTildes(i['Nombre']))))
                 SerieActualTemp = self.parseaFeed(
                     i['Nombre'], i['Temporada'], i['Capitulo'], i['VOSE'])
                 if i['VOSE'] == 'Si':
@@ -94,10 +95,10 @@ class DescargaAutomaticaCli():
                 else:
                     SerieActualNew = SerieActualTemp
             except Exception as e:
-                print('################' ,i['Nombre'], ' FALLO: ', e)
+                logger.error('################' ,i['Nombre'], ' FALLO: ', e)
 
         if len(self.ultimaSerieNew) != 0:  # or len(self.ultimaSerieShow) != 0:
-            print(self.actualizaDia)
+            logger.info(self.actualizaDia)
             # actualiza los dias en los que sale el capitulo
             ejecutaScriptSqlite(self.db, self.actualizaDia)
 
@@ -110,11 +111,11 @@ class DescargaAutomaticaCli():
 
         # capitulos que descargo
         for i in self.capDescargado.items():
-            # print (i)
+            # logger.info(i)
             query = 'UPDATE Series SET Capitulo_Descargado={} WHERE Nombre LIKE "{}";\n'.format(str(i[1]), i[0])
             self.consultaUpdate += query
 
-        print(self.consultaUpdate)
+        logger.info(self.consultaUpdate)
         # actualiza el ultimo capitulo que he descargado
         ejecutaScriptSqlite(self.db, self.consultaUpdate)
 
@@ -125,7 +126,7 @@ class DescargaAutomaticaCli():
             with open('{}/{}'.format(self.rutlog, fichShowrss), 'w') as f:
                 f.write(funciones.eliminaTildes(SerieActualShow))
         else:
-            print('PROBLEMA CON if SerieActualShow is not None and SerieActualNew is not None:')
+            logger.warning('PROBLEMA CON if SerieActualShow is not None and SerieActualNew is not None:')
 
     def parseaFeed(self, serie, tem, cap, vose):
         """Solo funciona con series de 2 digitos por la expresion regular"""
@@ -147,7 +148,7 @@ class DescargaAutomaticaCli():
         for i in d.entries:
             self.titleSerie = funciones.eliminaTildes(i.title)
             # cuando llegamos al ultimo capitulo pasamos a la siguiente serie
-            #print(self.titleSerie, ".........", ultimaSerie, ".FIN")
+            #logger.info(self.titleSerie, ".........", ultimaSerie, ".FIN")
             if self.titleSerie == ultimaSerie:
                 # retornamos el valor que luego usaremos en ultima serie para guardarlo en el fichero
                 return funciones.eliminaTildes(d.entries[0].title)
@@ -157,8 +158,8 @@ class DescargaAutomaticaCli():
                 funciones.escapaParentesis(serie.lower()), tem, tem+1, tem+2)
 
             if serie.lower() == SERIE_DEBUG.lower():
-                print(regex_cast, self.titleSerie)
-                print(i.link)
+                logger.info('{}->{}'.format(regex_cast, self.titleSerie))
+                logger.info(i.link)
 
             estado = False
             if vose == 'Si':
@@ -176,7 +177,7 @@ class DescargaAutomaticaCli():
                     torrent = funciones.descargaUrlTorrent(i.link)
 
                 try: # arreglar problema codificacion de algunas series
-                    print(titleSerie)
+                    logger.info(titleSerie)
                 except:
                     titleSerie = titleSerie.replace(u"\uFFFD", "?")
 
@@ -211,7 +212,7 @@ class DescargaAutomaticaCli():
                         if self.capDescargado[serie] < capituloActual:
                             self.capDescargado[serie] = capituloActual
 
-                print(('DESCARGANDO: {}'.format(serie)))
+                logger.info(('DESCARGANDO: {}'.format(serie)))
 
         return funciones.eliminaTildes(d.entries[0].title)
 
@@ -238,7 +239,7 @@ class DescargaAutomaticaCli():
         Datos = conectionSQLite(ruta_db, queryN, True)
 
         global tg3, pb3, ml3, api_ml3
-        print(Datos)
+        logger.info(Datos)
         for i in Datos:
             if i['Activo'] == 'True':
                 if i['Nombre'] == 'Telegram':

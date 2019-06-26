@@ -8,6 +8,7 @@ from PyQt5 import QtWidgets
 from app.views.ui.listar_todas_ui import Ui_Dialog
 from app.modulos.connect_sqlite import conectionSQLite, ejecutaScriptSqlite
 from app.modulos.settings import modo_debug, ruta_db
+from app import logger
 
 
 class ListarTodas(QtWidgets.QDialog):
@@ -125,16 +126,14 @@ class ListarTodas(QtWidgets.QDialog):
                     i.text())
                 self.queryCompleta += query
 
-        if modo_debug:
-            print(self.queryCompleta)
+        logger.debug(self.queryCompleta)
 
     def aplicaDatos(self):
         """
         Ejecuta todas las consultas que hay en la lista
         """
 
-        if modo_debug:
-            print(self.queryCompleta)
+        logger.debug(self.queryCompleta)
 
         ejecutaScriptSqlite(self.db, self.queryCompleta)
 

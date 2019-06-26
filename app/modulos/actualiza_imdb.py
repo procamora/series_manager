@@ -13,6 +13,8 @@ except: #Ejecucion local
     from app.modulos.connect_sqlite import conectionSQLite, ejecutaScriptSqlite
     from app.modulos.settings import modo_debug, ruta_db
 
+from app import logger
+
 #if '../' not in sys.path:
 #    sys.path.append('../')
 from app.modulos.funciones import dbConfiguarion
@@ -52,13 +54,13 @@ class actualizaImdb():
     def __actualizaDatos(self, Datos):
         query = 'UPDATE series SET imdb_Temporada="{}", imdb_Finaliza="{}", imdb_Capitulos="{}" WHERE imdb_id Like "{}"'.format(Datos['Temp'], Datos['year'], Datos['Cap'], Datos['id_imdb'])
         conectionSQLite(self.nombre_db, query)
-        print(query)
+        logger.info(query)
 
 
     def __actualizaDatosParcial(self, Datos):
         query = 'UPDATE series SET imdb_Temporada="{}", imdb_Finaliza="{}" WHERE imdb_id Like "{}"'.format(Datos['Temp'], Datos['year'], Datos['id_imdb'])
         conectionSQLite(self.nombre_db, query)
-        print(query)
+        logger.info(query)
 
 
     def actualizaTemporadas(self): #tarda mucho
@@ -67,7 +69,7 @@ class actualizaImdb():
 
         for i in series:
             try:
-                print(i['Nombre'])
+                logger.info(i['Nombre'])
                 title = self.imdb.get_title_by_id(i['imdb_id'])
 
                 if title.data['seasons'][-1] == 'unknown':  #en algunas series la ultima temporada pone unknown
@@ -80,12 +82,12 @@ class actualizaImdb():
                 DatosImdb['Cap'] = Cap
 
                 if not self.__compruebaDatosParcial(DatosImdb, i):
-                    print(DatosImdb)
+                    logger.info(DatosImdb)
                     self.__actualizaDatosParcial(DatosImdb)
 
             except Exception as e:
-                print('FALLO: {}'.format(i['Nombre']))
-                print(e)
+                logger.error('FALLO: {}'.format(i['Nombre']))
+                logger.error(e)
 
 
     """
@@ -94,12 +96,11 @@ class actualizaImdb():
     def actulizaCompleto(self):
         query = 'SELECT * FROM Series WHERE imdb_seguir LIKE "Si" AND (imdb_id IS NULL OR imdb_Finaliza IS NULL) AND NOT imdb_id IS NULL'  # para nuevas series con mod completa
         series =  conectionSQLite(self.nombre_db, query, True)
-        print(series)
+        logger.info(series)
 
         for i in series:
             try:
-                if modo_debug:
-                    print(i['Nombre'])
+                logger.debug(i['Nombre'])
                 title = self.imdb.get_title_by_id(i['imdb_id'])
 
                 if title.data['seasons'][-1] == 'unknown':  #en algunas series la ultima temporada pone unknown
@@ -112,16 +113,16 @@ class actualizaImdb():
                 DatosImdb['Cap'] = Cap
 
                 if not self.__compruebaDatos(DatosImdb, i):
-                    #print 'completo'
+                    #logger.info('completo')
                     self.__actualizaDatos(DatosImdb)
 
             except Exception as e:
-                print('FALLO: {}'.format(i['Nombre']))
-                print(e)
+                logger.error('FALLO: {}'.format(i['Nombre']))
+                logger.error(e)
 
 
     def actualizaSerie(self, imdb_id):
-        print(imdb_id)
+        logger.info(imdb_id)
         try:
             title = self.imdb.get_title_by_id(imdb_id)
 
@@ -137,8 +138,8 @@ class actualizaImdb():
             self.__actualizaDatos(DatosImdb)
 
         except Exception as e:
-            print('FALLO: {}'.format(title.data['title']))
-            print(e)
+            logger.error('FALLO: {}'.format(title.data['title']))
+            logger.error(e)
 
 
     def compruebaTitulo(self, imdb_id):
@@ -166,19 +167,19 @@ class actualizaImdb():
             query = 'UPDATE series SET imdb_seguir="No" WHERE Nombre LIKE "{}";'.format(i["Nombre"])
             queryCompleta += '\n'+query
 
-        #print(queryCompleta)
+        #logger.info(queryCompleta)
         ejecutaScriptSqlite(self.nombre_db, queryCompleta)
 
 
 def main():
     a = actualizaImdb()
-    #print((a.compruebaTitulo('tt1475582')))
+    #logger.info((a.compruebaTitulo('tt1475582')))
     #"""
-    print('actualizaTemporadas')
+    logger.info('actualizaTemporadas')
     #a.actualizaTemporadas()			# actualizar_insertar series con mod parcial(todas lases series siguiendo, tarda bastante)
-    print('actulizaCompleto')
+    logger.info('actulizaCompleto')
     #a.actulizaCompleto()
-    print('actualizaSerie')
+    logger.info('actualizaSerie')
     #a.actualizaSerie('tt3551096')
     #"""				# actualizar_insertar series que no tienen datos de capitulo/temporada de imdb
     a.series_finalizadas()

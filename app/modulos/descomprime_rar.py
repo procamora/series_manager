@@ -13,8 +13,8 @@ import rarfile
 import requests
 from bs4 import BeautifulSoup
 
-import telegram2
-
+import app.modulos.telegram2 as TG2
+from app import logger
 
 def busca_pass(url):
     """
@@ -53,9 +53,9 @@ def descomprime(fichero):
 
 
 def main(ruta):
-    a = telegram2.TG2('33063767')
+    a = TG2('33063767')
     for i in glob.glob(ruta):
-        print(i)
+        logger.info(i)
         try:
             a.sendTg(
                 'Empieza proceos descomprimir: {}'.format(i.split('/')[-1]))
@@ -65,7 +65,7 @@ def main(ruta):
         except Exception as e:
             if str(e) != "Need to start from first volume":
                 a.sendTg('Fallo al descomprimir: {} por: {}'.format(i.split('/')[-1], e))
-            print("|{}|".format(e))
+            logger.info("|{}|".format(e))
 
             with open('/tmp/unrar.log', 'a', encoding="UTF-8") as f:
                 f.write(str(sys.exc_info()[0]))

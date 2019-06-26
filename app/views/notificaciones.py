@@ -8,6 +8,7 @@ from PyQt5 import QtWidgets
 from app.views.ui.notificaciones_ui import Ui_Dialog
 from app.modulos.connect_sqlite import conectionSQLite, ejecutaScriptSqlite
 from app.modulos.settings import modo_debug, ruta_db
+from app import logger
 
 
 class Notificaciones(QtWidgets.QDialog):
@@ -78,9 +79,7 @@ class Notificaciones(QtWidgets.QDialog):
         """
 
         for i in self.datodDb:
-
-            if modo_debug:
-                print(i)
+            logger.debug(i)
 
             if len(str(i['API'])) != 'None':
                 api = str(i['API'])
@@ -142,9 +141,7 @@ class Notificaciones(QtWidgets.QDialog):
                 query += """\nUPDATE Notificaciones SET API="{}", Activo="{}" WHERE Nombre LIKE "{}";""".format(
                     i['API'], i['Activo'], i['Nombre'])
 
-        if modo_debug:
-            print(query)
-
+        logger.debug(query)
         ejecutaScriptSqlite(self.db, query)
         return True
 

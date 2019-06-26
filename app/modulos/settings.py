@@ -8,7 +8,6 @@ try:  # Ejecucion desde Series.py
 except:  # Ejecucion local
     from app.modulos.constantes import sync_gdrive, sync_sqlite, nombre_db
 
-
 modo_debug = True
 gdrive = 0
 sistema = platform.system()
@@ -57,7 +56,6 @@ else:
 
 ruta_db = '{}/{}'.format(directorio_trabajo, nombre_db)
 
-if modo_debug:
-    print('Dir local: {}'.format(directorio_local))
-    print('Dir traba: {}'.format(directorio_trabajo))
-    print('Ruta db: {}'.format(ruta_db))
+print('Dir local: {}'.format(directorio_local))
+print('Dir traba: {}'.format(directorio_trabajo))
+print('Ruta db: {}'.format(ruta_db))

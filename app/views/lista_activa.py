@@ -7,6 +7,7 @@ from PyQt5 import QtWidgets, QtSql
 
 from app.views.ui.lista_activa_ui import Ui_Dialog
 from app.modulos.settings import modo_debug, ruta_db
+from app import logger
 
 
 class ListaActiva(QtWidgets.QDialog):
@@ -22,8 +23,7 @@ class ListaActiva(QtWidgets.QDialog):
 
         self.setWindowTitle('Series Activas')
 
-        if modo_debug:
-            print(self.db)
+        logger.debug(self.db)
 
         self.database = QtSql.QSqlDatabase.addDatabase('QSQLITE')
         self.crearConexion()
@@ -49,7 +49,7 @@ class ListaActiva(QtWidgets.QDialog):
         if self.database.open():
             return True
         else:
-            print((self.database.lastError().text()))
+            logger.info(self.database.lastError().text())
             return False
 
     def aplicaDatos(self):  # actualmente sin uso

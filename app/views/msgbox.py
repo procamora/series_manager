@@ -5,6 +5,7 @@ import sys
 from PyQt5 import QtWidgets
 
 from app.views.ui.msgbox_ui import Ui_Dialog
+from app import logger
 
 
 class MsgBox(QtWidgets.QDialog, ):

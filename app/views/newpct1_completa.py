@@ -13,6 +13,7 @@ from app.modulos import funciones
 from app.modulos.settings import modo_debug
 from app.modulos.telegram2 import TG2
 from app.views.ui.descarga_completa_ui import Ui_Dialog
+from app import logger
 
 
 # https://gist.github.com/kaotika/e8ca5c340ec94f599fb2
@@ -56,26 +57,20 @@ class mythread(QtCore.QThread):
                     self.textEdit.append('{} {}x{}'.format(self.serie, self.temp, i))
                 else:
                     self.textEdit.append('No encontrada: {} {}x{}'.format(self.serie, self.temp, i))
-                    
-                if modo_debug:
-                    print()
-
             except Exception as e:
-                print('FALLO DESCONOCIDO!!', e)
+                logger.error('FALLO DESCONOCIDO!!', e)
                 self.textEdit.append("Error:{}".format(str(e)))
                 raise
 
-        print("fin")
+        logger.info("fin")
 
     def tryGetUrl(self, url, capitulo, fichero):
         urlFormat = url.format(self.serie, self.temp, capitulo)
-        if modo_debug:
-            print(urlFormat)
+        logger.debug(urlFormat)
         try:
             urlTorrent = funciones.descargaUrlTorrent(urlFormat)
-            if modo_debug:
-                print(urlFormat)
-                print(capitulo, "Bien: ", urlTorrent)
+            logger.debug(urlFormat)
+            logger.debug(capitulo, "Bien: ", urlTorrent)
 
             if (urlTorrent is None):
                 return False
@@ -84,7 +79,7 @@ class mythread(QtCore.QThread):
             return True
 
         except Exception as e:
-            print("fallo: ", urlFormat, e, file=sys.stderr)
+            logger.error("fallo: ", urlFormat, e, file=sys.stderr)
             return False
 
 
@@ -125,8 +120,7 @@ class torrentlocuraCompleta(QtWidgets.QDialog):
 
     def update(self):
         self.n += 1
-        if modo_debug:
-            print(self.n)
+        logger.debug(self.n)
         self.ui.progressBar.setValue(self.n)
 
     def campoTemporada(self):
@@ -207,7 +201,7 @@ class torrentlocuraCompleta(QtWidgets.QDialog):
             thread.update.connect(self.update)
             # thread.finished.connect(self.close)
             thread.start()
-            print("final thread")
+            logger.info("final thread")
         else:
             self.ui.textEdit.append('Introduce una nombre')
 

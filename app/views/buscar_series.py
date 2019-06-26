@@ -8,7 +8,7 @@ from app.views.ui.buscar_series_ui import Ui_Dialog
 from app.views.actualizar_insertar import ActualizarInsertar
 from app.modulos.connect_sqlite import conectionSQLite
 from app.modulos.settings import modo_debug, ruta_db
-
+from app import logger
 
 class BuscarSeries(QtWidgets.QDialog):
     def __init__(self, parent=None, dbSeries=None):
@@ -57,8 +57,7 @@ class BuscarSeries(QtWidgets.QDialog):
         """
 
         for i in self.ui.listWidget.selectedItems():
-            if modo_debug:
-                print((i.text()))
+            logger.debug((i.text()))
 
             query = 'SELECT * FROM Series WHERE Nombre LIKE "{}"'.format(
                 i.text())

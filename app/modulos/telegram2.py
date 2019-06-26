@@ -11,6 +11,7 @@ except:  # Ejecucion local
     from app.modulos.settings import modo_debug, ruta_db, directorio_local, sync_sqlite
     from app.modulos.connect_sqlite import conectionSQLite, ejecutaScriptSqlite
 
+from app import logger
 
 class TG2():
     def __init__(self, chat_id):
@@ -61,9 +62,7 @@ class TG2():
         result = requests.request(method, request_url, params=params, files=files, timeout=(
             connect_timeout, read_timeout))
 
-        if modo_debug:
-            print(requests.request(method, request_url, params=params, files=files, timeout=(
-            connect_timeout, read_timeout)))
+        logger.debug(requests.request(method, request_url, params=params, files=files, timeout=(connect_timeout, read_timeout)))
 
         return json.loads(result.text)['ok']
 
@@ -79,7 +78,7 @@ class TG2():
             return r'sendDocument'
         if data_type == 'sticker':
             return r'sendSticker"""
-        # print(dic[data_type])
+        # logger.debug(dic[data_type])
         return dic[data_type]
 
     def sendTg(self, texto='ola k ase'):  # funciona en python 3
@@ -110,18 +109,18 @@ class TG2():
         session = requests.session()
         login = session.post(URL, headers=req_headers)  # Authenticate
 
-        print((type(login.text)))
+        logger.info(type(login.text))
 
-        # print(str(login.text.strip().decode('utf-8')))
-        # print( json.loads( str(login.text.strip())))
+        # logger.info(str(login.text.strip().decode('utf-8')))
+        # logger.info( json.loads( str(login.text.strip())))
 
         dat = json.loads(str(login.text.strip()))
 
-        print(dat)
+        logger.info(dat)
 
 
 if __name__ == '__main__':
     a = TG2('33063767')
-    print(a.sendTg('Test desde modulo de python'))
-    # print(a.sendFile('connect_sqlite.py'))
+    logger.info(a.sendTg('Test desde modulo de python'))
+    # logger.info(a.sendFile('connect_sqlite.py'))
     # a.recibeTg()

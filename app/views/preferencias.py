@@ -9,6 +9,7 @@ from app.modulos import funciones
 from app.modulos.connect_sqlite import conectionSQLite
 from app.modulos.settings import modo_debug, directorio_local, ruta_db
 from app.views.ui.preferencias_ui import Ui_Dialog
+from app import logger
 
 
 class Preferencias(QtWidgets.QDialog):
@@ -34,7 +35,7 @@ class Preferencias(QtWidgets.QDialog):
         # que sale
         allItems = [self.ui.BoxId.itemText(i) for i in range(self.ui.BoxId.count())]
 
-        print(allItems)
+        logger.info(allItems)
         with open(r'{}/id.conf'.format(self.ruta), 'r') as f:
             id_fich = f.readline().replace('/n', '')
 
@@ -106,9 +107,8 @@ class Preferencias(QtWidgets.QDialog):
 
         for i in self.configuraciones:
             if str(self.ui.BoxId.currentText()) == str(i['id']):
-                if modo_debug:
-                    print((self.ui.BoxId.currentText()))
-                    print(i)
+                logger.debug(self.ui.BoxId.currentText())
+                logger.debug(i)
                 self.datodDb = i
         if self.ui.BoxId.currentText() == self.otra:
             self.datodDb = {'UrlFeedShowrss': '',
@@ -133,13 +133,12 @@ class Preferencias(QtWidgets.QDialog):
         }
 
         if datos['ID'] == self.otra:
-            print('insert')
+            logger.info('insert')
             query = """INSERT INTO Configuraciones(UrlFeedNewpct, UrlFeedShowrss, RutaDescargas) VALUES ("{}", "{}", 
             "{}")""".format(datos['Newpct'], datos['showrss'], datos['Ruta'])
 
-            if modo_debug:
-                print('update')
-                print(query)
+            logger.debug('update')
+            logger.debug(query)
 
             conectionSQLite(self.db, query)
             self.operacionesIniciales()
@@ -147,9 +146,8 @@ class Preferencias(QtWidgets.QDialog):
             query = """UPDATE Configuraciones SET UrlFeedNewpct="{}", UrlFeedShowrss="{}", RutaDescargas="{}"
             WHERE ID LIKE {}""".format(datos['Newpct'], datos['showrss'], datos['Ruta'], datos['ID'])
 
-            if modo_debug:
-                print('update')
-                print(query)
+            logger.debug('update')
+            logger.debug(query)
 
             conectionSQLite(self.db, query)
 

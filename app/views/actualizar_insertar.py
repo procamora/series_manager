@@ -10,7 +10,7 @@ from app.modulos import funciones
 from app.modulos.connect_sqlite import conectionSQLite
 from app.modulos.settings import modo_debug, ruta_db
 from app.views.ui.actualizar_insertar_ui import Ui_Dialog
-
+from app import logger
 
 class ActualizarInsertar(QtWidgets.QDialog):
     def __init__(self, parent=None, dbSeries=None, datSerie=None):
@@ -147,8 +147,7 @@ class ActualizarInsertar(QtWidgets.QDialog):
         """
         Establece los valores por defecto que se le indican en caso de que se indiquen
         """
-        if modo_debug:
-            print(self.datSerie)
+        logger.debug(self.datSerie)
 
         self.ui.lineTitulo.setText(self.datSerie['Nombre'])
 
@@ -255,9 +254,7 @@ class ActualizarInsertar(QtWidgets.QDialog):
                         datos['Titulo'], datos['Temporada'], datos['Capitulo'], datos['Seguir'], datos['Emision'],
                         datos['VOSE'], datos['Acabada'], datos['Estado'], datos['idImdb'])
             try:
-                if modo_debug:
-                    print(query)
-
+                logger.debug(query)
                 if datos['ImdbLanzar'] == 'Si':
                     imbd_test = actualizaImdb()
 
@@ -285,7 +282,7 @@ class ActualizarInsertar(QtWidgets.QDialog):
                 return True
 
             except Exception as e:
-                print(e)
+                logger.error(e)
                 dat = {'title': 'Error en bd', 'text': str(e)}
                 MsgBox.getData(datos=dat)
                 return False
@@ -301,8 +298,7 @@ class ActualizarInsertar(QtWidgets.QDialog):
         a = actualizaImdb()
         id_imdb = str(self.ui.lineImdb.text())
         if len(id_imdb) > 0:
-            if modo_debug:
-                print('actualiza imdb')
+            logger.debug('actualiza imdb')
             a.actualizaSerie(id_imdb)
 
     def aceptaDatos(self):

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from pushbullet import Pushbullet
-
+from app import logger
 
 # https://github.com/randomchars/pushbullet.py
 
@@ -30,7 +30,7 @@ class PB2():
 
     def muestaTodos(self):
         for i in self.pb.devices:
-            print(i)
+            logger.info(i)
 
     def enviaPrimerDispositivo(self):
         motog = self.pb.devices[0]

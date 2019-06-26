@@ -23,6 +23,8 @@ from app.modulos.mail2 import ML2
 from app.modulos.pushbullet2 import PB2
 from app.modulos.settings import modo_debug, directorio_trabajo, ruta_db
 from app.modulos.telegram2 import TG2
+from app import logger
+
 
 SERIE_DEBUG = "SEAL Team"
 
@@ -335,7 +337,7 @@ class DescargaAutomaticaCli():
         Datos = conectionSQLite(ruta_db, queryN, True)
 
         global tg3, pb3, ml3, api_ml3
-        print(Datos)
+        logger.info(Datos)
         for i in Datos:
             if i['Activo'] == 'True':
                 if i['Nombre'] == 'Telegram':

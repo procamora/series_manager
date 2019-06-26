@@ -9,6 +9,7 @@ from app.views.ui.estado_series_ui import Ui_Dialog
 from app.modulos.tviso import conectTviso
 from app.modulos.connect_sqlite import conectionSQLite, ejecutaScriptSqlite
 from app.modulos.settings import modo_debug, ruta_db
+from app import logger
 
 
 class EstadoSeries(QtWidgets.QDialog):
@@ -103,9 +104,7 @@ class EstadoSeries(QtWidgets.QDialog):
         """
         Ejecuta todas las consultas que hay en la lista
         """
-
-        if modo_debug:
-            print(self.QueryCompleta)
+        logger.debug(self.QueryCompleta)
 
         ejecutaScriptSqlite(self.db, self.QueryCompleta)
 
@@ -140,7 +139,7 @@ class EstadoSeries(QtWidgets.QDialog):
         for DatSer in self.DatSeriesFinalizadas:
             query = """UPDATE series SET Temporada=imdb_Temporada, Capitulo=imdb_Capitulos
                 WHERE Nombre LIKE '{}'""".format(DatSer['Nombre'])
-            print(query)
+            logger.info(query)
             conectionSQLite(self.db, query)
 
     def seriesEmpiezanTemporada(self):
@@ -185,8 +184,7 @@ class EstadoSeries(QtWidgets.QDialog):
                     i.text())
                 self.QueryCompleta += '\n' + query
 
-        if modo_debug:
-            print(self.QueryCompleta)
+        logger.debug(self.QueryCompleta)
 
     def aceptaDatos(self):
         if self.aplicaDatos():

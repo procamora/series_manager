@@ -16,6 +16,8 @@ import telebot  # Importamos la librería
 from bs4 import BeautifulSoup
 from telebot import types  # Y los tipos especiales de esta
 
+from app import logger
+
 try:  # Ejecucion desde Series.py
     from .settings import modo_debug, ruta_db, directorio_local, directorio_trabajo
     from .connect_sqlite import conectionSQLite, ejecutaScriptSqlite
@@ -61,8 +63,7 @@ def formatea(texto):
 
 def checkError(codigo, stderr):
     if codigo.returncode and stderr:
-        if modo_debug:
-            print("Error:")
+        logger.debug("Error:")
         return True
     return False
 
@@ -299,8 +300,7 @@ def handle_magnet(message):
     stdout, stderr = ejecucion.communicate()
     stdout = formatea(stdout)  # sino stdout esta en bytes
 
-    if modo_debug:
-        print(comando)
+    logger.debug(comando)
 
     if checkError(ejecucion, stderr):
         bot.reply_to(message, 'Error: {}'.format(stderr))

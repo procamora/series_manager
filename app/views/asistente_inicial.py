@@ -8,6 +8,7 @@ from PyQt5 import QtWidgets
 
 from app.views.ui.asistente_inicial_ui import Ui_Dialog
 from app.modulos.constantes import sync_sqlite, sync_gdrive
+from app import logger
 
 
 class AsistenteInicial(QtWidgets.QDialog):

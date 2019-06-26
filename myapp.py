@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import sys
+
 from app.views import descarga_automatica, Series
 
 if __name__ == '__main__':

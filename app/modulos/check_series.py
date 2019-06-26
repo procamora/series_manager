@@ -5,9 +5,10 @@ try:  # Ejecucion desde Series.py
     from .connect_sqlite import conectionSQLite, ejecutaScriptSqlite
     from .settings import modo_debug, ruta_db
 except:  # Ejecucion local
-    from connect_sqlite import conectionSQLite, ejecutaScriptSqlite
-    from settings import modo_debug, ruta_db
+    from app.modulos.connect_sqlite import conectionSQLite, ejecutaScriptSqlite
+    from app.modulos.settings import modo_debug, ruta_db
 
+from app import logger
 
 def acabada(write=False):
     queryAcabada = 'SELECT * FROM Series WHERE Acabada LIKE "Si" AND Estado <> "Finalizada"'
@@ -41,16 +42,15 @@ def makeUpdate(query, update, write=False):
         update.format(i['Nombre'])
         queryUpdate += update
 
-    if modo_debug:
-        print(queryUpdate)
+    logger.debug(queryUpdate)
 
     if write and len(queryUpdate) != 0:
-        print('ejecutar script')
+        logger.info('ejecutar script')
         ejecutaScriptSqlite(ruta_db, queryUpdate)
 
     return queryUpdate
 
 
 if __name__ == '__main__':
-    print(acabada(write=False))
-    print(imdb(write=False))
+    logger.info(acabada(write=False))
+    logger.info(imdb(write=False))

@@ -2,18 +2,20 @@
 # -*- coding: utf-8 -*-
 
 
-from modulos.actualiza_imdb import actualizaImdb
+from app.modulos.actualiza_imdb import actualizaImdb
+
+from app import logger
 
 a = actualizaImdb()
-# print((a.compruebaTitulo('tt1475582')))
+# logger.info((a.compruebaTitulo('tt1475582')))
 # """
-print('actualizaTemporadas')
+logger.info('actualizaTemporadas')
 # actualizar_insertar series con mod parcial(todas lases series siguiendo,
 # tarda bastante)
 a.actualizaTemporadas()
-print('actulizaCompleto')
+logger.info('actulizaCompleto')
 a.actulizaCompleto()
-print('actualizaSerie')
+logger.info('actualizaSerie')
 # a.actualizaSerie('tt3551096')
 # """				# actualizar_insertar series que no tienen datos de capitulo/temporada de imdb
 a.series_finalizadas()

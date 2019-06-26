@@ -10,6 +10,7 @@ try:  # Ejecucion desde Series.py
 except:  # Ejecucion local
     from app.modulos.settings import modo_debug
 
+from app import logger
 
 def conectTvisoMechanize(USERNAME, PASSWORD):   # NO funciona en python 3
     #import mechanicalsoup as mechanize
@@ -45,13 +46,12 @@ def conectTvisoMechanize(USERNAME, PASSWORD):   # NO funciona en python 3
     #br.select_form(name = 'entrada')
     br.form[LOGINHTML] = USERNAME
     br.form[LOGINPASS] = PASSWORD
-    # print br
 
     #request2 = br.form.click()
     response1 = br.submit()
-    print(response1.read())
+    logger.info(response1.read())
 
-    # print cookiejar
+    # logger.info(cookiejar)
     url = br.open(URLAFTER)
     returnPage = url.read()
     compl = re.findall('<span class="event-name full-name">.*</span>', returnPage)
@@ -101,7 +101,7 @@ def main():
     opcion1 = conectTviso("user", "pass")
 
     for i in opcion1:
-        print(i)
+        logger.info(i)
 
 
 if __name__ == '__main__':
