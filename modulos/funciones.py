@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import os
-import time
 import datetime
-import unidecode
 import glob
-import re
-import requests
 import logging
-import urllib3
-import feedparser
-import colorlog  # https://medium.com/@galea/python-logging-example-with-color-formatting-file-handlers-6ee21d363184
+import os
+import re
+import time
 
+import colorlog  # https://medium.com/@galea/python-logging-example-with-color-formatting-file-handlers-6ee21d363184
+import feedparser
+import requests
+import unidecode
+import urllib3
 from bs4 import BeautifulSoup
 
 try:
@@ -230,7 +230,8 @@ def descargaFichero(url, destino, libreria='requests'):
 
     if libreria == 'requests':
         # print "downloading with requests"
-        r = requests.get(url)
+        r = requests.get(url, verify=False)
+        print('Descargo el fichero: {}'.format(destino))
         with open(destino, "wb") as code:
             code.write(r.content)
 
@@ -240,7 +241,8 @@ def descargaFichero(url, destino, libreria='requests'):
         wget.download(url, destino)
 
 
-def descargaUrlTorrent(direcc, bot=None, message=None):
+# YA NO ES VALIDA
+def __descargaUrlTorrent(direcc, bot=None, message=None):
     """
     Funcion que obtiene la url torrent del la dirreccion que recibe,hay que tener en cuenta que la url que recibe es la 
     del feed y que no es la apgina que contiene el torrent, pero como todas tienen la misma forma se modifica la url 
@@ -269,13 +271,13 @@ def descargaUrlTorrent(direcc, bot=None, message=None):
             bot.reply_to(message, 'Buscando torrent en torrentlocura.com')
         session = requests.session()
 
-        comp1 = descargaUrlTorrentAux(
+        comp1 = __descargaUrlTorrentAux(
             session.get(direcc.replace('torrentlocura.com/', 'torrentlocura.com/descarga-torrent/'), verify=False).text)
         if comp1 is not None:
             return comp1
 
         # opcion 2
-        comp2 = descargaUrlTorrentAux(
+        comp2 = __descargaUrlTorrentAux(
             session.get(direcc.replace('torrentlocura.com/', 'torrentlocura.com/descargar-seriehd/'),
                         verify=False).text)
         if comp2 is not None:
@@ -284,10 +286,11 @@ def descargaUrlTorrent(direcc, bot=None, message=None):
         return None
 
     elif re.search(regexRecursion, direcc):
-        return descargaUrlTorrent(re.sub(regexRecursion, "torrentlocura", direcc), message)
+        return __descargaUrlTorrent(re.sub(regexRecursion, "torrentlocura", direcc), message)
 
 
-def descargaUrlTorrentAux(page):
+# YA NO ES VALIDA
+def __descargaUrlTorrentAux(page):
     try:
         sopa = BeautifulSoup(page, 'html.parser')
         result = sopa.find('a', {"class": "btn-torrent"})['href']
@@ -309,7 +312,8 @@ def descargaUrlTorrentAux(page):
         return None
 
 
-def descargaUrlTorrentPctnew(direcc, bot=None, message=None):
+# YA NO ES VALIDA
+def __descargaUrlTorrentPctnew(direcc, bot=None, message=None):
     """
     Funcion que obtiene la url torrent del la dirreccion que recibe,hay que tener en cuenta que la url que recibe es la 
     del feed y que no es la apgina que contiene el torrent, pero como todas tienen la misma forma se modifica la url 
@@ -348,7 +352,8 @@ def descargaUrlTorrentPctnew(direcc, bot=None, message=None):
         return None
 
 
-def descargaUrlTorrentAuxPctnew(page):
+# YA NO ES VALIDA
+def __descargaUrlTorrentAuxPctnew(page):
     try:
         sopa = BeautifulSoup(page, 'html.parser')
         result = sopa.find('a', {"class": "btn-torrent"})['href']
@@ -370,7 +375,8 @@ def descargaUrlTorrentAuxPctnew(page):
         return None
 
 
-def buscaTorrentAntiguo(direcc):  # para newpct
+# YA NO ES VALIDA
+def __buscaTorrentAntiguo(direcc):  # para newpct
     """
     Funcion que obtiene la url torrent del la dirreccion que recibe
 
@@ -384,6 +390,49 @@ def buscaTorrentAntiguo(direcc):  # para newpct
     sopa = BeautifulSoup(page, 'html.parser')
 
     return sopa.find('span', id="content-torrent").a['href']
+
+
+def descargaUrlTorrentDonTorrent(direcc, bot=None, message=None):
+    """
+    Funcion que obtiene la url torrent del la dirreccion que recibe,hay que tener en cuenta que la url que recibe es la
+    del feed y que no es la apgina que contiene el torrent, pero como todas tienen la misma forma se modifica la url
+    poniendole descarga-torrent
+
+    :param str direcc: Dirreccion de la pagina web que contiene el torrent
+    :param obj bot: bot
+    :param obj message: instancia del mensaje recibido
+
+    :return str: Nos devuelve el string con la url del torrent
+    """
+
+    if not re.match(r"^(https?:\/\/).*", direcc):
+        direcc = 'https://' + direcc
+
+    # if modo_debug:
+    #    print(direcc)
+
+    if re.search("dontorrent", direcc):
+        if bot is not None and message is not None:
+            bot.reply_to(message, 'Buscando torrent en pctnew.com')
+        session = requests.session()
+
+        req_headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; WOW64; rv:35.0) Gecko/20100101 Firefox/35.0',
+                       'Content-Type': 'application/x-www-form-urlencoded'}
+
+        session = requests.session()
+        login = session.get(direcc, headers=req_headers, verify=False)
+        sopa = BeautifulSoup(login.text, 'html.parser')
+        mtable = sopa.findAll('table', {"class": "table table-sm table-striped text-center"})
+
+        # urls = re.findall(r'href\=\"(.*)" ', str(mtable)) # misma regex pero generica
+        urls = re.findall(r'href\=\"((\/\w*)*.torrent)\"', str(mtable))
+
+        newUrls = list()
+        for i in urls:
+            newUrls.append('https://dontorrent.com{}'.format(i[0]))
+
+        # print(newUrls)
+        return newUrls
 
 
 def feedParser(url):

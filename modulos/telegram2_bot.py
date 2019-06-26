@@ -322,7 +322,7 @@ def handle_newpct1(message):
     #else:
     #    urlPeli = re.sub('(http://)?(www.)?newpct1.com/', 'http://www.newpct1.com/descarga-torrent/', message.text)
 
-    url = funciones.descargaUrlTorrent(message.text, message)
+    url = funciones.descargaUrlTorrentDonTorrent(message.text, message)
     if url is not None:
         with tempfile.NamedTemporaryFile(mode='rb', dir=credenciales['RutaDescargas'], suffix='.torrent', delete=False) as fp:
             try:
@@ -351,7 +351,7 @@ def handle_pctnew(message):
     #else:
     #    urlPeli = re.sub('(http://)?(www.)?newpct1.com/', 'http://www.newpct1.com/descarga-torrent/', message.text)
 
-    url = funciones.descargaUrlTorrentPctnew(message.text, message)
+    url = funciones.descargaUrlTorrentDonTorrent(message.text, message)
     if url is not None:
         with tempfile.NamedTemporaryFile(mode='rb', dir=credenciales['RutaDescargas'], suffix='.torrent', delete=False) as fp:
             try:
