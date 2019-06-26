@@ -13,3 +13,4 @@ unidecode
 telethon
 colorlog
 urllib3
+wunderpy
