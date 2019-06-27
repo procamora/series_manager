@@ -1,0 +1,75 @@
+BEGIN TRANSACTION;
+CREATE TABLE "Configuraciones" (
+	"id"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+	"UrlFeedNewpct"	TEXT,
+	"UrlFeedShowrss"	TEXT,
+	"RutaDescargas"	TEXT,
+	"FicheroFeedNewpct"	TEXT,
+	"FicheroFeedShowrss"	TEXT,
+	"FicheroDescargas"	INTEGER
+);
+INSERT INTO "Configuraciones" VALUES(1,'http://torrentlocura.com/feed','http://showrss.info/user/20342.rss?magnets=false&namespaces=false&name=clean&quality=hd&re=no','C:/Users/procamora/Downloads','feedNewpct.log','feedShowrss.log','descargas.log');
+CREATE TABLE "Credenciales" (
+	`pass_transmission`	TEXT,
+	`user_tviso`	TEXT,
+	`pass_tviso`	TEXT,
+	`api_telegram`	TEXT
+);
+
+CREATE TABLE "Genero" (
+	`id`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+	`genero`	INTEGER,
+	FOREIGN KEY(`id`) REFERENCES ID_Estados(ID)
+);
+INSERT INTO "Genero" VALUES(1,3);
+INSERT INTO "Genero" VALUES(2,'SADAD');
+INSERT INTO "Genero" VALUES(3,'ASD');
+CREATE TABLE `ID_Estados` (
+	`ID`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
+	`Estados`	TEXT UNIQUE
+);
+INSERT INTO "ID_Estados" VALUES(1,'Finalizada');
+INSERT INTO "ID_Estados" VALUES(2,'Activa');
+INSERT INTO "ID_Estados" VALUES(3,'En Espera');
+INSERT INTO "ID_Estados" VALUES(4,'Pausada');
+CREATE TABLE "Id_Url" (
+	`Id`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
+	`Url`	TEXT UNIQUE,
+	`Descripcion`	TEXT
+);
+CREATE TABLE "Notificaciones" (
+	`ID`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
+	`Nombre`	TEXT UNIQUE,
+	`API`	TEXT,
+	`Activo`	INTEGER DEFAULT 0
+);
+INSERT INTO "Notificaciones" VALUES(1,'Telegram','644545','True');
+INSERT INTO "Notificaciones" VALUES(2,'Pushbullet','','False');
+INSERT INTO "Notificaciones" VALUES(3,'Email','@gmail.com','False');
+INSERT INTO "Notificaciones" VALUES(4,'Hangouts',NULL,'False');
+CREATE TABLE "Series" (
+	`ID`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
+	`Nombre`	TEXT NOT NULL UNIQUE,
+	`Temporada`	INTEGER DEFAULT 1,
+	`Capitulo`	INTEGER DEFAULT 1,
+	`Siguiendo`	TEXT DEFAULT 'Si',
+	`VOSE`	TEXT DEFAULT 'No',
+	`Acabada`	TEXT DEFAULT 'No',
+	`Dia`	TEXT DEFAULT 'None',
+	`Estado`	TEXT DEFAULT 'Activa',
+	`imdb_id`	TEXT UNIQUE,
+	`imdb_Temporada`	TEXT,
+	`imdb_Capitulos`	TEXT,
+	`imdb_Finaliza`	TEXT,
+	`imdb_seguir`	INTEGER DEFAULT 'Si',
+	`Capitulo_Descargado`	INTEGER
+);
+INSERT INTO "Series" VALUES(1,'House',8,22,'No','No','Si','None','Finalizada','tt0412142','8','22','2012','No',NULL);
+
+DELETE FROM "sqlite_sequence";
+INSERT INTO "sqlite_sequence" VALUES('ID_Estados',4);
+INSERT INTO "sqlite_sequence" VALUES('Genero',3);
+INSERT INTO "sqlite_sequence" VALUES('Notificaciones',4);
+INSERT INTO "sqlite_sequence" VALUES('Series',275);
+INSERT INTO "sqlite_sequence" VALUES('Configuraciones',5);
+COMMIT;

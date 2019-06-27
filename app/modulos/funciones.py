@@ -13,15 +13,10 @@ import urllib3
 from bs4 import BeautifulSoup
 
 from app import logger
-
-
 from app.modulos.connect_sqlite import conectionSQLite, ejecutaScriptSqlite, dumpDatabase
 from app.modulos.settings import directorio_trabajo, directorio_local, nombre_db, ruta_db, sync_sqlite
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-
-
-
 
 
 def creaDirectorioTrabajo():
@@ -120,8 +115,8 @@ def crearBackUpCompletoDB():
     try:
         with open('{}/SQL/{}.sql'.format(directorio_local, time.strftime("%Y%m%d")), 'w') as f:
             f.write(data)
-    except:
-        logger.error('error al hacer backup')
+    except Exception as e:
+        logger.error('error al hacer backup: {}'.format(e))
 
 
 def calculaDiaSemana():

@@ -2,7 +2,7 @@
 *.pyc
 build/
 dist/
-SQL/
+app/SQL/*.sql
 Pruebas.py
 sync.conf
 id.conf
