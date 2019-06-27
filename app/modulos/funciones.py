@@ -14,14 +14,9 @@ from bs4 import BeautifulSoup
 
 from app import logger
 
-try:
-    from .connect_sqlite import conectionSQLite, ejecutaScriptSqlite, dumpDatabase
-    from .settings import directorio_trabajo, directorio_local, nombre_db, ruta_db, sync_sqlite, sync_gdrive, \
-        modo_debug
-except:
-    from app.modulos.connect_sqlite import conectionSQLite, ejecutaScriptSqlite, dumpDatabase
-    from app.modulos.settings import directorio_trabajo, directorio_local, nombre_db, ruta_db, sync_sqlite, sync_gdrive, \
-        modo_debug
+
+from app.modulos.connect_sqlite import conectionSQLite, ejecutaScriptSqlite, dumpDatabase
+from app.modulos.settings import directorio_trabajo, directorio_local, nombre_db, ruta_db, sync_sqlite
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -38,16 +33,15 @@ def creaDirectorioTrabajo():
     """
 
     if not os.path.exists(directorio_trabajo):
-        logger.debug("NO EXISTE DIRECTORIO TRABAJO")
+        logger.debug("NO EXISTE DIRECTORIO TRABAJO, CREANDOLO")
         os.mkdir(directorio_trabajo)
         plantillaDatabase()
         plantillaFicheroConf()
     else:
-        ruta_id = '{}/{}'.format(directorio_local, sync_sqlite)
         if not os.path.exists(ruta_db) or os.stat(ruta_db).st_size == 0:
             logger.info(1)
             plantillaDatabase()
-        if not os.path.exists(ruta_id) or os.stat(ruta_id).st_size == 0:
+        if not os.path.exists(sync_sqlite) or os.stat(sync_sqlite).st_size == 0:
             logger.info(2)
             plantillaFicheroConf()
 
@@ -69,7 +63,7 @@ def dbConfiguarion():
     """
 
     try:
-        with open(r'{}/{}'.format(directorio_local, sync_sqlite), 'r') as f:
+        with open(sync_sqlite, 'r') as f:
             id_db = f.readline()
     except:
         logger.warning('fallo en dbConfiguarion')
@@ -87,9 +81,9 @@ def plantillaFicheroConf():
     vacio o no existe lo pone a 1
     """
 
-    fichero_conf = '{}/{}'.format(directorio_local, sync_sqlite)
+    fichero_conf = '{}/{}'.format(directorio_local, sync_sqlite.split('/')[-1])
     if os.path.exists(sync_sqlite):
-        logger.debug(sync_sqlite, fichero_conf)
+        logger.debug('{} & {}'.format(sync_sqlite, fichero_conf))
         os.rename(sync_sqlite, fichero_conf)
     else:
         if os.path.exists(fichero_conf):

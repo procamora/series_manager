@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import sys
 import os
 import platform
+import sys
 
 from PyQt5 import QtWidgets
 
+from app.modulos.settings import sync_sqlite, sync_gdrive
 from app.views.ui.asistente_inicial_ui import Ui_Dialog
-from app.modulos.constantes import sync_sqlite, sync_gdrive
 from app import logger
 
 
@@ -173,6 +173,8 @@ class AsistenteInicial(QtWidgets.QDialog):
         """
 
         # Si no existe uno de los ficheros necesarios asistente inicial
+        logger.debug('Analized exists: {}'.format(sync_sqlite))
+        logger.debug('Analized exists: {}'.format(sync_gdrive))
         if not os.path.exists(sync_sqlite) or not os.path.exists(sync_gdrive):
             main()  # main de la funcion
             return False

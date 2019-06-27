@@ -33,10 +33,8 @@ def getLogger(verbose, name='Series'):
 
     if verbose:
         log.setLevel(logging.DEBUG)
-        log.debug('logging in mode DEBUG')
     else:
         log.setLevel(logging.INFO)
-        log.info('logging in mode INFO')
 
     return log
 
