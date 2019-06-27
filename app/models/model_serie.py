@@ -26,11 +26,11 @@ class Serie(object):
         attributes = inspect.getmembers(self, lambda a: not (inspect.isroutine(a)))
         [a for a in attributes if not (a[0].startswith('__') and a[0].endswith('__'))]
 
-        new_attributes = Serie.deleteNoneValues(attributes[2][1])
+        new_attributes = Serie.delete_none_values(attributes[2][1])
         return str(new_attributes)
 
     @staticmethod
-    def deleteNoneValues(attributes) -> dict:
+    def delete_none_values(attributes) -> dict:
         new_attributes = dict()
         new_attributes['class'] = 'Serie'
         for i in attributes:
@@ -51,11 +51,11 @@ class Serie(object):
             elif i == 'Capitulo':
                 s._chapter = int(dictionaty[i])
             elif i == 'Siguiendo':
-                s._following = dictionaty[i]
+                s._following = bool(dictionaty[i])
             elif i == 'VOSE':
                 s._vose = dictionaty[i]
             elif i == 'Acabada':
-                s._finished = dictionaty[i]
+                s._finished = bool(dictionaty[i])
             elif i == 'Dia':
                 s._day = dictionaty[i]
             elif i == 'Estado':
@@ -69,7 +69,7 @@ class Serie(object):
             elif i == 'imdb_Finaliza':
                 s._imdb_finished = dictionaty[i]
             elif i == 'imdb_seguir':
-                s._imdn_following = dictionaty[i]
+                s._imdn_following = bool(dictionaty[i])
             elif i == 'Capitulo_Descargado':
                 s._chapter_downloaded = dictionaty[i]
         return s

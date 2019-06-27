@@ -29,7 +29,7 @@ from app.views import preferencias
 from app.views.ui.series_ui import Ui_MainWindow
 from app import logger
 
-from app.models.Serie import Serie
+from app.models.model_serie import Serie
 
 
 class Series(QtWidgets.QMainWindow):
