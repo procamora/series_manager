@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import sqlite3
 import os
+import sqlite3
 
 
-def conectionSQLite(db, query, dict=False):
+def conectionSQLite(db, query, dict=False, toClass=None) -> list:
     if os.path.exists(db):
         conn = sqlite3.connect(db)
         if dict:
@@ -22,17 +22,24 @@ def conectionSQLite(db, query, dict=False):
         cursor.close()
         conn.close()
 
+        response = list()
+        if toClass is not None:
+            for i in data:
+                a = toClass.__class__
+                response.append(a.load(i))
+            return response
+
         return data
 
 
-def __dictFactory(cursor, row):
+def __dictFactory(cursor, row) -> dict:
     d = dict()
     for idx, col in enumerate(cursor.description):
         d[col[0]] = row[idx]
     return d
 
 
-def ejecutaScriptSqlite(db, script):
+def ejecutaScriptSqlite(db, script) -> None:
     conn = sqlite3.connect(db)
     cursor = conn.cursor()
     cursor.executescript(script)
@@ -41,7 +48,7 @@ def ejecutaScriptSqlite(db, script):
     conn.close()
 
 
-def dumpDatabase(db):
+def dumpDatabase(db) -> str:
     """
     Hace un dump de la base de datos y lo retorna
     :param db: ruta de la base de datos

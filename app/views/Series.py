@@ -29,6 +29,8 @@ from app.views import preferencias
 from app.views.ui.series_ui import Ui_MainWindow
 from app import logger
 
+from app.models.Serie import Serie
+
 
 class Series(QtWidgets.QMainWindow):
     def __init__(self, parent=None):
@@ -58,7 +60,7 @@ class Series(QtWidgets.QMainWindow):
 
         query = """SELECT Nombre, Temporada, Capitulo, Dia, Capitulo_Descargado FROM Series 
                 WHERE Siguiendo = "Si" AND Capitulo <> 0 AND Estado='Activa'"""
-        series = conectionSQLite(self.db, query, True)
+        series = conectionSQLite(self.db, query, True, Serie())
 
         # todo esto es para ordenar las series por fecha de proximidad de proximo capitulo
         fecha2 = funciones.calculaDiaSemana()
@@ -68,7 +70,7 @@ class Series(QtWidgets.QMainWindow):
 
         for texto, i in zip(listadoFinal, list(range(0, len(listadoFinal)))):  # el encabezado lo tengo encima
             self.creaListaSerie(i, texto)
-            logger.debug(i, texto)
+            logger.debug('{}**{}'.format(i, texto))
 
         self.ui.pushButtonAceptar.setVisible(False)
         self.ui.pushButtonAplicar.setText("Guardar")
@@ -108,13 +110,13 @@ class Series(QtWidgets.QMainWindow):
         horizontalLayoutBotones.addWidget(buttonSumar)
         self.ui.gridLayoutGobal.addWidget(widgetBotones, n, 3, 1, 1, QtCore.Qt.AlignLeft)
 
-        labelEmision.setText(datos["Dia"])
-        labelNombre.setText(datos["Nombre"])
+        labelEmision.setText(datos._day)
+        labelNombre.setText(datos._name)
         # hago esto para que quede bonito los numeros de los capitulos
-        if len(str(datos["Capitulo"])) == 1:
-            lineEpisodio.setText('{}x0{}'.format(datos["Temporada"], datos["Capitulo"]))
+        if len(str(datos._chapter)) == 1:
+            lineEpisodio.setText('{}x0{}'.format(datos._season, datos._chapter))
         else:
-            lineEpisodio.setText('{}x{}'.format(datos["Temporada"], datos["Capitulo"]))
+            lineEpisodio.setText('{}x{}'.format(datos._season, datos._chapter))
         buttonSumar.setText("+1")
         buttonRestar.setText("-1")
 
@@ -149,8 +151,8 @@ class Series(QtWidgets.QMainWindow):
         self.ui.gridLayoutGobal.addWidget(widgetTeoricos, n, 4, 1, 1, QtCore.Qt.AlignLeft)
 
         # Si el capitulo es None o ya lo tengo actualizado no muestro el boton
-        if datos["Capitulo_Descargado"] is not None and datos["Capitulo"] != datos["Capitulo_Descargado"]:
-            lineEpisodioTeorico.setText(str(datos["Capitulo_Descargado"]))  # Asignamos el valor del capitulo
+        if datos._chapter_downloaded is not None and datos._chapter != datos._chapter_downloaded:
+            lineEpisodioTeorico.setText(str(datos._chapter_downloaded))  # Asignamos el valor del capitulo
         else:
             lineEpisodioTeorico.setVisible(False)
             buttonTeorico.setVisible(False)
@@ -185,11 +187,11 @@ class Series(QtWidgets.QMainWindow):
         param dat dict: diccionario con todos los datos de la serie que me modificara
         """
 
-        dat["Capitulo"] = dat["Capitulo"] + 1  # esto funciona porque hace referencia al objeto
-        if len(str(dat["Capitulo"])) == 1:
-            n.setText('{}x0{}'.format(dat["Temporada"], dat["Capitulo"]))
+        dat._chapter = dat._chapter + 1  # esto funciona porque hace referencia al objeto
+        if len(str(dat._chapter)) == 1:
+            n.setText('{}x0{}'.format(dat._season, dat._chapter))
         else:
-            n.setText('{}x{}'.format(dat["Temporada"], dat["Capitulo"]))
+            n.setText('{}x{}'.format(dat._season, dat._chapter))
 
         query = """UPDATE series SET Capitulo=Capitulo+1 WHERE Nombre LIKE "{}";""".format(dat["Nombre"])
         self.queryCompleta += '\n' + query
@@ -205,11 +207,11 @@ class Series(QtWidgets.QMainWindow):
         param dat dict: diccionario con todos los datos de la serie que me modificara
         """
 
-        dat["Capitulo"] = dat["Capitulo"] - 1  # esto funciona porque hace referencia al objeto
-        if len(str(dat["Capitulo"])) == 1:
-            n.setText('{}x0{}'.format(dat["Temporada"], dat["Capitulo"]))
+        dat._chapter = dat._chapter - 1  # esto funciona porque hace referencia al objeto
+        if len(str(dat._chapter)) == 1:
+            n.setText('{}x0{}'.format(dat._season, dat._chapter))
         else:
-            n.setText('{}x{}'.format(dat["Temporada"], dat["Capitulo"]))
+            n.setText('{}x{}'.format(dat._season, dat._chapter))
 
         query = 'UPDATE series SET Capitulo=Capitulo-1 WHERE Nombre LIKE "{}";'.format(dat["Nombre"])
         self.queryCompleta += '\n' + query
@@ -249,7 +251,7 @@ class Series(QtWidgets.QMainWindow):
 
         for i in semana:
             for j in series:
-                if j['Dia'] == i:
+                if j._day == i:
                     lista.append(j)
         logger.debug(lista)
         return lista
