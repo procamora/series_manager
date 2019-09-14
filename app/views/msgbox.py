@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import sys
+from typing import NoReturn
 
 from PyQt5 import QtWidgets
 
 from app.views.ui.msgbox_ui import Ui_Dialog
-from app import logger
 
 
-class MsgBox(QtWidgets.QDialog, ):
-    def __init__(self, parent=None, datos=None):
+class MsgBox(QtWidgets.QDialog):
+    def __init__(self, parent: object = None, datos: str = None) -> NoReturn:
         QtWidgets.QWidget.__init__(self, parent)
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
@@ -27,7 +27,7 @@ class MsgBox(QtWidgets.QDialog, ):
         # self.ui.ButtonOk.clicked.connect(self.retornaDatos)
 
     @staticmethod
-    def getData(parent=None, datos=None):
+    def getData(parent: object = None, datos: str = None) -> NoReturn:
         dialog = MsgBox(parent, datos)
         dialog.exec_()
 

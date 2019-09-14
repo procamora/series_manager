@@ -2,17 +2,18 @@
 # -*- coding: utf-8 -*-
 
 import sys
+from typing import NoReturn
 
 from PyQt5 import QtWidgets
 
-from app.views.ui.listar_todas_ui import Ui_Dialog
-from app.modulos.connect_sqlite import conectionSQLite, ejecutaScriptSqlite
-from app.modulos.settings import modo_debug, ruta_db
 from app import logger
+from app.modulos.connect_sqlite import conectionSQLite, ejecutaScriptSqlite
+from app.modulos.settings import ruta_db
+from app.views.ui.listar_todas_ui import Ui_Dialog
 
 
 class ListarTodas(QtWidgets.QDialog):
-    def __init__(self, parent=None, dbSeries=None):
+    def __init__(self, parent: object = None, dbSeries: str = None) -> NoReturn:
         QtWidgets.QWidget.__init__(self, parent)
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
@@ -43,7 +44,7 @@ class ListarTodas(QtWidgets.QDialog):
         self.ui.pushButtonCerrar.clicked.connect(self.cancela)
         self.ui.pushButtonAceptar.clicked.connect(self.aceptaDatos)
 
-    def sacaSeries(self):
+    def sacaSeries(self) -> NoReturn:
         """
         Saca todas las series de la bd y las mete en una lista de diccionarios accesible en todo el objeto
         """
@@ -53,7 +54,7 @@ class ListarTodas(QtWidgets.QDialog):
         # lo ejecuto al principio ya que es el activado por defecto
         self.seriesActuales()
 
-    def seriesActuales(self):
+    def seriesActuales(self) -> NoReturn:
         """
         Creo una lista con todas las series que estoy siguiendo
         """
@@ -65,7 +66,7 @@ class ListarTodas(QtWidgets.QDialog):
                 item.setText(i['Nombre'])
                 self.ui.listWidget.addItem(item)
 
-    def seriesTemporales(self):
+    def seriesTemporales(self) -> NoReturn:
         """
         Creo una lista con todas las series que han acabado temporada
         """
@@ -77,7 +78,7 @@ class ListarTodas(QtWidgets.QDialog):
                 item.setText(i['Nombre'])
                 self.ui.listWidget.addItem(item)
 
-    def seriesPausadas(self):
+    def seriesPausadas(self) -> NoReturn:
         """
         Creo una lista con todas las series que han acabado temporada
         """
@@ -89,7 +90,7 @@ class ListarTodas(QtWidgets.QDialog):
                 item.setText(i['Nombre'])
                 self.ui.listWidget.addItem(item)
 
-    def seriesTodas(self):
+    def seriesTodas(self) -> NoReturn:
         """
         Creo una lista con todas las series
         """
@@ -100,7 +101,7 @@ class ListarTodas(QtWidgets.QDialog):
             item.setText(i['Nombre'])
             self.ui.listWidget.addItem(item)
 
-    def printCurrentItems(self):
+    def printCurrentItems(self) -> NoReturn:
         """
         Coge todas las series seleccionadas y las mete en una lista con su respectiva consulta para despues ejecutarlas
         """
@@ -128,7 +129,7 @@ class ListarTodas(QtWidgets.QDialog):
 
         logger.debug(self.queryCompleta)
 
-    def aplicaDatos(self):
+    def aplicaDatos(self) -> bool:
         """
         Ejecuta todas las consultas que hay en la lista
         """
@@ -140,7 +141,7 @@ class ListarTodas(QtWidgets.QDialog):
         self.queryCompleta = str()
         return True
 
-    def cancela(self):
+    def cancela(self) -> NoReturn:
         """
         Establece el estado actual en cancelado para retornar None y ejecuta reject
         """
@@ -148,12 +149,12 @@ class ListarTodas(QtWidgets.QDialog):
         self.estadoA = self.estadoF
         self.reject()
 
-    def aceptaDatos(self):
+    def aceptaDatos(self) -> NoReturn:
         if self.aplicaDatos():
             self.accept()
 
     @staticmethod
-    def getDatos(parent=None, dbSeries=None):
+    def getDatos(parent: object = None, dbSeries: str = None) -> NoReturn:
         dialog = ListarTodas(parent, dbSeries)
         dialog.exec_()
 

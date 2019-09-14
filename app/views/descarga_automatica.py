@@ -5,14 +5,15 @@
 
 """
 import sys
+from typing import NoReturn
 
 from PyQt5 import QtWidgets, QtCore
 
+from app.modulos import funciones
+from app.modulos.connect_sqlite import conectionSQLite
+from app.modulos.settings import ruta_db
 from app.views.descarga_automatica_cli import DescargaAutomaticaCli
 from app.views.msgbox import MsgBox
-from app.modulos import funciones
-from app.modulos.connect_sqlite import conectionSQLite, ejecutaScriptSqlite
-from app.modulos.settings import modo_debug, directorio_trabajo, ruta_db
 from app.views.ui.descarga_automatica_ui import Ui_Dialog
 
 
@@ -23,22 +24,23 @@ class mythread(QtCore.QThread, DescargaAutomaticaCli):
     total = QtCore.pyqtSignal(object)
     update = QtCore.pyqtSignal()
 
-    def __init__(self, parent, objVistas, objDescargas, dbSeries=None, query=None):
+    def __init__(self, parent: QtWidgets.QProgressBar, objVistas: QtWidgets.QTextEdit,
+                 objDescargas: QtWidgets.QTextEdit, dbSeries: str = None, query: str = None) -> NoReturn:
         super(mythread, self).__init__(parent)
         self.objVistas = objVistas
         self.objDescargas = objDescargas
         self.db = dbSeries
         self.query = query
 
-    def run(self):
+    def run(self) -> NoReturn:
         # para saber cuantas series tiene en la barra de progreso (ajustarla y que marque bien los porcentajes)
         self.total.emit(len(self.getSeries()))
         DescargaAutomaticaCli.run(self)
 
-    def accionExtra(self, serie):
+    def accionExtra(self, serie: str) -> NoReturn:
         self.objDescargas.append(serie)
 
-    def parseaFeed(self, serie, tem, cap, vose):
+    def parseaFeed(self, serie: str, tem: str, cap: str, vose: str) -> str:
         """Solo funciona con series de 2 digitos por la expresion regular"""
 
         self.update.emit()
@@ -48,7 +50,7 @@ class mythread(QtCore.QThread, DescargaAutomaticaCli):
 
 
 class DescargaAutomatica(QtWidgets.QDialog):
-    def __init__(self, parent=None, dbSeries=None):
+    def __init__(self, parent: object = None, dbSeries: str = None) -> NoReturn:
         QtWidgets.QWidget.__init__(self, parent)
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
@@ -74,13 +76,13 @@ class DescargaAutomatica(QtWidgets.QDialog):
         self.thread.finished.connect(self.close)
         self.thread.start()
 
-    def update(self):
+    def update(self) -> NoReturn:
         self.ui.textEditVistas.append(str(self.series[self.n]['Nombre']))
         self.n += 1
         self.ui.progressBar.setValue(self.n)
 
     @staticmethod
-    def getDatos(parent=None, dbSeries=None):
+    def getDatos(parent: object = None, dbSeries: str = None) -> NoReturn:
         if funciones.internetOn():
             dialog = DescargaAutomatica(parent, dbSeries)
             dialog.exec_()

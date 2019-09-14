@@ -1,19 +1,21 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import sys
+from typing import Dict, NoReturn
 
 from PyQt5 import QtWidgets
 
-from app.modulos.actualiza_imdb import actualizaImdb
-from app.views.msgbox import MsgBox
-from app.modulos import funciones
-from app.modulos.connect_sqlite import conectionSQLite
-from app.modulos.settings import modo_debug, ruta_db
-from app.views.ui.actualizar_insertar_ui import Ui_Dialog
 from app import logger
+from app.modulos import funciones
+from app.modulos.actualiza_imdb import actualizaImdb
+from app.modulos.connect_sqlite import conectionSQLite
+from app.modulos.settings import ruta_db
+from app.views.msgbox import MsgBox
+from app.views.ui.actualizar_insertar_ui import Ui_Dialog
+
 
 class ActualizarInsertar(QtWidgets.QDialog):
-    def __init__(self, parent=None, dbSeries=None, datSerie=None):
+    def __init__(self, parent=None, dbSeries: str = None, datSerie: Dict = None) -> NoReturn:
         QtWidgets.QWidget.__init__(self, parent)
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
@@ -70,7 +72,7 @@ class ActualizarInsertar(QtWidgets.QDialog):
         self.ui.pushButtonCerrar.clicked.connect(self.cancela)
         self.ui.pushButtonAceptar.clicked.connect(self.aceptaDatos)
 
-    def campoTemp(self):
+    def campoTemp(self) -> NoReturn:
         """
         Si en la lista de temporadas seleccionamos otra se abre un line edit
         para poner el numero de temporada que no esta, si lo cambiamos se oculta
@@ -85,7 +87,7 @@ class ActualizarInsertar(QtWidgets.QDialog):
             self.ui.lineTemp.setVisible(False)
             self.ui.lineTemp.setText(str(self.ui.BoxTemporada.currentText()))
 
-    def campoCap(self):
+    def campoCap(self) -> NoReturn:
         """
         Si en la lista de capitulos seleccionamos otra se abre un line edit
         para poner el numero de capitulo que no esta, si lo cambiamos se oculta
@@ -101,7 +103,7 @@ class ActualizarInsertar(QtWidgets.QDialog):
             self.ui.lineCapitulo.setText(
                 str(self.ui.BoxCapitulo.currentText()))
 
-    def listaTemporadas(self, x, y):
+    def listaTemporadas(self, x: int, y: int) -> NoReturn:
         """
         Crea el comboBox de las temporadas, primero lo vacia y
         luego lo crea con los rangos que le indico
@@ -115,7 +117,7 @@ class ActualizarInsertar(QtWidgets.QDialog):
         self.ui.BoxTemporada.addItems(listTemp)
         self.ui.BoxTemporada.addItem(self.otra)
 
-    def listaCapitulos(self, x, y):
+    def listaCapitulos(self, x: int, y: int) -> NoReturn:
         """
         Crea el comboBox de los capitulos, primero lo vacia y
         luego lo crea con los rangos que le indico
@@ -129,7 +131,7 @@ class ActualizarInsertar(QtWidgets.QDialog):
         self.ui.BoxCapitulo.addItems(listCap)
         self.ui.BoxCapitulo.addItem(self.otra)
 
-    def listaEstados(self):
+    def listaEstados(self) -> NoReturn:
         """
         Crea el comboBox de los estados, primero lo vacia y
         luego lo crea con los rangos que le indico
@@ -143,7 +145,7 @@ class ActualizarInsertar(QtWidgets.QDialog):
         self.ui.BoxEstado.clear()
         self.ui.BoxEstado.addItems(listEst)
 
-    def creaConf(self):
+    def creaConf(self) -> NoReturn:
         """
         Establece los valores por defecto que se le indican en caso de que se indiquen
         """
@@ -184,7 +186,7 @@ class ActualizarInsertar(QtWidgets.QDialog):
 
         self.ui.radioImdbNo.click()
 
-    def aplicaDatos(self):
+    def aplicaDatos(self) -> bool:
         """
         Recoge todos los valores que necesita, crea el update y lo ejecuta
         """
@@ -290,7 +292,7 @@ class ActualizarInsertar(QtWidgets.QDialog):
             funciones.muestraMensaje(self.ui.label_Info, 'Titulo vacio', False)
             return False
 
-    def ejecutaImdb(self):
+    def ejecutaImdb(self) -> NoReturn:
         """
         Actualiza los datos de la serie de imdb siempre que el id no este vacio
         """
@@ -301,7 +303,7 @@ class ActualizarInsertar(QtWidgets.QDialog):
             logger.debug('actualiza imdb')
             a.actualizaSerie(id_imdb)
 
-    def aceptaDatos(self):
+    def aceptaDatos(self) -> NoReturn:
         """
         Boton Aceptar, primero aplicas los datos, si retorna True, cierra la ventana
         """
@@ -309,7 +311,7 @@ class ActualizarInsertar(QtWidgets.QDialog):
         if self.aplicaDatos():
             self.accept()
 
-    def cancela(self):
+    def cancela(self) -> NoReturn:
         """
         Establece el estado actual en cancelado para retornar None y ejecuta reject
         """
@@ -318,7 +320,7 @@ class ActualizarInsertar(QtWidgets.QDialog):
         self.reject()
 
     @staticmethod
-    def getDatos(parent=None, datSerie=None, dbSeries=None):
+    def getDatos(parent: object = None, datSerie: Dict = None, dbSeries: str = None) -> NoReturn:
         dialog = ActualizarInsertar(parent, dbSeries, datSerie)
         dialog.exec_()
 

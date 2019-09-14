@@ -6,14 +6,12 @@
 # https://github.com/eternnoir/pyTelegramBotAPI/blob/master/telebot/types.py
 
 
-import os
 import re
 import subprocess
 import tempfile
 
 import requests
 import telebot  # Importamos la librería
-from bs4 import BeautifulSoup
 from telebot import types  # Y los tipos especiales de esta
 
 from app import logger
@@ -57,7 +55,7 @@ def formatea(texto):
     if texto is not None:
         text = texto.decode('utf-8')
         return str(text)
-        #return text.replace('\n', '')
+        # return text.replace('\n', '')
     return texto
 
 
@@ -309,23 +307,25 @@ def handle_magnet(message):
         send_show_torrent(message)
 
 
-@bot.message_handler(regexp=r"^(http:\/\/)?(www.)?(newpct|newpct1|tumejortorrent|torrentlocura).com\/.*")
-def handle_newpct1(message):
+@bot.message_handler(regexp=r"^(https:\/\/)?(www.)?(dontorrent).com\/.*")
+def handle_torrent(message) -> None:
     # si no envio yo la url no continuo
     if message.chat.id != administrador:
         return
     # ya no es necesario, lo implementa descargaUrlTorrent
     # buscamos el genero
-    #regexGenero = re.search('descarga-torrent', message.text)
-    #if regexGenero:  # si hay find continua, sino retorno None el re.search
+    # regexGenero = re.search('descarga-torrent', message.text)
+    # if regexGenero:  # si hay find continua, sino retorno None el re.search
     #    urlPeli = message.text
-    #else:
+    # else:
     #    urlPeli = re.sub('(http://)?(www.)?newpct1.com/', 'http://www.newpct1.com/descarga-torrent/', message.text)
 
-    url = funciones.descargaUrlTorrentDonTorrent(message.text, message)
+    url = funciones.descargaUrlTorrentDonTorrentDirecto(message.text, message)
     if url is not None:
-        with tempfile.NamedTemporaryFile(mode='rb', dir=credenciales['RutaDescargas'], suffix='.torrent', delete=False) as fp:
+        with tempfile.NamedTemporaryFile(mode='rb', dir=credenciales['RutaDescargas'], suffix='.torrent',
+                                         delete=False) as fp:
             try:
+                print(url)
                 descargaFichero(url, fp.name)
                 file_data = open(fp.name, 'rb')
                 bot.send_document(message.chat.id, file_data)
@@ -336,36 +336,8 @@ def handle_newpct1(message):
             f.write('{}, {}, {} -> {}\n'.format(message.chat.id, message.chat.first_name, message.chat.username,
                                                 message.text))
     else:
-        bot.reply_to(message, 'descargaUrlTorrent retorna None')
+        bot.reply_to(message, 'handle_torrent retorna None')
 
-@bot.message_handler(regexp=r"^(https:\/\/)?(www.)?(pctnew).com\/.*")
-def handle_pctnew(message):
-    # si no envio yo la url no continuo
-    if message.chat.id != administrador:
-        return
-    # ya no es necesario, lo implementa descargaUrlTorrent
-    # buscamos el genero
-    #regexGenero = re.search('descarga-torrent', message.text)
-    #if regexGenero:  # si hay find continua, sino retorno None el re.search
-    #    urlPeli = message.text
-    #else:
-    #    urlPeli = re.sub('(http://)?(www.)?newpct1.com/', 'http://www.newpct1.com/descarga-torrent/', message.text)
-
-    url = funciones.descargaUrlTorrentDonTorrent(message.text, message)
-    if url is not None:
-        with tempfile.NamedTemporaryFile(mode='rb', dir=credenciales['RutaDescargas'], suffix='.torrent', delete=False) as fp:
-            try:
-                descargaFichero(url, fp.name)
-                file_data = open(fp.name, 'rb')
-                bot.send_document(message.chat.id, file_data)
-            except:
-                bot.reply_to(message, 'Ha ocurrido un error al descargar')
-
-        with open('/tmp/descarga_torrent.log', "a") as f:
-            f.write('{}, {}, {} -> {}\n'.format(message.chat.id, message.chat.first_name, message.chat.username,
-                                                message.text))
-    else:
-        bot.reply_to(message, 'descargaUrlTorrentPctnew retorna None')
 
 @bot.message_handler(func=lambda message: message.chat.id == administrador, content_types=["text"])
 def my_text(message):

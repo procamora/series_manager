@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from __future__ import annotations
+
 import inspect
+from typing import NoReturn, Dict, List
 
 
 class ModelStates(object):
-    def __init__(self):
+    def __init__(self) -> NoReturn:
         super().__init__()
         self._state = str()
 
@@ -17,7 +20,7 @@ class ModelStates(object):
         return str(new_attributes)
 
     @staticmethod
-    def delete_none_values(attributes) -> dict:
+    def delete_none_values(attributes: List) -> Dict:
         new_attributes = dict()
         new_attributes['class'] = 'ModelStates'
         for i in attributes:
@@ -28,7 +31,7 @@ class ModelStates(object):
         return new_attributes
 
     @staticmethod
-    def load(dictionaty) -> object:
+    def load(dictionaty: Dict) -> ModelStates:
         s = ModelStates()
         for i in dictionaty:
             if i == 'Estados':

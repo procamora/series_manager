@@ -1,17 +1,19 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import sys
+from typing import NoReturn
 
 from PyQt5 import QtWidgets
 
-from app.views.ui.buscar_series_ui import Ui_Dialog
-from app.views.actualizar_insertar import ActualizarInsertar
-from app.modulos.connect_sqlite import conectionSQLite
-from app.modulos.settings import modo_debug, ruta_db
 from app import logger
+from app.modulos.connect_sqlite import conectionSQLite
+from app.modulos.settings import ruta_db
+from app.views.actualizar_insertar import ActualizarInsertar
+from app.views.ui.buscar_series_ui import Ui_Dialog
+
 
 class BuscarSeries(QtWidgets.QDialog):
-    def __init__(self, parent=None, dbSeries=None):
+    def __init__(self, parent: object = None, dbSeries: str = None) -> NoReturn:
         QtWidgets.QWidget.__init__(self, parent)
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
@@ -26,7 +28,7 @@ class BuscarSeries(QtWidgets.QDialog):
         self.ui.pushButtonAplicar.clicked.connect(self.actualizaSerie)
         self.ui.pushButtonCerrar.clicked.connect(self.cancela)
 
-    def operacionesIniciales(self):
+    def operacionesIniciales(self) -> NoReturn:
         """
         Busca todas las series que haya con el patron buscado y crea una lista
         para seleccionar posteriormente una %% es para escapar el tanto por ciento
@@ -50,7 +52,7 @@ class BuscarSeries(QtWidgets.QDialog):
                 item.setText(i['Nombre'])
                 self.ui.listWidget.addItem(item)
 
-    def actualizaSerie(self):
+    def actualizaSerie(self) -> NoReturn:
         """
         cojo la serie escogida, saco todos sus datos y se los mando a la libreria
         de actualizar_insertar serie
@@ -66,7 +68,7 @@ class BuscarSeries(QtWidgets.QDialog):
             ActualizarInsertar.getDatos(
                 datSerie=ser, dbSeries=self.db)
 
-    def cancela(self):
+    def cancela(self) -> NoReturn:
         """
         Establece el estado actual en cancelado para retornar None y ejecuta reject
         """
@@ -75,7 +77,7 @@ class BuscarSeries(QtWidgets.QDialog):
         self.reject()
 
     @staticmethod
-    def getDatos(parent=None, dbSeries=None):
+    def getDatos(parent: object = None, dbSeries: str = None) -> NoReturn:
         dialog = BuscarSeries(parent, dbSeries)
         dialog.exec_()
 

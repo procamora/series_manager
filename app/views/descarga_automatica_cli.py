@@ -5,6 +5,10 @@
 # Como ha dejado de funcionar el feed de torrentlocura he creado uno nuevo haciendo scraping web de la pagina de ultimos capitulos
 
 """
+
+from __future__ import annotations
+
+import logging
 import os
 import re
 import sys
@@ -21,10 +25,11 @@ from app.modulos import funciones
 from app.modulos.connect_sqlite import conectionSQLite, ejecutaScriptSqlite
 from app.modulos.mail2 import ML2
 from app.modulos.pushbullet2 import PB2
-from app.modulos.settings import modo_debug, directorio_trabajo, ruta_db
+from app.modulos.settings import directorio_trabajo, ruta_db
 from app.modulos.telegram2 import TG2
 from app import logger
 
+from typing import List, NoReturn
 
 SERIE_DEBUG = "SEAL Team"
 
@@ -32,7 +37,7 @@ SERIE_DEBUG = "SEAL Team"
 # https://gist.github.com/kaotika/e8ca5c340ec94f599fb2
 
 class feed:
-    def __init__(self, title, cap, link):
+    def __init__(self, title: str, cap: str, link: str) -> NoReturn:
         self.title = title
         self.link = link
         self.cap = cap
@@ -70,20 +75,20 @@ class feed:
         self.epi = re.findall(r'\d+', self.cap)[-1]
         # self.cap = "{}x{}".format(self.temp, self.epi)
 
-    def toString(self):
+    def toString(self) -> NoReturn:
         return '{} - {} - {}'.format(self.title, self.cap, self.link)
 
 
 class feedparserPropio:
-    def __init__(self):
+    def __init__(self) -> NoReturn:
         self.entries = list()
 
-    def add(self, title, cap, link):
+    def add(self, title: str, cap: str, link: str) -> NoReturn:
         f = feed(title.strip(), cap, link)
         self.entries.append(f)
 
     @staticmethod
-    def parse(logger, url='https://dontorrent.com/series/hd'):
+    def parse(logger: logging, url: str = 'https://dontorrent.com/series/hd') -> feedparserPropio:
         """
         """
         req_headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; WOW64; rv:35.0) Gecko/20100101 Firefox/35.0',
@@ -120,9 +125,9 @@ class feedparserPropio:
 
 
 class DescargaAutomaticaCli():
-    def __init__(self, dbSeries=None):
+    def __init__(self, dbSeries: str = None) -> NoReturn:
         if funciones.internetOn():
-            self._logger = funciones.getLogger(modo_debug)
+            self._logger = logger
             self._logger.debug('Start')
 
             if dbSeries is None:  # en herencia no mando ruta
@@ -162,7 +167,7 @@ class DescargaAutomaticaCli():
 
             self.consultaSeries = conectionSQLite(self.db, self.query, True)
 
-    def run(self):
+    def run(self) -> NoReturn:
         SerieActualNew = str()
         SerieActualShow = str()
         SerieActualTemp = str()
@@ -230,7 +235,7 @@ class DescargaAutomaticaCli():
         else:
             self._logger.error('PROBLEMA CON if SerieActualShow is not None and SerieActualNew is not None:')
 
-    def parseaFeed(self, serie, tem, cap, vose):
+    def parseaFeed(self, serie: str, tem: str, cap: str, vose: str) -> str:
         """Solo funciona con series de 2 digitos por la expresion regular"""
         cap = str(cap)
         ruta = str(self.conf['RutaDescargas'])  # es unicode
@@ -314,7 +319,7 @@ class DescargaAutomaticaCli():
 
         return funciones.eliminaTildes(d.entries[0].title)
 
-    def accionExtra(self, serie):
+    def accionExtra(self, serie: str) -> NoReturn:
         """
         Metodo que no hace nada en esta clase pero que en herencia es
         usado para usar el entorno ggrafico que QT
@@ -322,14 +327,14 @@ class DescargaAutomaticaCli():
         """
         pass
 
-    def getSeries(self):
+    def getSeries(self) -> List:
         return self.consultaSeries
 
-    def getSerieActual(self):
+    def getSerieActual(self) -> str:
         return self.titleSerie
 
     @staticmethod
-    def muestraNotificaciones():
+    def muestraNotificaciones() -> List:
         """
         poner las api de la base de datos
         """

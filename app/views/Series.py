@@ -6,14 +6,17 @@ import functools
 import os
 import subprocess
 import sys
+from typing import List, NoReturn
 
 # TERCEROS
 from PyQt5 import QtGui, QtWidgets, QtCore
 
+from app import logger
+from app.models.model_serie import Serie
 # PROPIAS
 from app.modulos import funciones
 from app.modulos.connect_sqlite import conectionSQLite, ejecutaScriptSqlite
-from app.modulos.settings import directorio_trabajo, sistema, nombre_db, directorio_local, modo_debug
+from app.modulos.settings import directorio_trabajo, sistema, nombre_db, directorio_local
 from app.views import acerca_de
 from app.views import actualizar_insertar
 from app.views import asistente_inicial
@@ -27,13 +30,10 @@ from app.views import newpct1_completa
 from app.views import notificaciones
 from app.views import preferencias
 from app.views.ui.series_ui import Ui_MainWindow
-from app import logger
-
-from app.models.model_serie import Serie
 
 
 class Series(QtWidgets.QMainWindow):
-    def __init__(self, parent=None):
+    def __init__(self, parent: object = None) -> NoReturn:
         QtWidgets.QWidget.__init__(self, parent)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
@@ -54,7 +54,7 @@ class Series(QtWidgets.QMainWindow):
         funciones.crearBackUpCompletoDB()
         self.menus()
 
-    def initListaActiva(self):
+    def initListaActiva(self) -> NoReturn:
 
         self.ui.gridLayoutGobal = QtWidgets.QGridLayout(self.ui.scrollAreaWidgetContents)
 
@@ -78,7 +78,7 @@ class Series(QtWidgets.QMainWindow):
         self.ui.pushButtonCerrar.clicked.connect(self.cancela)
         self.ui.pushButtonAceptar.clicked.connect(self.aceptaDatos)
 
-    def creaListaSerie(self, n=0, datos=None):
+    def creaListaSerie(self, n: int = 0, datos: Serie = None) -> NoReturn:
         """
         Crea la linea de cada serie completa, generada por qtdesigner y pasado
         el codigo a python, despues visto como se crea y hecho algunas modificaciones
@@ -159,7 +159,7 @@ class Series(QtWidgets.QMainWindow):
 
         buttonTeorico.clicked.connect(functools.partial(self.botonTeorico, lineEpisodioTeorico, lineEpisodio, datos))
 
-    def botonTeorico(self, capituloT, capitulo, dat):
+    def botonTeorico(self, capituloT: QtWidgets.QLineEdit, capitulo: QtWidgets.QLineEdit, dat: Serie) -> NoReturn:
         """
         Calcula si el capitulo descargado es mayor o menor, despues el bucle se ejecuta la diferencia entre los capitulos ejecutando la funcion
         de sumar o restar capitulos
@@ -177,7 +177,7 @@ class Series(QtWidgets.QMainWindow):
                 logger.debug('Resta: {}'.format(str(i)))
                 self.restarSerie(capitulo, dat)
 
-    def sumarSerie(self, n, dat):
+    def sumarSerie(self, n: QtWidgets.QLineEdit, dat: Serie) -> NoReturn:
         """
         Tiene 2 funcionalidades:
             - 1: sumar un capitulo a numero de capitulo que se ve por pantalla de la serie
@@ -197,7 +197,7 @@ class Series(QtWidgets.QMainWindow):
         self.queryCompleta += '\n' + query
         logger.debug(query)
 
-    def restarSerie(self, n, dat):
+    def restarSerie(self, n: QtWidgets.QLineEdit, dat: Serie) -> NoReturn:
         """
         Tiene 2 funcionalidades,
             - 1: restar un capitulo a numero de capitulo que se ve por pantalla de la serie
@@ -217,7 +217,7 @@ class Series(QtWidgets.QMainWindow):
         self.queryCompleta += '\n' + query
         logger.debug(query)
 
-    def cancela(self):
+    def cancela(self) -> NoReturn:
         """
         Establece el estado actual en cancelado para retornar None y ejecuta reject
         """
@@ -225,7 +225,7 @@ class Series(QtWidgets.QMainWindow):
         self.estadoA = self.estadoF
         self.close()
 
-    def aplicaDatos(self):
+    def aplicaDatos(self) -> bool:
         """
         Recorre toda la lista de updates alctualizando todas las series,
         cuando termina vacia la lista por si volvemos a darle a aplicar,
@@ -240,7 +240,7 @@ class Series(QtWidgets.QMainWindow):
         return True
 
     @staticmethod
-    def ordenaSeries(semana, series):
+    def ordenaSeries(semana: List, series: List) -> List[Serie]:
         """
         creo una lista ordenada por dia de la semana
         """
@@ -256,7 +256,7 @@ class Series(QtWidgets.QMainWindow):
         logger.debug(lista)
         return lista
 
-    def aceptaDatos(self):
+    def aceptaDatos(self) -> NoReturn:
         """
         Boton Aceptar, primero aplicas los datos, si retorna True, cierra la ventana
         """
@@ -264,7 +264,7 @@ class Series(QtWidgets.QMainWindow):
         if self.aplicaDatos():
             self.accept()
 
-    def menus(self):
+    def menus(self) -> NoReturn:
         # Crear menu nuevo completo
         """
         self.tools = self.menubar.addMenu('&Tools')
@@ -341,28 +341,28 @@ class Series(QtWidgets.QMainWindow):
         self.ui.actionAcerca_de.setShortcut('Ctrl+H')
         self.ui.actionAcerca_de.setStatusTip('A cerca de')
 
-    def menSeriesActivas(self):
+    def menSeriesActivas(self) -> NoReturn:
         """
         Muestra todas las series activas con un boton de sumar o restar capitulos
         """
 
         lista_activa.ListaActiva.getDatos(dbSeries=self.database)
 
-    def menListar(self):
+    def menListar(self) -> NoReturn:
         """
         Muestra las series para hacer modificaciones en masa
         """
 
         listar_todas.ListarTodas.getDatos(dbSeries=self.database)
 
-    def menActualizaSerie(self):
+    def menActualizaSerie(self) -> NoReturn:
         """
         Busca una serie especifica en la bd y te abre la ventana de modificacion de la serie
         """
 
         buscar_series.BuscarSeries.getDatos(dbSeries=self.database)
 
-    def menInsertar(self):
+    def menInsertar(self) -> NoReturn:
         """
         Abre una ventana para meter una nueva serie en la bd
         """
@@ -377,13 +377,13 @@ class Series(QtWidgets.QMainWindow):
         estado_series.EstadoSeries.getDatos(dbSeries=self.database)
 
     @staticmethod
-    def menActualizarImdb():
+    def menActualizarImdb() -> NoReturn:
         import app.modulos.actualiza_imdb as actualiza_imdb
         a = actualiza_imdb.actualizaImdb()
         logger.info('actulizaCompleto')
         a.actulizaCompleto()
 
-    def menNewpct1(self):
+    def menNewpct1(self) -> NoReturn:
         Conf = funciones.dbConfiguarion()
         rutaDesc = str(Conf['RutaDescargas'])  # es unicode
 
@@ -394,7 +394,7 @@ class Series(QtWidgets.QMainWindow):
             descarga_automatica.DescargaAutomatica.getDatos(dbSeries=self.database)
 
     @staticmethod
-    def menCompletoNewpct1():
+    def menCompletoNewpct1() -> NoReturn:
         Conf = funciones.dbConfiguarion()
         rutaDesc = str(Conf['RutaDescargas'])  # es unicode
 
@@ -405,7 +405,7 @@ class Series(QtWidgets.QMainWindow):
             newpct1_completa.Newpct1Completa.getDatos()
 
     @staticmethod
-    def abrirDirectorioDatos():
+    def abrirDirectorioDatos() -> NoReturn:
         if sistema == 'Windows':
             comando = 'explorer "{}"'.format(directorio_trabajo.replace('/', '\\'))
         else:
@@ -426,13 +426,13 @@ class Series(QtWidgets.QMainWindow):
         ejecucion.communicate()  # no se lanza un hilo, hasta que no se cierre la ventana no sepuede seguir usando
 
     # PREFERENCIAS
-    def menPreferencias(self):
+    def menPreferencias(self) -> NoReturn:
         preferencias.Preferencias.getDatos(dbSeries=self.database)
 
-    def menNotificaciones(self):
+    def menNotificaciones(self) -> NoReturn:
         notificaciones.Notificaciones.getDatos(dbSeries=self.database)
 
-    def menSeleccionaLog(self, num):
+    def menSeleccionaLog(self, num: str) -> NoReturn:
         """
         creo una lista con los directorios/ficheros que quiero borrar
         """
@@ -461,7 +461,7 @@ class Series(QtWidgets.QMainWindow):
         self.menVaciaLog(listaLog)
 
     @staticmethod
-    def menVaciaLog(listaLog):
+    def menVaciaLog(listaLog) -> NoReturn:
         """
         Borra los ficheros que estan la la lista (si existen)
         """
@@ -472,11 +472,11 @@ class Series(QtWidgets.QMainWindow):
                     pass
 
     @staticmethod
-    def menAsistenteInicial():
+    def menAsistenteInicial() -> NoReturn:
         asistente_inicial.AsistenteInicial.getDatos(ruta=directorio_trabajo)
 
     @staticmethod
-    def menAcercaDe():
+    def menAcercaDe() -> NoReturn:
         acerca_de.AcercaDe.getDatos()
 
 

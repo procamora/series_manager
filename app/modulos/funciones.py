@@ -16,10 +16,13 @@ from app import logger
 from app.modulos.connect_sqlite import conectionSQLite, ejecutaScriptSqlite, dumpDatabase
 from app.modulos.settings import directorio_trabajo, directorio_local, nombre_db, ruta_db, sync_sqlite
 
+from typing import Dict, Any, List, Union, NoReturn
+
+
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
-def creaDirectorioTrabajo():
+def creaDirectorioTrabajo() -> NoReturn:
     """
     Funcion encargada de checkear el correcto estado del directorio de trabajo
     Si el directorio no existe lo crea y crea la base de datos dejandola vacia
@@ -41,16 +44,16 @@ def creaDirectorioTrabajo():
             plantillaFicheroConf()
 
 
-def crearFichero(fichero):
+def crearFichero(fichero)-> NoReturn:
     with open(fichero, 'w') as f:
         f.write("")
 
 
-def cambiaBarras(texto):
+def cambiaBarras(texto)-> str:
     return texto.replace('\\', '/')
 
 
-def dbConfiguarion():
+def dbConfiguarion()-> List:
     """
     Funcion que obtiene los valores de la configuracion de un programa, devuelve el diciconario con los datos
 
@@ -69,7 +72,7 @@ def dbConfiguarion():
     return consulta
 
 
-def plantillaFicheroConf():
+def plantillaFicheroConf()-> NoReturn:
     """
     Si hay una configuracion en la la carpeta del programa la mueve a la carpeta
     de configuracion, sino la hay comprueba si existe el fichero, si existe y esta
@@ -90,7 +93,7 @@ def plantillaFicheroConf():
                 f.write("1")
 
 
-def plantillaDatabase():
+def plantillaDatabase()-> NoReturn:
     """
     Funcion encargada de checkear el correcto estado de la base de datos, si no existe la base de datos o esta vacia le
     cargo la estructura basica
@@ -106,7 +109,7 @@ def plantillaDatabase():
         ejecutaScriptSqlite(fichero_db, plantilla)
 
 
-def crearBackUpCompletoDB():
+def crearBackUpCompletoDB()-> NoReturn:
     """
     Funcion encargada de generar backup de la base de datos y guardarlo 
     """
@@ -149,7 +152,7 @@ def calculaDiaSemana():
         return eliminaTildes(a)
 
 
-def fechaToNumero(dia):
+def fechaToNumero(dia) -> List:
     """
     Convierte el dia de la semana a un numero, y luego te crea una lista ordenada
     de los dias de la semana de mas cerca a menos cerca
@@ -382,6 +385,35 @@ def descargaUrlTorrentDonTorrent(direcc, bot=None, message=None):
 
         return newUrls
 
+
+def descargaUrlTorrentDonTorrentDirecto(direcc, bot=None, message=None):
+    """
+    es similar a al ade arriba pero solo busca un torrent especifdico en un a
+    """
+
+    if not re.match(r"^(https?:\/\/).*", direcc):
+        direcc = 'https://' + direcc
+
+    # if modo_debug:
+    #    print(direcc)
+
+    if re.search("dontorrent", direcc):
+        if bot is not None and message is not None:
+            bot.reply_to(message, 'Buscando torrent en pctnew.com')
+        session = requests.session()
+
+        req_headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; WOW64; rv:35.0) Gecko/20100101 Firefox/35.0',
+                       'Content-Type': 'application/x-www-form-urlencoded'}
+
+        session = requests.session()
+        login = session.get(direcc, headers=req_headers, verify=False)
+        sopa = BeautifulSoup(login.text, 'html.parser')
+        mtable = sopa.find('a', {"class": "text-white bg-primary rounded-pill d-block shadow text-decoration-none p-1"})
+        print(mtable)
+        print(mtable['href'])
+
+        return 'https://dontorrent.com{}'.format(mtable['href'])
+    
 
 def feedParser(url):
     """

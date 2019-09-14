@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import sys
+from typing import NoReturn
 
 from PyQt5 import QtGui, QtWidgets
 
@@ -8,7 +9,7 @@ from app.views.ui.acerca_de_ui import Ui_Dialog
 
 
 class AcercaDe(QtWidgets.QDialog):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None) -> NoReturn:
         # super(MiFormulario, self).__init__()
         # uic.loadUi('ui/AcercaDe.ui', self)
         QtWidgets.QWidget.__init__(self, parent)
@@ -32,7 +33,7 @@ class AcercaDe(QtWidgets.QDialog):
         <p>PyQt Version 5.7.4</p>
         <p>Qt Version 5.7.1</p>
         <p><br/></p>
-        <p>&#169; 2017 Pablo Rocamora All Rights Reserved</p>
+        <p>&#169; 2019 Pablo Rocamora All Rights Reserved</p>
         <p>
             <a href="mailto:pablojoserocamora@gmail.com">pablojoserocamora@gmail.com</a>
         </p>
@@ -44,7 +45,7 @@ class AcercaDe(QtWidgets.QDialog):
         self.ui.pushButtonClose.clicked.connect(self.close)
 
     @staticmethod
-    def getDatos(parent=None):
+    def getDatos(parent=None) -> NoReturn:
         dialog = AcercaDe(parent)
         dialog.exec_()
 

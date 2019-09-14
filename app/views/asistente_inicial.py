@@ -3,16 +3,17 @@
 import os
 import platform
 import sys
+from typing import NoReturn
 
 from PyQt5 import QtWidgets
 
+from app import logger
 from app.modulos.settings import sync_sqlite, sync_gdrive
 from app.views.ui.asistente_inicial_ui import Ui_Dialog
-from app import logger
 
 
 class AsistenteInicial(QtWidgets.QDialog):
-    def __init__(self, parent=None, ruta=None):
+    def __init__(self, parent: object = None, ruta: str = None) -> NoReturn:
         # super(MiFormulario, self).__init__()
         # uic.loadUi('ui/AcercaDe.ui', self)
         QtWidgets.QWidget.__init__(self, parent)
@@ -41,7 +42,7 @@ class AsistenteInicial(QtWidgets.QDialog):
         self.ui.pushButtonAceptar.clicked.connect(self.aceptaDatos)
 
     @staticmethod
-    def muestraDirectorioTemporal():
+    def muestraDirectorioTemporal() -> NoReturn:
         """
         IMPORTANTE
         Esta funcion es la misma que la de settings, solo la hago por visibilidad,
@@ -55,7 +56,7 @@ class AsistenteInicial(QtWidgets.QDialog):
             directorio_trabajo = '{}/.{}'.format(os.environ['HOME'], 'Gestor-Series')
         return directorio_trabajo
 
-    def buscarDirectorio(self):
+    def buscarDirectorio(self) -> NoReturn:
         """
         Se encarga de coger la ruta en la que vamos a guardar el fichero,
         en este caso solo buscamos directorios,y establecemos que la ruta raiz sea
@@ -75,7 +76,7 @@ class AsistenteInicial(QtWidgets.QDialog):
             self.muestraMensaje(self.ui.checkBoxValido, 'No Valido 1', False)
             self.ui.checkBoxValido.setChecked(False)
 
-    def checkSync(self):
+    def checkSync(self) -> NoReturn:
         if self.ui.checkBoxSync.isChecked():
             # self.__cambiaVisibilidad(True)
             self.ui.checkBoxValido.setChecked(False)
@@ -87,7 +88,7 @@ class AsistenteInicial(QtWidgets.QDialog):
             self.muestraMensaje(self.ui.checkBoxValido, 'Valido', True)
             self.ui.lineRuta.setText(self.rutaSistemaDefecto)
 
-    def aplicaDatos(self):
+    def aplicaDatos(self) -> bool:
         if self.ui.checkBoxValido.isChecked():
             if self.ui.checkBoxSync.isChecked():
                 with open(sync_gdrive, 'w') as f:
@@ -104,7 +105,7 @@ class AsistenteInicial(QtWidgets.QDialog):
             self.muestraMensaje(self.ui.label, 'Error', False)
             return False
 
-    def aceptaDatos(self):
+    def aceptaDatos(self) -> NoReturn:
         """
         Boton Aceptar, primero aplicas los datos, si retorna True, cierra la ventana
         """
@@ -113,7 +114,7 @@ class AsistenteInicial(QtWidgets.QDialog):
             self.accept()
 
     @staticmethod
-    def muestraMensaje(label, texto='Texto plantilla', estado=True):
+    def muestraMensaje(label: QtWidgets.QLabel, texto: str = 'Texto plantilla', estado: bool = True) -> NoReturn:
         """
         Muestra una determinada label con rojo o verde (depende del estado) y
         con el texto indicado
@@ -126,7 +127,7 @@ class AsistenteInicial(QtWidgets.QDialog):
             label.setStyleSheet('color: red')
 
     @staticmethod
-    def cambiaBarras(texto):
+    def cambiaBarras(texto: str) -> str:
         """
         Funcion para sustituir las barra de windows por las de linux, esta implementada
         en funciones.py, pero este fichero no puede importar nada de otros, ya que
@@ -135,7 +136,7 @@ class AsistenteInicial(QtWidgets.QDialog):
         return texto.replace('\\', '/')
 
     @staticmethod
-    def checkIntegridadSqlite(idSqlite):
+    def checkIntegridadSqlite(idSqlite: str) -> bool:
         """
         Metodo para checkear que es correcto el fichero que contiene el id de la configuracion de la base de datos
         :return boolean: indicando si el valor es un integer o no 
@@ -148,7 +149,7 @@ class AsistenteInicial(QtWidgets.QDialog):
             return False
 
     @staticmethod
-    def checkIntegridadGdrive(idGdrive):
+    def checkIntegridadGdrive(idGdrive: str) -> bool:
         """
         Metodo para checkear que es correcto el fichero que contiene el la ruta del directorio de rtrabajo con la base 
         de datos
@@ -163,7 +164,7 @@ class AsistenteInicial(QtWidgets.QDialog):
             return False
 
     @staticmethod
-    def checkIntegridadFicheros():
+    def checkIntegridadFicheros() -> bool:
         """
         Comprobamos que existen los ficheros de cofiguracion necesarios y son correctos, en caso contrario llamamos a 
         asistente_inicial y terminamos
@@ -194,7 +195,7 @@ class AsistenteInicial(QtWidgets.QDialog):
             return True
 
     @staticmethod
-    def getDatos(parent=None, ruta=None):
+    def getDatos(parent: object = None, ruta: str = None) -> NoReturn:
         dialog = AsistenteInicial(parent, ruta)
         dialog.exec_()
 

@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from __future__ import annotations
+
 import inspect
+from typing import NoReturn, Dict, List
 
-
+# FIXME CAMBIAR NOMBRE POR model_serie??? o eliminar el model del resto
 class Serie(object):
-    def __init__(self) -> None:
+    def __init__(self) -> NoReturn:
         super().__init__()
         self._name = str()
         self._season = -1
@@ -30,7 +33,7 @@ class Serie(object):
         return str(new_attributes)
 
     @staticmethod
-    def delete_none_values(attributes) -> dict:
+    def delete_none_values(attributes: List) -> Dict:
         new_attributes = dict()
         new_attributes['class'] = 'Serie'
         for i in attributes:
@@ -41,7 +44,7 @@ class Serie(object):
         return new_attributes
 
     @staticmethod
-    def load(dictionaty) -> object:
+    def load(dictionaty: Dict) -> Serie:
         s = Serie()
         for i in dictionaty:
             if i == 'Nombre':

@@ -2,17 +2,18 @@
 # -*- coding: utf-8 -*-
 
 import sys
+from typing import NoReturn
 
 from PyQt5 import QtWidgets
 
-from app.views.ui.notificaciones_ui import Ui_Dialog
-from app.modulos.connect_sqlite import conectionSQLite, ejecutaScriptSqlite
-from app.modulos.settings import modo_debug, ruta_db
 from app import logger
+from app.modulos.connect_sqlite import conectionSQLite, ejecutaScriptSqlite
+from app.modulos.settings import ruta_db
+from app.views.ui.notificaciones_ui import Ui_Dialog
 
 
 class Notificaciones(QtWidgets.QDialog):
-    def __init__(self, parent=None, dbSeries=None):
+    def __init__(self, parent: object = None, dbSeries: str = None) -> NoReturn:
         QtWidgets.QWidget.__init__(self, parent)
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
@@ -27,27 +28,27 @@ class Notificaciones(QtWidgets.QDialog):
         self.operacionesIniciales()
 
         self.ui.checkBox_Telegram.clicked.connect(lambda
-                                                  x=self.ui.checkBox_Telegram,
-                                                  y=self.ui.lineEdit_Telegram: self.compruebaCheck(x, y))
+                                                      x=self.ui.checkBox_Telegram,
+                                                      y=self.ui.lineEdit_Telegram: self.compruebaCheck(x, y))
 
         self.ui.checkBox_PushBullet.clicked.connect(lambda
-                                                    x=self.ui.checkBox_PushBullet,
-                                                    y=self.ui.lineEdit_PushBullet: self.compruebaCheck(x, y))
+                                                        x=self.ui.checkBox_PushBullet,
+                                                        y=self.ui.lineEdit_PushBullet: self.compruebaCheck(x, y))
 
         self.ui.checkBox_Email.clicked.connect(lambda
-                                               x=self.ui.checkBox_Email,
-                                               y=self.ui.lineEdit_Email: self.compruebaCheck(x, y))
+                                                   x=self.ui.checkBox_Email,
+                                                   y=self.ui.lineEdit_Email: self.compruebaCheck(x, y))
 
         self.ui.checkBox_Hangouts.clicked.connect(lambda
-                                                  x=self.ui.checkBox_Hangouts,
-                                                  y=self.ui.lineEdit_Hangouts: self.compruebaCheck(x, y))
+                                                      x=self.ui.checkBox_Hangouts,
+                                                      y=self.ui.lineEdit_Hangouts: self.compruebaCheck(x, y))
 
         self.ui.pushButtonAplicar.clicked.connect(self.aplicaDatos)
         self.ui.pushButtonCerrar.clicked.connect(self.cancela)
         self.ui.pushButtonAceptar.clicked.connect(self.aceptaDatos)
 
     @staticmethod
-    def compruebaCheck(a, b):
+    def compruebaCheck(a: QtWidgets.QCheckBox, b: QtWidgets.QCheckBox) -> NoReturn:
         """
         Compruueba se hay un check en el campo a y si lo hay desabilita el campo de texto b
         """
@@ -57,7 +58,7 @@ class Notificaciones(QtWidgets.QDialog):
         else:
             b.setDisabled(True)
 
-    def operacionesIniciales(self):
+    def operacionesIniciales(self) -> NoReturn:
         """
         Ejecuta las 2 funciones necesarias para que funcione el programa,
         sacar los datos e introducirlos a la views
@@ -65,7 +66,7 @@ class Notificaciones(QtWidgets.QDialog):
         self.sacaDatos()
         self.averiguaConf()
 
-    def sacaDatos(self):
+    def sacaDatos(self) -> NoReturn:
         """
         Ejecuta la consulta
         """
@@ -73,7 +74,7 @@ class Notificaciones(QtWidgets.QDialog):
         query = 'SELECT * FROM Notificaciones'
         self.datodDb = conectionSQLite(self.db, query, True)
 
-    def averiguaConf(self):
+    def averiguaConf(self) -> NoReturn:
         """
         Con la lista de la bd pone los datos en la views
         """
@@ -116,7 +117,7 @@ class Notificaciones(QtWidgets.QDialog):
                 else:
                     self.ui.lineEdit_Hangouts.setDisabled(True)
 
-    def aplicaDatos(self):
+    def aplicaDatos(self) -> bool:
         """
         Creo un diccionario con todos los datos y voy ejecutando los updates,
         si el campo de la api es None o NULL hago que ponfga el campo NULL en la bd
@@ -145,7 +146,7 @@ class Notificaciones(QtWidgets.QDialog):
         ejecutaScriptSqlite(self.db, query)
         return True
 
-    def cancela(self):
+    def cancela(self) -> NoReturn:
         """
         Establece el estado actual en cancelado para retornar None y ejecuta reject
         """
@@ -153,7 +154,7 @@ class Notificaciones(QtWidgets.QDialog):
         self.estadoA = self.estadoF
         self.reject()
 
-    def aceptaDatos(self):
+    def aceptaDatos(self) -> NoReturn:
         """
         Boton Aceptar, primero aplicas los datos, si retorna True, cierra la ventana
         """
@@ -162,7 +163,7 @@ class Notificaciones(QtWidgets.QDialog):
             self.accept()
 
     @staticmethod
-    def getDatos(parent=None, dbSeries=None):
+    def getDatos(parent: object = None, dbSeries: str = None) -> NoReturn:
         dialog = Notificaciones(parent, dbSeries)
         dialog.exec_()
 

@@ -2,16 +2,17 @@
 # -*- coding: utf-8 -*-
 
 import sys
+from typing import NoReturn
 
 from PyQt5 import QtWidgets, QtSql
 
-from app.views.ui.lista_activa_ui import Ui_Dialog
-from app.modulos.settings import modo_debug, ruta_db
 from app import logger
+from app.modulos.settings import ruta_db
+from app.views.ui.lista_activa_ui import Ui_Dialog
 
 
 class ListaActiva(QtWidgets.QDialog):
-    def __init__(self, parent=None, dbSeries=None):
+    def __init__(self, parent: object = None, dbSeries: str = None) -> NoReturn:
         QtWidgets.QWidget.__init__(self, parent)
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
@@ -40,7 +41,7 @@ class ListaActiva(QtWidgets.QDialog):
         self.ui.pushButtonCerrar.clicked.connect(self.cancela)
         self.ui.pushButtonAceptar.clicked.connect(self.aceptaDatos)
 
-    def crearConexion(self):
+    def crearConexion(self) -> bool:
         """
 
         """
@@ -52,14 +53,14 @@ class ListaActiva(QtWidgets.QDialog):
             logger.info(self.database.lastError().text())
             return False
 
-    def aplicaDatos(self):  # actualmente sin uso
+    def aplicaDatos(self) -> bool:  # actualmente sin uso
         """
         Ejecuta todas las consultas que hay en la lista
         """
         self.database.close()  # cerramos la conexion de la bd
         return True
 
-    def cancela(self):
+    def cancela(self) -> NoReturn:
         """
         Establece el estado actual en cancelado para retornar None y ejecuta reject
         """
@@ -68,7 +69,7 @@ class ListaActiva(QtWidgets.QDialog):
         self.database.close()  # cerramos la conexion de la bd
         self.reject()
 
-    def aceptaDatos(self):
+    def aceptaDatos(self) -> NoReturn:
         """
         Boton Aceptar, primero aplicas los datos, si retorna True, cierra la ventana
         """
@@ -77,7 +78,7 @@ class ListaActiva(QtWidgets.QDialog):
             self.accept()
 
     @staticmethod
-    def getDatos(parent=None, dbSeries=None):
+    def getDatos(parent: object = None, dbSeries: str = None) -> NoReturn:
         dialog = ListaActiva(parent, dbSeries)
         dialog.exec_()
 

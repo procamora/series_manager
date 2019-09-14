@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from __future__ import annotations
+
 import inspect
+from typing import NoReturn, Dict, List
 
 
 class ModelNotification(object):
-    def __init__(self):
+    def __init__(self) -> NoReturn:
         super().__init__()
         self._name = str()
         self._api = str()
@@ -19,7 +22,7 @@ class ModelNotification(object):
         return str(new_attributes)
 
     @staticmethod
-    def delete_none_values(attributes) -> dict:
+    def delete_none_values(attributes: List) -> Dict:
         new_attributes = dict()
         new_attributes['class'] = 'ModelNotification'
         for i in attributes:
@@ -30,7 +33,7 @@ class ModelNotification(object):
         return new_attributes
 
     @staticmethod
-    def load(dictionaty) -> object:
+    def load(dictionaty: Dict) -> ModelNotification:
         s = ModelNotification()
         for i in dictionaty:
             if i == 'Nombre':

@@ -2,18 +2,19 @@
 # -*- coding: utf-8 -*-
 
 import sys
+from typing import NoReturn
 
 from PyQt5 import QtWidgets
 
+from app import logger
 from app.modulos import funciones
 from app.modulos.connect_sqlite import conectionSQLite
-from app.modulos.settings import modo_debug, directorio_local, ruta_db
+from app.modulos.settings import directorio_local, ruta_db
 from app.views.ui.preferencias_ui import Ui_Dialog
-from app import logger
 
 
 class Preferencias(QtWidgets.QDialog):
-    def __init__(self, parent=None, dbSeries=None):
+    def __init__(self, parent: object = None, dbSeries: str = None) -> NoReturn:
         QtWidgets.QWidget.__init__(self, parent)
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
@@ -57,11 +58,11 @@ class Preferencias(QtWidgets.QDialog):
         self.ui.pushButtonCerrar.clicked.connect(self.cancela)
         self.ui.pushButtonAceptar.clicked.connect(self.aceptaDatos)
 
-    def operacionesIniciales(self):
+    def operacionesIniciales(self) -> NoReturn:
         self.sacaDatos()
         self.listaId()
 
-    def buscarDirectorio(self):
+    def buscarDirectorio(self) -> NoReturn:
         """
         Se encarga de coger la ruta en la que vamos a guardar el fichero, en este caso solo buscamos directorios,
         y establecemos que la ruta raiz sea el escrotorio, que se establece en el init
@@ -77,7 +78,7 @@ class Preferencias(QtWidgets.QDialog):
             # QString sino str
             self.ui.lineRuta.setText(filenames)
 
-    def sacaDatos(self):
+    def sacaDatos(self) -> NoReturn:
         """
 
         """
@@ -87,7 +88,7 @@ class Preferencias(QtWidgets.QDialog):
         if len(self.configuraciones) > 0:
             self.datodDb = self.configuraciones[0]
 
-    def listaId(self):
+    def listaId(self) -> NoReturn:
         """
 
         """
@@ -100,7 +101,7 @@ class Preferencias(QtWidgets.QDialog):
         self.ui.BoxId.addItems(lista)
         self.ui.BoxId.addItem(self.otra)
 
-    def averiguaConf(self):
+    def averiguaConf(self) -> NoReturn:
         """
 
         """
@@ -116,7 +117,7 @@ class Preferencias(QtWidgets.QDialog):
                             'UrlFeedNewpct': '',
                             'id': ''}
 
-    def procesosComunes(self):
+    def procesosComunes(self) -> NoReturn:
         """
 
         """
@@ -124,7 +125,7 @@ class Preferencias(QtWidgets.QDialog):
         self.averiguaConf()
         self.insertarSerie()
 
-    def aplicaDatos(self):
+    def aplicaDatos(self) -> bool:
         datos = {
             'ID': str(self.ui.BoxId.currentText()),
             'Newpct': str(self.ui.lineNewpct.text()),
@@ -156,7 +157,7 @@ class Preferencias(QtWidgets.QDialog):
 
         return True
 
-    def insertarSerie(self):
+    def insertarSerie(self) -> NoReturn:
         """
 
         """
@@ -165,7 +166,7 @@ class Preferencias(QtWidgets.QDialog):
         self.ui.lineShowrss.setText(self.datodDb['UrlFeedShowrss'])
         self.ui.lineRuta.setText(str(self.datodDb['RutaDescargas']))
 
-    def cancela(self):
+    def cancela(self) -> NoReturn:
         """
         Establece el estado actual en cancelado para retornar None y ejecuta reject
         """
@@ -173,7 +174,7 @@ class Preferencias(QtWidgets.QDialog):
         self.estadoA = self.estadoF
         self.reject()
 
-    def aceptaDatos(self):
+    def aceptaDatos(self) -> NoReturn:
         """
         Boton Aceptar, primero aplicas los datos, si retorna True, cierra la ventana
         """
@@ -182,7 +183,7 @@ class Preferencias(QtWidgets.QDialog):
             self.accept()
 
     @staticmethod
-    def getDatos(parent=None, dbSeries=None):
+    def getDatos(parent: object = None, dbSeries: str = None) -> NoReturn:
         dialog = Preferencias(parent, dbSeries)
         dialog.exec_()
 

@@ -2,18 +2,19 @@
 # -*- coding: utf-8 -*-
 
 import sys
+from typing import List, NoReturn
 
 from PyQt5 import QtWidgets
 
-from app.views.ui.estado_series_ui import Ui_Dialog
-from app.modulos.tviso import conectTviso
-from app.modulos.connect_sqlite import conectionSQLite, ejecutaScriptSqlite
-from app.modulos.settings import modo_debug, ruta_db
 from app import logger
+from app.modulos.connect_sqlite import conectionSQLite, ejecutaScriptSqlite
+from app.modulos.settings import ruta_db
+from app.modulos.tviso import conectTviso
+from app.views.ui.estado_series_ui import Ui_Dialog
 
 
 class EstadoSeries(QtWidgets.QDialog):
-    def __init__(self, parent=None, dbSeries=None):
+    def __init__(self, parent: object = None, dbSeries: str = None) -> NoReturn:
         QtWidgets.QWidget.__init__(self, parent)
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
@@ -47,7 +48,7 @@ class EstadoSeries(QtWidgets.QDialog):
         self.ui.pushButtonCerrar.clicked.connect(self.cancela)
         self.ui.pushButtonAceptar.clicked.connect(self.aceptaDatos)
 
-    def sacaSeries(self):
+    def sacaSeries(self) -> NoReturn:
         """
         Saca todas las series de la bd y las mete en una lista de diccionarios
         accesible en todo el objeto
@@ -76,7 +77,7 @@ class EstadoSeries(QtWidgets.QDialog):
         if len(datos) > 0:
             self.actuales = conectTviso(datos[0]['user_tviso'], datos[0]['pass_tviso'])
 
-    def botonSiguiendo(self, seriesTest):
+    def botonSiguiendo(self, seriesTest: List) -> NoReturn:
         """
         Creo una lista con todas las series que estoy siguiendo
         """
@@ -100,7 +101,7 @@ class EstadoSeries(QtWidgets.QDialog):
         except:
             pass
 
-    def aplicaDatos(self):
+    def aplicaDatos(self) -> bool:
         """
         Ejecuta todas las consultas que hay en la lista
         """
@@ -111,7 +112,7 @@ class EstadoSeries(QtWidgets.QDialog):
         self.QueryCompleta = str()
         return True
 
-    def cancela(self):
+    def cancela(self) -> NoReturn:
         """
         Establece el estado actual en cancelado para retornar None y ejecuta reject
         """
@@ -119,17 +120,17 @@ class EstadoSeries(QtWidgets.QDialog):
         self.EstadoA = self.EstadoF
         self.reject()
 
-    def serieFinalizada(self):
+    def serieFinalizada(self) -> NoReturn:
         # coge las series de imdb y actualiza la table de estado
         # query = 'SELECT ID, Nombre, Estado, imdb_Finaliza FROM Series'
         # revisar porque puedo ESTAR VIENDO UNA SERIE FINALIZADA Y NO QUIERO
         # QUE CAMBIE ESTADO
         self.botonSiguiendo(self.DatSerieFinalizada)
 
-    def temporadaAcabada(self):
+    def temporadaAcabada(self) -> NoReturn:
         self.botonSiguiendo(self.DatTemporadaAcabada)
 
-    def seriesFinalizadas(self):
+    def seriesFinalizadas(self) -> NoReturn:
         # busca las series finalizadas y las actualiza con el ultimo episodio si la he acabado de ver,
         # NO HAY IMPLEMENTADO BOTON PARA ELLO, solo lo ejecuto a pelo cuando lo
         # necesito
@@ -142,7 +143,7 @@ class EstadoSeries(QtWidgets.QDialog):
             logger.info(query)
             conectionSQLite(self.db, query)
 
-    def seriesEmpiezanTemporada(self):
+    def seriesEmpiezanTemporada(self) -> NoReturn:
         # cuidado, si lo ejecutas la misma semana que acabas la temporada se pondra en activa,
         # hay que ejecurtarlo 1 vez a la semana
         # buscar forma de hacer que haga una comprobacion con las series que
@@ -160,7 +161,7 @@ class EstadoSeries(QtWidgets.QDialog):
 
         self.botonSiguiendo(calendario)
 
-    def __printCurrentItems(self):
+    def __printCurrentItems(self) -> NoReturn:
         """
         Coge todas las series seleccionadas y las mete en una lista con su
         respectiva consulta para despues ejecutarlas
@@ -186,12 +187,12 @@ class EstadoSeries(QtWidgets.QDialog):
 
         logger.debug(self.QueryCompleta)
 
-    def aceptaDatos(self):
+    def aceptaDatos(self) -> NoReturn:
         if self.aplicaDatos():
             self.accept()
 
     @staticmethod
-    def getDatos(parent=None, dbSeries=None):
+    def getDatos(parent: object = None, dbSeries: str = None) -> NoReturn:
         dialog = EstadoSeries(parent, dbSeries)
         dialog.exec_()
 
@@ -204,7 +205,6 @@ def main():
 
 if __name__ == '__main__':
     main()
-
 
 # HACER FUNCION QUE COJA
 

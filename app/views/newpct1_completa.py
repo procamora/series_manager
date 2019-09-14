@@ -6,14 +6,14 @@
 
 import sys
 import time
+from typing import NoReturn
 
 from PyQt5 import QtWidgets, QtCore
 
+from app import logger
 from app.modulos import funciones
-from app.modulos.settings import modo_debug
 from app.modulos.telegram2 import TG2
 from app.views.ui.descarga_completa_ui import Ui_Dialog
-from app import logger
 
 
 # https://gist.github.com/kaotika/e8ca5c340ec94f599fb2
@@ -22,11 +22,12 @@ class mythread(QtCore.QThread):
     total = QtCore.pyqtSignal(object)
     update = QtCore.pyqtSignal()
 
-    def __init__(self, parent, serie, capitulo, temporada, textEdit, sendTg):
+    def __init__(self, parent: QtWidgets.QProgressBar, serie: str, capitulo: int, temporada: int,
+                 textEdit: QtWidgets.QTextEdit, sendTg: bool) -> NoReturn:
         super(mythread, self).__init__(parent)
 
         self.conf = funciones.dbConfiguarion()
-        self.serie = serie.replace(' ', '-') # ruta correcta
+        self.serie = serie.replace(' ', '-')  # ruta correcta
         self.cap = capitulo
         self.temp = temporada
         self.textEdit = textEdit
@@ -37,7 +38,7 @@ class mythread(QtCore.QThread):
         self.url = 'http://torrentlocura.com/descargar-seriehd/{}/capitulo-{}{}/hdtv-720p-ac3-5-1/'
         self.url2 = 'http://torrentlocura.com/serie/{}/capitulo-{}{}/hdtv-720p-ac3-5-1/'
 
-    def run(self):
+    def run(self) -> NoReturn:
         ruta = self.conf['RutaDescargas']
         self.total.emit(int(self.cap))
         for i in range(1, self.cap + 1):
@@ -50,7 +51,7 @@ class mythread(QtCore.QThread):
             try:
                 fichero = '{}/{}_{}x{}.torrent'.format(ruta, self.serie, self.temp, i)
                 # al ser un or si la primera retorna true no comprueba la segunda
-                if(self.tryGetUrl(self.url, i, fichero) or self.tryGetUrl(self.url2, i, fichero)):
+                if (self.tryGetUrl(self.url, i, fichero) or self.tryGetUrl(self.url2, i, fichero)):
                     if self.sendTg:
                         self.telegram.sendFile(fichero)
                         # fichero = '{}/{}x{}.torrent'.format(ruta, self.serie, i)
@@ -64,7 +65,7 @@ class mythread(QtCore.QThread):
 
         logger.info("fin")
 
-    def tryGetUrl(self, url, capitulo, fichero):
+    def tryGetUrl(self, url: str, capitulo: str, fichero: str) -> bool:
         urlFormat = url.format(self.serie, self.temp, capitulo)
         logger.debug(urlFormat)
         try:
@@ -83,9 +84,8 @@ class mythread(QtCore.QThread):
             return False
 
 
-
 class torrentlocuraCompleta(QtWidgets.QDialog):
-    def __init__(self, parent=None):
+    def __init__(self, parent: object = None) -> NoReturn:
         QtWidgets.QWidget.__init__(self, parent)
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
@@ -112,18 +112,18 @@ class torrentlocuraCompleta(QtWidgets.QDialog):
         self.ui.pushButtonCerrar.clicked.connect(self.close)
         self.ui.checkBoxTg.clicked.connect(self.checkTg)
 
-    def checkTg(self):
+    def checkTg(self) -> NoReturn:
         if self.ui.checkBoxTg.isChecked():
             self.envioTg = True
         else:
             self.envioTg = False
 
-    def update(self):
+    def update(self) -> NoReturn:
         self.n += 1
         logger.debug(self.n)
         self.ui.progressBar.setValue(self.n)
 
-    def campoTemporada(self):
+    def campoTemporada(self) -> NoReturn:
         """
         Si en la lista de temporadas seleccionamos otra se abre un line edit para poner el numero de temporada que 
         no esta, si lo cambiamos se oculta
@@ -138,7 +138,7 @@ class torrentlocuraCompleta(QtWidgets.QDialog):
             self.ui.lineTemp.setVisible(False)
             self.ui.lineTemp.setText(str(self.ui.BoxTemporada.currentText()))
 
-    def campoCapitulos(self):
+    def campoCapitulos(self) -> NoReturn:
         """
         Si en la lista de temporadas seleccionamos otra se abre un line edit para poner el numero de temporada que 
         no esta, si lo cambiamos se oculta
@@ -153,7 +153,7 @@ class torrentlocuraCompleta(QtWidgets.QDialog):
             self.ui.lineCap.setVisible(False)
             self.ui.lineCap.setText(str(self.ui.BoxCapitulos.currentText()))
 
-    def listaTemporadas(self, x, y):
+    def listaTemporadas(self, x, y) -> NoReturn:
         """
         Crea el comboBox de las temporadas, primero lo vacia y luego lo crea con los rangos que le indico
         """
@@ -166,7 +166,7 @@ class torrentlocuraCompleta(QtWidgets.QDialog):
         self.ui.BoxTemporada.addItems(listTemp)
         self.ui.BoxTemporada.addItem(self.Otra)
 
-    def listaCapitulos(self):
+    def listaCapitulos(self) -> NoReturn:
         """
         Crea el comboBox de las temporadas, primero lo vacia y luego lo crea con los rangos que le indico
         """
@@ -183,7 +183,7 @@ class torrentlocuraCompleta(QtWidgets.QDialog):
         self.ui.BoxCapitulos.addItems(listCap)
         self.ui.BoxCapitulos.addItem(self.Otra)
 
-    def aplicaCambios(self):
+    def aplicaCambios(self) -> NoReturn:
         """
         Recoge todos los valores que necesita, crea el update y lo ejecuta
         """
@@ -206,7 +206,7 @@ class torrentlocuraCompleta(QtWidgets.QDialog):
             self.ui.textEdit.append('Introduce una nombre')
 
     @staticmethod
-    def getDatos(parent=None):
+    def getDatos(parent: object = None) -> NoReturn:
         dialog = torrentlocuraCompleta(parent)
         dialog.exec_()
 
