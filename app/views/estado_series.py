@@ -5,23 +5,23 @@ import sys
 from typing import List, NoReturn
 
 from PyQt5 import QtWidgets
+from app.views.ui.estado_series_ui import Ui_Dialog
 
 from app import logger
 from app.modulos.connect_sqlite import conectionSQLite, ejecutaScriptSqlite
 from app.modulos.settings import ruta_db
 from app.modulos.tviso import conectTviso
-from app.views.ui.estado_series_ui import Ui_Dialog
 
 
 class EstadoSeries(QtWidgets.QDialog):
-    def __init__(self, parent: object = None, dbSeries: str = None) -> NoReturn:
+    def __init__(self, parent: object = None, database: str = None) -> NoReturn:
         QtWidgets.QWidget.__init__(self, parent)
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
         self.EstadoI = 'Ok'  # estado inicial
         self.EstadoF = 'Cancelado'  # final
         self.EstadoA = self.EstadoI  # actual
-        self.db = dbSeries
+        self.db = database
 
         # str de consultas que se ejecutaran al final
         self.QueryCompleta = str()
@@ -192,14 +192,14 @@ class EstadoSeries(QtWidgets.QDialog):
             self.accept()
 
     @staticmethod
-    def getDatos(parent: object = None, dbSeries: str = None) -> NoReturn:
-        dialog = EstadoSeries(parent, dbSeries)
+    def get_data(parent: object = None, database: str = None) -> NoReturn:
+        dialog = EstadoSeries(parent, database)
         dialog.exec_()
 
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
-    EstadoSeries.getDatos(dbSeries=ruta_db)
+    EstadoSeries.get_data(database=ruta_db)
     return app
 
 

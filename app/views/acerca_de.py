@@ -4,7 +4,6 @@ import sys
 from typing import NoReturn
 
 from PyQt5 import QtGui, QtWidgets
-
 from app.views.ui.acerca_de_ui import Ui_Dialog
 
 
@@ -45,14 +44,14 @@ class AcercaDe(QtWidgets.QDialog):
         self.ui.pushButtonClose.clicked.connect(self.close)
 
     @staticmethod
-    def getDatos(parent=None) -> NoReturn:
+    def get_data(parent=None) -> NoReturn:
         dialog = AcercaDe(parent)
         dialog.exec_()
 
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
-    AcercaDe.getDatos()
+    AcercaDe.get_data()
 
     return app
 

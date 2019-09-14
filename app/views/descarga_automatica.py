@@ -8,13 +8,13 @@ import sys
 from typing import NoReturn
 
 from PyQt5 import QtWidgets, QtCore
+from app.views.ui.descarga_automatica_ui import Ui_Dialog
 
 from app.modulos import funciones
 from app.modulos.connect_sqlite import conectionSQLite
 from app.modulos.settings import ruta_db
 from app.views.descarga_automatica_cli import DescargaAutomaticaCli
 from app.views.msgbox import MsgBox
-from app.views.ui.descarga_automatica_ui import Ui_Dialog
 
 
 # https://gist.github.com/kaotika/e8ca5c340ec94f599fb2
@@ -25,11 +25,11 @@ class mythread(QtCore.QThread, DescargaAutomaticaCli):
     update = QtCore.pyqtSignal()
 
     def __init__(self, parent: QtWidgets.QProgressBar, objVistas: QtWidgets.QTextEdit,
-                 objDescargas: QtWidgets.QTextEdit, dbSeries: str = None, query: str = None) -> NoReturn:
+                 objDescargas: QtWidgets.QTextEdit, database: str = None, query: str = None) -> NoReturn:
         super(mythread, self).__init__(parent)
         self.objVistas = objVistas
         self.objDescargas = objDescargas
-        self.db = dbSeries
+        self.db = database
         self.query = query
 
     def run(self) -> NoReturn:
@@ -50,14 +50,14 @@ class mythread(QtCore.QThread, DescargaAutomaticaCli):
 
 
 class DescargaAutomatica(QtWidgets.QDialog):
-    def __init__(self, parent: object = None, dbSeries: str = None) -> NoReturn:
+    def __init__(self, parent: object = None, database: str = None) -> NoReturn:
         QtWidgets.QWidget.__init__(self, parent)
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
         self.otra = 'otra'  # campo otra del formulario
         self.estadoI = 'Ok'  # estado inicial
         self.n = 0
-        self.db = dbSeries
+        self.db = database
         self.setWindowTitle('Descarga automatica de newpct1')
         self.ui.progressBar.setValue(self.n)
 
@@ -82,9 +82,9 @@ class DescargaAutomatica(QtWidgets.QDialog):
         self.ui.progressBar.setValue(self.n)
 
     @staticmethod
-    def getDatos(parent: object = None, dbSeries: str = None) -> NoReturn:
+    def get_data(parent: object = None, database: str = None) -> NoReturn:
         if funciones.internetOn():
-            dialog = DescargaAutomatica(parent, dbSeries)
+            dialog = DescargaAutomatica(parent, database)
             dialog.exec_()
         else:
             dat = {'title': 'Error de internet', 'text': 'No hay internet'}
@@ -93,7 +93,7 @@ class DescargaAutomatica(QtWidgets.QDialog):
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
-    DescargaAutomatica.getDatos(dbSeries=ruta_db)
+    DescargaAutomatica.get_data(database=ruta_db)
     return app
 
 

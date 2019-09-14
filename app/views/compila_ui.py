@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import glob
 import os
+
 from app import logger
 
 fich = glob.glob("ui/*.ui")

@@ -10,26 +10,26 @@ import time
 
 import feedparser
 
+from app import logger
 from app.modulos import funciones
 from app.modulos.connect_sqlite import conectionSQLite, ejecutaScriptSqlite
 from app.modulos.mail2 import ML2
 from app.modulos.pushbullet2 import PB2
-from app.modulos.settings import modo_debug, directorio_trabajo, ruta_db
+from app.modulos.settings import directorio_trabajo, ruta_db
 from app.modulos.telegram2 import TG2
-from app import logger
-
 
 # https://gist.github.com/kaotika/e8ca5c340ec94f599fb2
 
-SERIE_DEBUG="NoAtlantis"
+SERIE_DEBUG = "NoAtlantis"
+
 
 class DescargaAutomaticaCli():
-    def __init__(self, dbSeries=None):
+    def __init__(self, database=None):
         if funciones.internetOn():
-            if dbSeries is None:  # en herencia no mando ruta
+            if database is None:  # en herencia no mando ruta
                 self.db = ruta_db
             else:
-                self.db = dbSeries
+                self.db = database
 
             self.notificaciones = self.muestraNotificaciones()  # variable publica
 
@@ -95,7 +95,7 @@ class DescargaAutomaticaCli():
                 else:
                     SerieActualNew = SerieActualTemp
             except Exception as e:
-                logger.error('################' ,i['Nombre'], ' FALLO: ', e)
+                logger.error('################', i['Nombre'], ' FALLO: ', e)
 
         if len(self.ultimaSerieNew) != 0:  # or len(self.ultimaSerieShow) != 0:
             logger.info(self.actualizaDia)
@@ -148,14 +148,14 @@ class DescargaAutomaticaCli():
         for i in d.entries:
             self.titleSerie = funciones.eliminaTildes(i.title)
             # cuando llegamos al ultimo capitulo pasamos a la siguiente serie
-            #logger.info(self.titleSerie, ".........", ultimaSerie, ".FIN")
+            # logger.info(self.titleSerie, ".........", ultimaSerie, ".FIN")
             if self.titleSerie == ultimaSerie:
                 # retornamos el valor que luego usaremos en ultima serie para guardarlo en el fichero
                 return funciones.eliminaTildes(d.entries[0].title)
 
-            regex_vose = '(?i){} ({}|{}|{}).*'.format(funciones.escapaParentesis(serie.lower()), tem, tem+1, tem+2)
+            regex_vose = '(?i){} ({}|{}|{}).*'.format(funciones.escapaParentesis(serie.lower()), tem, tem + 1, tem + 2)
             regex_cast = '(?i){}( \(Proper\))?( )*- Temporada( )?\d+ \[HDTV 720p?\]\[Cap\.({}|{}|{})\d+(_\d+)?\]\[A.*'.format(
-                funciones.escapaParentesis(serie.lower()), tem, tem+1, tem+2)
+                funciones.escapaParentesis(serie.lower()), tem, tem + 1, tem + 2)
 
             if serie.lower() == SERIE_DEBUG.lower():
                 logger.info('{}->{}'.format(regex_cast, self.titleSerie))
@@ -170,13 +170,13 @@ class DescargaAutomaticaCli():
                     estado = True
 
             if estado:
-                titleSerie = self.titleSerie # conversion necesaria para usar como str
+                titleSerie = self.titleSerie  # conversion necesaria para usar como str
                 if vose == 'Si':
                     torrent = i.link
                 else:
                     torrent = funciones.descargaUrlTorrent(i.link)
 
-                try: # arreglar problema codificacion de algunas series
+                try:  # arreglar problema codificacion de algunas series
                     logger.info(titleSerie)
                 except:
                     titleSerie = titleSerie.replace(u"\uFFFD", "?")
@@ -256,7 +256,7 @@ class DescargaAutomaticaCli():
 
 
 def main():
-    DescargaAutomaticaCli(dbSeries=ruta_db).run()
+    DescargaAutomaticaCli(database=ruta_db).run()
 
 
 if __name__ == '__main__':

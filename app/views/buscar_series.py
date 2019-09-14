@@ -4,23 +4,23 @@ import sys
 from typing import NoReturn
 
 from PyQt5 import QtWidgets
+from app.views.ui.buscar_series_ui import Ui_Dialog
 
 from app import logger
 from app.modulos.connect_sqlite import conectionSQLite
 from app.modulos.settings import ruta_db
 from app.views.actualizar_insertar import ActualizarInsertar
-from app.views.ui.buscar_series_ui import Ui_Dialog
 
 
 class BuscarSeries(QtWidgets.QDialog):
-    def __init__(self, parent: object = None, dbSeries: str = None) -> NoReturn:
+    def __init__(self, parent: object = None, database: str = None) -> NoReturn:
         QtWidgets.QWidget.__init__(self, parent)
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
         self.EstadoI = 'Ok'  # estado inicial
         self.EstadoF = 'Cancelado'  # final
         self.EstadoA = self.EstadoI  # actual
-        self.db = dbSeries
+        self.db = database
 
         self.setWindowTitle('Buscador de series')
 
@@ -65,8 +65,8 @@ class BuscarSeries(QtWidgets.QDialog):
                 i.text())
             ser = conectionSQLite(self.db, query, True)[0]
 
-            ActualizarInsertar.getDatos(
-                datSerie=ser, dbSeries=self.db)
+            ActualizarInsertar.get_data(
+                data_serie=ser, database=self.db)
 
     def cancela(self) -> NoReturn:
         """
@@ -77,14 +77,14 @@ class BuscarSeries(QtWidgets.QDialog):
         self.reject()
 
     @staticmethod
-    def getDatos(parent: object = None, dbSeries: str = None) -> NoReturn:
-        dialog = BuscarSeries(parent, dbSeries)
+    def get_data(parent: object = None, database: str = None) -> NoReturn:
+        dialog = BuscarSeries(parent, database)
         dialog.exec_()
 
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
-    BuscarSeries.getDatos(dbSeries=ruta_db)
+    BuscarSeries.get_data(database=ruta_db)
     return app
 
 

@@ -10,6 +10,7 @@ from typing import List, NoReturn
 
 # TERCEROS
 from PyQt5 import QtGui, QtWidgets, QtCore
+from app.views.ui.series_ui import Ui_MainWindow
 
 from app import logger
 from app.models.model_serie import Serie
@@ -29,7 +30,6 @@ from app.views import msgbox
 from app.views import newpct1_completa
 from app.views import notificaciones
 from app.views import preferencias
-from app.views.ui.series_ui import Ui_MainWindow
 
 
 class Series(QtWidgets.QMainWindow):
@@ -346,35 +346,35 @@ class Series(QtWidgets.QMainWindow):
         Muestra todas las series activas con un boton de sumar o restar capitulos
         """
 
-        lista_activa.ListaActiva.getDatos(dbSeries=self.database)
+        lista_activa.ListaActiva.get_data(database=self.database)
 
     def menListar(self) -> NoReturn:
         """
         Muestra las series para hacer modificaciones en masa
         """
 
-        listar_todas.ListarTodas.getDatos(dbSeries=self.database)
+        listar_todas.ListarTodas.get_data(database=self.database)
 
     def menActualizaSerie(self) -> NoReturn:
         """
         Busca una serie especifica en la bd y te abre la ventana de modificacion de la serie
         """
 
-        buscar_series.BuscarSeries.getDatos(dbSeries=self.database)
+        buscar_series.BuscarSeries.get_data(database=self.database)
 
     def menInsertar(self) -> NoReturn:
         """
         Abre una ventana para meter una nueva serie en la bd
         """
 
-        actualizar_insertar.ActualizarInsertar.getDatos(dbSeries=self.database)
+        actualizar_insertar.ActualizarInsertar.get_data(database=self.database)
 
     def RevisaEstadoSeries(self):
         """
         Revisa los estados de las series, si empiezan temporada, acaban temporadao acaban serie
         """
 
-        estado_series.EstadoSeries.getDatos(dbSeries=self.database)
+        estado_series.EstadoSeries.get_data(database=self.database)
 
     @staticmethod
     def menActualizarImdb() -> NoReturn:
@@ -391,7 +391,7 @@ class Series(QtWidgets.QMainWindow):
             dat = {'title': 'No existe el directorio', 'text': 'El directorio {} no existe'.format(rutaDesc)}
             msgbox.MsgBox.getData(datos=dat)
         else:
-            descarga_automatica.DescargaAutomatica.getDatos(dbSeries=self.database)
+            descarga_automatica.DescargaAutomatica.get_data(database=self.database)
 
     @staticmethod
     def menCompletoNewpct1() -> NoReturn:
@@ -402,7 +402,7 @@ class Series(QtWidgets.QMainWindow):
             dat = {'title': 'No existe el directorio', 'text': 'El directorio {} no existe'.format(rutaDesc)}
             msgbox.MsgBox.getData(datos=dat)
         else:
-            newpct1_completa.Newpct1Completa.getDatos()
+            newpct1_completa.Newpct1Completa.get_data()
 
     @staticmethod
     def abrirDirectorioDatos() -> NoReturn:
@@ -427,10 +427,10 @@ class Series(QtWidgets.QMainWindow):
 
     # PREFERENCIAS
     def menPreferencias(self) -> NoReturn:
-        preferencias.Preferencias.getDatos(dbSeries=self.database)
+        preferencias.Preferencias.get_data(database=self.database)
 
     def menNotificaciones(self) -> NoReturn:
-        notificaciones.Notificaciones.getDatos(dbSeries=self.database)
+        notificaciones.Notificaciones.get_data(database=self.database)
 
     def menSeleccionaLog(self, num: str) -> NoReturn:
         """
@@ -473,11 +473,11 @@ class Series(QtWidgets.QMainWindow):
 
     @staticmethod
     def menAsistenteInicial() -> NoReturn:
-        asistente_inicial.AsistenteInicial.getDatos(ruta=directorio_trabajo)
+        asistente_inicial.AsistenteInicial.get_data(ruta=directorio_trabajo)
 
     @staticmethod
     def menAcercaDe() -> NoReturn:
-        acerca_de.AcercaDe.getDatos()
+        acerca_de.AcercaDe.get_data()
 
 
 def main():

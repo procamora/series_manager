@@ -8,6 +8,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
@@ -22,12 +23,14 @@ class Ui_Dialog(object):
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.textEditVistas = QtWidgets.QTextEdit(Dialog)
         self.textEditVistas.setEnabled(False)
-        self.textEditVistas.setTextInteractionFlags(QtCore.Qt.TextSelectableByKeyboard|QtCore.Qt.TextSelectableByMouse)
+        self.textEditVistas.setTextInteractionFlags(
+            QtCore.Qt.TextSelectableByKeyboard | QtCore.Qt.TextSelectableByMouse)
         self.textEditVistas.setObjectName("textEditVistas")
         self.horizontalLayout.addWidget(self.textEditVistas)
         self.textEditDescargadas = QtWidgets.QTextEdit(Dialog)
         self.textEditDescargadas.setEnabled(False)
-        self.textEditDescargadas.setTextInteractionFlags(QtCore.Qt.TextSelectableByKeyboard|QtCore.Qt.TextSelectableByMouse)
+        self.textEditDescargadas.setTextInteractionFlags(
+            QtCore.Qt.TextSelectableByKeyboard | QtCore.Qt.TextSelectableByMouse)
         self.textEditDescargadas.setObjectName("textEditDescargadas")
         self.horizontalLayout.addWidget(self.textEditDescargadas)
         self.gridLayout.addLayout(self.horizontalLayout, 0, 0, 1, 1)
@@ -56,14 +59,15 @@ class Ui_Dialog(object):
         Dialog.setWindowTitle(_translate("Dialog", "Dialog"))
         self.pushButtonCerrar.setText(_translate("Dialog", "Cerrar"))
 
+
 import app.views.ui.fatcow_rc
 
 if __name__ == "__main__":
     import sys
+
     app = QtWidgets.QApplication(sys.argv)
     Dialog = QtWidgets.QDialog()
     ui = Ui_Dialog()
     ui.setupUi(Dialog)
     Dialog.show()
     sys.exit(app.exec_())
-

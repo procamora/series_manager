@@ -8,6 +8,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -296,14 +297,15 @@ class Ui_MainWindow(object):
         self.actionDescarga_Automatica.setText(_translate("MainWindow", "Descarga Automatica"))
         self.actionAsistente_inicial.setText(_translate("MainWindow", "Asistente inicial"))
 
+
 import app.views.ui.fatcow_rc
 
 if __name__ == "__main__":
     import sys
+
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
     MainWindow.show()
     sys.exit(app.exec_())
-

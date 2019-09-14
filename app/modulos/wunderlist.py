@@ -5,7 +5,6 @@ from datetime import datetime
 
 from wunderpy import Wunderlist
 
-
 # https://github.com/bsmt/wunderpy
 
 w = Wunderlist()

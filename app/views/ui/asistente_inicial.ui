@@ -1,148 +1,157 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Dialog</class>
- <widget class="QDialog" name="Dialog">
-  <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>385</width>
-    <height>124</height>
-   </rect>
-  </property>
-  <property name="windowTitle">
-   <string>Dialog</string>
-  </property>
-  <property name="windowIcon">
-   <iconset resource="fatcow.qrc">
-    <normaloff>:/Iconos/Icons/fatcow/Principal.png</normaloff>:/Iconos/Icons/fatcow/Principal.png</iconset>
-  </property>
-  <layout class="QGridLayout" name="gridLayout">
-   <item row="2" column="0">
-    <widget class="QWidget" name="WidgetBotones" native="true">
-     <layout class="QHBoxLayout" name="horizontalLayout_2">
-      <item>
-       <widget class="QLabel" name="label">
-        <property name="text">
-         <string/>
+    <class>Dialog</class>
+    <widget class="QDialog" name="Dialog">
+        <property name="geometry">
+            <rect>
+                <x>0</x>
+                <y>0</y>
+                <width>385</width>
+                <height>124</height>
+            </rect>
         </property>
-       </widget>
-      </item>
-      <item>
-       <spacer name="horizontalSpacer">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+        <property name="windowTitle">
+            <string>Dialog</string>
         </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
+        <property name="windowIcon">
+            <iconset resource="fatcow.qrc">
+                <normaloff>:/Iconos/Icons/fatcow/Principal.png</normaloff>:/Iconos/Icons/fatcow/Principal.png
+            </iconset>
         </property>
-       </spacer>
-      </item>
-      <item>
-       <widget class="QPushButton" name="pushButtonAplicar">
-        <property name="text">
-         <string>Aplicar</string>
-        </property>
-        <property name="icon">
-         <iconset resource="fatcow.qrc">
-          <normaloff>:/Iconos/Icons/fatcow/accept_button.png</normaloff>:/Iconos/Icons/fatcow/accept_button.png</iconset>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="pushButtonCerrar">
-        <property name="text">
-         <string>Cerrar</string>
-        </property>
-        <property name="icon">
-         <iconset resource="fatcow.qrc">
-          <normaloff>:/Iconos/Icons/fatcow/cancel.png</normaloff>:/Iconos/Icons/fatcow/cancel.png</iconset>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="pushButtonAceptar">
-        <property name="text">
-         <string>Aceptar</string>
-        </property>
-        <property name="icon">
-         <iconset resource="fatcow.qrc">
-          <normaloff>:/Iconos/Icons/fatcow/file_save_as.png</normaloff>:/Iconos/Icons/fatcow/file_save_as.png</iconset>
-        </property>
-       </widget>
-      </item>
-     </layout>
+        <layout class="QGridLayout" name="gridLayout">
+            <item row="2" column="0">
+                <widget class="QWidget" name="WidgetBotones" native="true">
+                    <layout class="QHBoxLayout" name="horizontalLayout_2">
+                        <item>
+                            <widget class="QLabel" name="label">
+                                <property name="text">
+                                    <string/>
+                                </property>
+                            </widget>
+                        </item>
+                        <item>
+                            <spacer name="horizontalSpacer">
+                                <property name="orientation">
+                                    <enum>Qt::Horizontal</enum>
+                                </property>
+                                <property name="sizeHint" stdset="0">
+                                    <size>
+                                        <width>40</width>
+                                        <height>20</height>
+                                    </size>
+                                </property>
+                            </spacer>
+                        </item>
+                        <item>
+                            <widget class="QPushButton" name="pushButtonAplicar">
+                                <property name="text">
+                                    <string>Aplicar</string>
+                                </property>
+                                <property name="icon">
+                                    <iconset resource="fatcow.qrc">
+                                        <normaloff>:/Iconos/Icons/fatcow/accept_button.png</normaloff>
+                                        :/Iconos/Icons/fatcow/accept_button.png
+                                    </iconset>
+                                </property>
+                            </widget>
+                        </item>
+                        <item>
+                            <widget class="QPushButton" name="pushButtonCerrar">
+                                <property name="text">
+                                    <string>Cerrar</string>
+                                </property>
+                                <property name="icon">
+                                    <iconset resource="fatcow.qrc">
+                                        <normaloff>:/Iconos/Icons/fatcow/cancel.png</normaloff>
+                                        :/Iconos/Icons/fatcow/cancel.png
+                                    </iconset>
+                                </property>
+                            </widget>
+                        </item>
+                        <item>
+                            <widget class="QPushButton" name="pushButtonAceptar">
+                                <property name="text">
+                                    <string>Aceptar</string>
+                                </property>
+                                <property name="icon">
+                                    <iconset resource="fatcow.qrc">
+                                        <normaloff>:/Iconos/Icons/fatcow/file_save_as.png</normaloff>
+                                        :/Iconos/Icons/fatcow/file_save_as.png
+                                    </iconset>
+                                </property>
+                            </widget>
+                        </item>
+                    </layout>
+                </widget>
+            </item>
+            <item row="1" column="0">
+                <widget class="QWidget" name="Widget1" native="true">
+                    <layout class="QHBoxLayout" name="horizontalLayout">
+                        <item>
+                            <widget class="QPushButton" name="pushButtonRuta">
+                                <property name="maximumSize">
+                                    <size>
+                                        <width>35</width>
+                                        <height>16777215</height>
+                                    </size>
+                                </property>
+                                <property name="text">
+                                    <string/>
+                                </property>
+                                <property name="icon">
+                                    <iconset resource="fatcow.qrc">
+                                        <normaloff>:/Iconos/Icons/fatcow/folder_search.png</normaloff>
+                                        :/Iconos/Icons/fatcow/folder_search.png
+                                    </iconset>
+                                </property>
+                            </widget>
+                        </item>
+                        <item>
+                            <widget class="QLineEdit" name="lineRuta">
+                                <property name="enabled">
+                                    <bool>false</bool>
+                                </property>
+                            </widget>
+                        </item>
+                    </layout>
+                </widget>
+            </item>
+            <item row="0" column="0">
+                <widget class="QWidget" name="WidgetDir" native="true">
+                    <layout class="QHBoxLayout" name="horizontalLayout_3">
+                        <item>
+                            <widget class="QCheckBox" name="checkBoxSync">
+                                <property name="text">
+                                    <string>Directorio instalacion personalizada</string>
+                                </property>
+                            </widget>
+                        </item>
+                        <item>
+                            <widget class="QCheckBox" name="checkBoxValido">
+                                <property name="enabled">
+                                    <bool>false</bool>
+                                </property>
+                                <property name="text">
+                                    <string>Valido</string>
+                                </property>
+                            </widget>
+                        </item>
+                    </layout>
+                </widget>
+            </item>
+        </layout>
     </widget>
-   </item>
-   <item row="1" column="0">
-    <widget class="QWidget" name="Widget1" native="true">
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <item>
-       <widget class="QPushButton" name="pushButtonRuta">
-        <property name="maximumSize">
-         <size>
-          <width>35</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="icon">
-         <iconset resource="fatcow.qrc">
-          <normaloff>:/Iconos/Icons/fatcow/folder_search.png</normaloff>:/Iconos/Icons/fatcow/folder_search.png</iconset>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLineEdit" name="lineRuta">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="0" column="0">
-    <widget class="QWidget" name="WidgetDir" native="true">
-     <layout class="QHBoxLayout" name="horizontalLayout_3">
-      <item>
-       <widget class="QCheckBox" name="checkBoxSync">
-        <property name="text">
-         <string>Directorio instalacion personalizada</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QCheckBox" name="checkBoxValido">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="text">
-         <string>Valido</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-  </layout>
- </widget>
- <tabstops>
-  <tabstop>checkBoxSync</tabstop>
-  <tabstop>pushButtonRuta</tabstop>
-  <tabstop>lineRuta</tabstop>
-  <tabstop>pushButtonAplicar</tabstop>
-  <tabstop>pushButtonCerrar</tabstop>
-  <tabstop>pushButtonAceptar</tabstop>
-  <tabstop>checkBoxValido</tabstop>
- </tabstops>
- <resources>
-  <include location="fatcow.qrc"/>
- </resources>
- <connections/>
+    <tabstops>
+        <tabstop>checkBoxSync</tabstop>
+        <tabstop>pushButtonRuta</tabstop>
+        <tabstop>lineRuta</tabstop>
+        <tabstop>pushButtonAplicar</tabstop>
+        <tabstop>pushButtonCerrar</tabstop>
+        <tabstop>pushButtonAceptar</tabstop>
+        <tabstop>checkBoxValido</tabstop>
+    </tabstops>
+    <resources>
+        <include location="fatcow.qrc"/>
+    </resources>
+    <connections/>
 </ui>

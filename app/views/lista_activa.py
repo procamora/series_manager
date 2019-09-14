@@ -5,14 +5,14 @@ import sys
 from typing import NoReturn
 
 from PyQt5 import QtWidgets, QtSql
+from app.views.ui.lista_activa_ui import Ui_Dialog
 
 from app import logger
 from app.modulos.settings import ruta_db
-from app.views.ui.lista_activa_ui import Ui_Dialog
 
 
 class ListaActiva(QtWidgets.QDialog):
-    def __init__(self, parent: object = None, dbSeries: str = None) -> NoReturn:
+    def __init__(self, parent: object = None, database: str = None) -> NoReturn:
         QtWidgets.QWidget.__init__(self, parent)
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
@@ -20,7 +20,7 @@ class ListaActiva(QtWidgets.QDialog):
         self.estadoI = 'Ok'  # estado inicial
         self.estadoF = 'Cancelado'  # final
         self.estadoA = self.estadoI  # actual
-        self.db = dbSeries
+        self.db = database
 
         self.setWindowTitle('Series Activas')
 
@@ -78,14 +78,14 @@ class ListaActiva(QtWidgets.QDialog):
             self.accept()
 
     @staticmethod
-    def getDatos(parent: object = None, dbSeries: str = None) -> NoReturn:
-        dialog = ListaActiva(parent, dbSeries)
+    def get_data(parent: object = None, database: str = None) -> NoReturn:
+        dialog = ListaActiva(parent, database)
         dialog.exec_()
 
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
-    ListaActiva.getDatos(dbSeries=ruta_db)
+    ListaActiva.get_data(database=ruta_db)
     return app
 
 

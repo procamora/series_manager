@@ -125,15 +125,15 @@ class feedparserPropio:
 
 
 class DescargaAutomaticaCli():
-    def __init__(self, dbSeries: str = None) -> NoReturn:
+    def __init__(self, database: str = None) -> NoReturn:
         if funciones.internetOn():
             self._logger = logger
             self._logger.debug('Start')
 
-            if dbSeries is None:  # en herencia no mando ruta
+            if database is None:  # en herencia no mando ruta
                 self.db = ruta_db
             else:
-                self.db = dbSeries
+                self.db = database
 
             self.notificaciones = self.muestraNotificaciones()  # variable publica
 
@@ -359,7 +359,7 @@ class DescargaAutomaticaCli():
 
 
 def main():
-    d = DescargaAutomaticaCli(dbSeries=ruta_db)
+    d = DescargaAutomaticaCli(database=ruta_db)
     d.run()
     # feedparserPropio.parse()
 

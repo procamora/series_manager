@@ -1,6 +1,6 @@
 <RCC>
-  <qresource prefix="new">
-    <file>personal.gif</file>
-    <file>personal.png</file>
-  </qresource>
+    <qresource prefix="new">
+        <file>personal.gif</file>
+        <file>personal.png</file>
+    </qresource>
 </RCC>

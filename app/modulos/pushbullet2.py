@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from pushbullet import Pushbullet
+
 from app import logger
+
 
 # https://github.com/randomchars/pushbullet.py
 

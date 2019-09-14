@@ -5,15 +5,15 @@ import sys
 from typing import NoReturn
 
 from PyQt5 import QtWidgets
+from app.views.ui.notificaciones_ui import Ui_Dialog
 
 from app import logger
 from app.modulos.connect_sqlite import conectionSQLite, ejecutaScriptSqlite
 from app.modulos.settings import ruta_db
-from app.views.ui.notificaciones_ui import Ui_Dialog
 
 
 class Notificaciones(QtWidgets.QDialog):
-    def __init__(self, parent: object = None, dbSeries: str = None) -> NoReturn:
+    def __init__(self, parent: object = None, database: str = None) -> NoReturn:
         QtWidgets.QWidget.__init__(self, parent)
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
@@ -21,7 +21,7 @@ class Notificaciones(QtWidgets.QDialog):
         self.estadoI = 'Ok'  # estado inicial
         self.estadoF = 'Cancelado'  # final
         self.estadoA = self.estadoI  # actual
-        self.db = dbSeries
+        self.db = database
         self.setWindowTitle('Notificaciones de la aplicacion')
 
         self.datodDb = list(dict())
@@ -163,14 +163,14 @@ class Notificaciones(QtWidgets.QDialog):
             self.accept()
 
     @staticmethod
-    def getDatos(parent: object = None, dbSeries: str = None) -> NoReturn:
-        dialog = Notificaciones(parent, dbSeries)
+    def get_data(parent: object = None, database: str = None) -> NoReturn:
+        dialog = Notificaciones(parent, database)
         dialog.exec_()
 
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
-    Notificaciones.getDatos(dbSeries=ruta_db)
+    Notificaciones.get_data(database=ruta_db)
     return app
 
 

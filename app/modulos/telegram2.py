@@ -13,6 +13,7 @@ except:  # Ejecucion local
 
 from app import logger
 
+
 class TG2():
     def __init__(self, chat_id):
         datosIniciales = self.datosIniciales()
@@ -62,7 +63,8 @@ class TG2():
         result = requests.request(method, request_url, params=params, files=files, timeout=(
             connect_timeout, read_timeout))
 
-        logger.debug(requests.request(method, request_url, params=params, files=files, timeout=(connect_timeout, read_timeout)))
+        logger.debug(
+            requests.request(method, request_url, params=params, files=files, timeout=(connect_timeout, read_timeout)))
 
         return json.loads(result.text)['ok']
 

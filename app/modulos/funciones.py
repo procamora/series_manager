@@ -5,6 +5,7 @@ import glob
 import os
 import re
 import time
+from typing import List, NoReturn
 
 import feedparser
 import requests
@@ -15,9 +16,6 @@ from bs4 import BeautifulSoup
 from app import logger
 from app.modulos.connect_sqlite import conectionSQLite, ejecutaScriptSqlite, dumpDatabase
 from app.modulos.settings import directorio_trabajo, directorio_local, nombre_db, ruta_db, sync_sqlite
-
-from typing import Dict, Any, List, Union, NoReturn
-
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -44,16 +42,16 @@ def creaDirectorioTrabajo() -> NoReturn:
             plantillaFicheroConf()
 
 
-def crearFichero(fichero)-> NoReturn:
+def crearFichero(fichero) -> NoReturn:
     with open(fichero, 'w') as f:
         f.write("")
 
 
-def cambiaBarras(texto)-> str:
+def cambiaBarras(texto) -> str:
     return texto.replace('\\', '/')
 
 
-def dbConfiguarion()-> List:
+def dbConfiguarion() -> List:
     """
     Funcion que obtiene los valores de la configuracion de un programa, devuelve el diciconario con los datos
 
@@ -72,7 +70,7 @@ def dbConfiguarion()-> List:
     return consulta
 
 
-def plantillaFicheroConf()-> NoReturn:
+def plantillaFicheroConf() -> NoReturn:
     """
     Si hay una configuracion en la la carpeta del programa la mueve a la carpeta
     de configuracion, sino la hay comprueba si existe el fichero, si existe y esta
@@ -93,7 +91,7 @@ def plantillaFicheroConf()-> NoReturn:
                 f.write("1")
 
 
-def plantillaDatabase()-> NoReturn:
+def plantillaDatabase() -> NoReturn:
     """
     Funcion encargada de checkear el correcto estado de la base de datos, si no existe la base de datos o esta vacia le
     cargo la estructura basica
@@ -109,7 +107,7 @@ def plantillaDatabase()-> NoReturn:
         ejecutaScriptSqlite(fichero_db, plantilla)
 
 
-def crearBackUpCompletoDB()-> NoReturn:
+def crearBackUpCompletoDB() -> NoReturn:
     """
     Funcion encargada de generar backup de la base de datos y guardarlo 
     """
@@ -413,7 +411,7 @@ def descargaUrlTorrentDonTorrentDirecto(direcc, bot=None, message=None):
         print(mtable['href'])
 
         return 'https://dontorrent.com{}'.format(mtable['href'])
-    
+
 
 def feedParser(url):
     """

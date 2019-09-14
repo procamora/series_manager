@@ -5,22 +5,22 @@ import sys
 from typing import NoReturn
 
 from PyQt5 import QtWidgets
+from app.views.ui.listar_todas_ui import Ui_Dialog
 
 from app import logger
 from app.modulos.connect_sqlite import conectionSQLite, ejecutaScriptSqlite
 from app.modulos.settings import ruta_db
-from app.views.ui.listar_todas_ui import Ui_Dialog
 
 
 class ListarTodas(QtWidgets.QDialog):
-    def __init__(self, parent: object = None, dbSeries: str = None) -> NoReturn:
+    def __init__(self, parent: object = None, database: str = None) -> NoReturn:
         QtWidgets.QWidget.__init__(self, parent)
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
         self.estadoI = 'Ok'  # estado inicial
         self.estadoF = 'Cancelado'  # final
         self.estadoA = self.estadoI  # actual
-        self.db = dbSeries
+        self.db = database
 
         # lista de consultas que se ejecutaran al final
         self.queryCompleta = str()
@@ -154,14 +154,14 @@ class ListarTodas(QtWidgets.QDialog):
             self.accept()
 
     @staticmethod
-    def getDatos(parent: object = None, dbSeries: str = None) -> NoReturn:
-        dialog = ListarTodas(parent, dbSeries)
+    def get_data(parent: object = None, database: str = None) -> NoReturn:
+        dialog = ListarTodas(parent, database)
         dialog.exec_()
 
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
-    ListarTodas.getDatos(dbSeries=ruta_db)
+    ListarTodas.get_data(database=ruta_db)
     return app
 
 

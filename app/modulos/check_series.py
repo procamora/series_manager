@@ -10,6 +10,7 @@ except:  # Ejecucion local
 
 from app import logger
 
+
 def acabada(write=False):
     queryAcabada = 'SELECT * FROM Series WHERE Acabada LIKE "Si" AND Estado <> "Finalizada"'
     query = conectionSQLite(ruta_db, queryAcabada, True)

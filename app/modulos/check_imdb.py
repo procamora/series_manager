@@ -2,9 +2,8 @@
 # -*- coding: utf-8 -*-
 
 
-from app.modulos.actualiza_imdb import actualizaImdb
-
 from app import logger
+from app.modulos.actualiza_imdb import actualizaImdb
 
 a = actualizaImdb()
 # logger.info((a.compruebaTitulo('tt1475582')))

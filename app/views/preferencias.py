@@ -5,16 +5,16 @@ import sys
 from typing import NoReturn
 
 from PyQt5 import QtWidgets
+from app.views.ui.preferencias_ui import Ui_Dialog
 
 from app import logger
 from app.modulos import funciones
 from app.modulos.connect_sqlite import conectionSQLite
 from app.modulos.settings import directorio_local, ruta_db
-from app.views.ui.preferencias_ui import Ui_Dialog
 
 
 class Preferencias(QtWidgets.QDialog):
-    def __init__(self, parent: object = None, dbSeries: str = None) -> NoReturn:
+    def __init__(self, parent: object = None, database: str = None) -> NoReturn:
         QtWidgets.QWidget.__init__(self, parent)
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
@@ -22,7 +22,7 @@ class Preferencias(QtWidgets.QDialog):
         self.estadoI = 'Ok'  # estado inicial
         self.estadoF = 'Cancelado'  # final
         self.estadoA = self.estadoI  # actual
-        self.db = dbSeries
+        self.db = database
         self.ruta = directorio_local
 
         self.setWindowTitle('Preferencias de configuracion')
@@ -183,14 +183,14 @@ class Preferencias(QtWidgets.QDialog):
             self.accept()
 
     @staticmethod
-    def getDatos(parent: object = None, dbSeries: str = None) -> NoReturn:
-        dialog = Preferencias(parent, dbSeries)
+    def get_data(parent: object = None, database: str = None) -> NoReturn:
+        dialog = Preferencias(parent, database)
         dialog.exec_()
 
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
-    Preferencias.getDatos(dbSeries=ruta_db)
+    Preferencias.get_data(database=ruta_db)
     return app
 
 

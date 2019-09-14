@@ -4,9 +4,9 @@
 """
 sudo apt-get install unrar-free
 """
-import re
-import os
 import glob
+import os
+import re
 import sys
 
 import rarfile
@@ -15,6 +15,7 @@ from bs4 import BeautifulSoup
 
 import app.modulos.telegram2 as TG2
 from app import logger
+
 
 def busca_pass(url):
     """

@@ -6,6 +6,7 @@ from __future__ import annotations
 import inspect
 from typing import NoReturn, Dict, List
 
+
 # FIXME CAMBIAR NOMBRE POR model_serie??? o eliminar el model del resto
 class Serie(object):
     def __init__(self) -> NoReturn:

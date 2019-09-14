@@ -5,6 +5,7 @@ import time
 
 from PyGtalkRobot import GtalkRobot
 
+
 ##########################################################################
 
 
@@ -18,7 +19,7 @@ class SampleBot(GtalkRobot):
     # U or UNICODE <=> (?u)         Make \w, \W, \b, and \B dependent on the Unicode character properties database.
     # X or VERBOSE <=> (?x)         Ignores whitespace outside character sets
 
-    #"command_" is the command prefix, "001" is the priviledge num, "setState" is the method name.
+    # "command_" is the command prefix, "001" is the priviledge num, "setState" is the method name.
     # This method is used to change the state and status text of the bot.
     def command_001_setState(self, user, message, args):
         # the __doc__ of the function is the Regular Expression of this command, if matched, this command method will be called.
@@ -43,7 +44,7 @@ class SampleBot(GtalkRobot):
         email_addr = args[0]
         subject = args[1]
         body = args[2]
-        #call_send_email_function(email_addr, subject,  body)
+        # call_send_email_function(email_addr, subject,  body)
 
         self.replyMessage(user, "\nEmail sent to " + email_addr +
                           " at: " + time.strftime("%Y-%m-%d %a %H:%M:%S", time.gmtime()))
@@ -53,6 +54,7 @@ class SampleBot(GtalkRobot):
         """.*?(?s)(?m)"""
         self.replyMessage(
             user, time.strftime("%Y-%m-%d %a %H:%M:%S", time.gmtime()))
+
 
 ##########################################################################
 if __name__ == "__main__":

@@ -4,6 +4,7 @@ import sys
 from typing import Dict, NoReturn
 
 from PyQt5 import QtWidgets
+from app.views.ui.actualizar_insertar_ui import Ui_Dialog
 
 from app import logger
 from app.modulos import funciones
@@ -11,34 +12,33 @@ from app.modulos.actualiza_imdb import actualizaImdb
 from app.modulos.connect_sqlite import conectionSQLite
 from app.modulos.settings import ruta_db
 from app.views.msgbox import MsgBox
-from app.views.ui.actualizar_insertar_ui import Ui_Dialog
 
 
 class ActualizarInsertar(QtWidgets.QDialog):
-    def __init__(self, parent=None, dbSeries: str = None, datSerie: Dict = None) -> NoReturn:
+    def __init__(self, parent=None, database: str = None, datSerie: Dict = None) -> NoReturn:
         QtWidgets.QWidget.__init__(self, parent)
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
-        self.otra = 'otra'  # campo otra del formulario
-        self.estadoI = 'Ok'  # estado inicial
-        self.estadoF = 'Cancelado'  # final
-        self.estadoA = self.estadoI  # actual
-        self.db = dbSeries
+        self.other = 'otra'  # campo otra del formulario
+        self.state_ok = 'Ok'  # estado inicial
+        self.state_cancel = 'Cancelado'  # final
+        self.state_current = self.state_ok  # actual
+        self.db = database
         self.datSerie = datSerie
 
         # para todos establezco esto que el estado es Activa, si actualizo lo
         # modifico en la funcion creaConf
-        self.listaEstados()
+        self.list_states()
 
-        allItems = [self.ui.BoxEstado.itemText(i) for i in range(self.ui.BoxEstado.count())]
-        if len(allItems) > 0:
-            self.ui.BoxEstado.setCurrentIndex(allItems.index('Activa'))
+        all_items = [self.ui.BoxEstado.itemText(i) for i in range(self.ui.BoxEstado.count())]
+        if len(all_items) > 0:
+            self.ui.BoxEstado.setCurrentIndex(all_items.index('Activa'))
 
         if self.datSerie is not None:  # Actualizar
             self.setWindowTitle('Actualizar serie: {}'.format(self.datSerie['Nombre']))
 
             # para poder modifical el nombre en el update
-            self.NombreOriginal = str(self.datSerie['Nombre'])
+            self.name_original = str(self.datSerie['Nombre'])
 
             self.ui.pushButtonAplicar.setText('Actualizar')
             self.creaConf()
@@ -53,9 +53,9 @@ class ActualizarInsertar(QtWidgets.QDialog):
             # pongo la fecha de hoy para insertar por defecto
             # recogo todos los dias de la caja y le paso el indice del dia en
             # el que sale
-            allItems = [self.ui.BoxEmision.itemText(i) for i in range(self.ui.BoxEmision.count())]
-            if len(allItems) > 0:
-                self.ui.BoxEmision.setCurrentIndex(allItems.index(funciones.calculaDiaSemana()))
+            all_items = [self.ui.BoxEmision.itemText(i) for i in range(self.ui.BoxEmision.count())]
+            if len(all_items) > 0:
+                self.ui.BoxEmision.setCurrentIndex(all_items.index(funciones.calculaDiaSemana()))
 
         # Ocultar textos
         self.ui.lineTemp.hide()
@@ -68,9 +68,9 @@ class ActualizarInsertar(QtWidgets.QDialog):
         self.ui.BoxTemporada.activated.connect(self.campoTemp)
         self.ui.BoxCapitulo.activated.connect(self.campoCap)
 
-        self.ui.pushButtonAplicar.clicked.connect(self.aplicaDatos)
-        self.ui.pushButtonCerrar.clicked.connect(self.cancela)
-        self.ui.pushButtonAceptar.clicked.connect(self.aceptaDatos)
+        self.ui.pushButtonAplicar.clicked.connect(self.apply_data)
+        self.ui.pushButtonCerrar.clicked.connect(self.cancel)
+        self.ui.pushButtonAceptar.clicked.connect(self.accept_data)
 
     def campoTemp(self) -> NoReturn:
         """
@@ -78,7 +78,7 @@ class ActualizarInsertar(QtWidgets.QDialog):
         para poner el numero de temporada que no esta, si lo cambiamos se oculta
         """
 
-        if self.ui.BoxTemporada.currentText() == self.otra:
+        if self.ui.BoxTemporada.currentText() == self.other:
             self.ui.lineTemp.setEnabled(True)
             self.ui.lineTemp.setVisible(True)
             self.ui.lineTemp.setText('')
@@ -93,7 +93,7 @@ class ActualizarInsertar(QtWidgets.QDialog):
         para poner el numero de capitulo que no esta, si lo cambiamos se oculta
         """
 
-        if str(self.ui.BoxCapitulo.currentText()) == self.otra:
+        if str(self.ui.BoxCapitulo.currentText()) == self.other:
             self.ui.lineCapitulo.setEnabled(True)
             self.ui.lineCapitulo.setVisible(True)
             self.ui.lineCapitulo.setText('')
@@ -115,7 +115,7 @@ class ActualizarInsertar(QtWidgets.QDialog):
 
         self.ui.BoxTemporada.clear()
         self.ui.BoxTemporada.addItems(listTemp)
-        self.ui.BoxTemporada.addItem(self.otra)
+        self.ui.BoxTemporada.addItem(self.other)
 
     def listaCapitulos(self, x: int, y: int) -> NoReturn:
         """
@@ -129,9 +129,9 @@ class ActualizarInsertar(QtWidgets.QDialog):
 
         self.ui.BoxCapitulo.clear()
         self.ui.BoxCapitulo.addItems(listCap)
-        self.ui.BoxCapitulo.addItem(self.otra)
+        self.ui.BoxCapitulo.addItem(self.other)
 
-    def listaEstados(self) -> NoReturn:
+    def list_states(self) -> NoReturn:
         """
         Crea el comboBox de los estados, primero lo vacia y
         luego lo crea con los rangos que le indico
@@ -163,9 +163,9 @@ class ActualizarInsertar(QtWidgets.QDialog):
             self.ui.radioSeguirNo.click()
 
         # recogo todos los dias de la caja y le paso el indice del dia en el que sale
-        allItems = [self.ui.BoxEmision.itemText(i) for i in range(self.ui.BoxEmision.count())]
-        if len(allItems) > 0:
-            self.ui.BoxEmision.setCurrentIndex(allItems.index(self.datSerie['Dia']))
+        all_items = [self.ui.BoxEmision.itemText(i) for i in range(self.ui.BoxEmision.count())]
+        if len(all_items) > 0:
+            self.ui.BoxEmision.setCurrentIndex(all_items.index(self.datSerie['Dia']))
 
         if self.datSerie['VOSE'] == 'Si':
             self.ui.radioVOSE_Si.click()
@@ -177,16 +177,16 @@ class ActualizarInsertar(QtWidgets.QDialog):
         else:
             self.ui.radioAcabadaNo.click()
 
-        allItems = [self.ui.BoxEstado.itemText(i) for i in range(self.ui.BoxEstado.count())]
-        if len(allItems) > 0:
-            self.ui.BoxEstado.setCurrentIndex(allItems.index(self.datSerie['Estado']))
+        all_items = [self.ui.BoxEstado.itemText(i) for i in range(self.ui.BoxEstado.count())]
+        if len(all_items) > 0:
+            self.ui.BoxEstado.setCurrentIndex(all_items.index(self.datSerie['Estado']))
 
         if self.datSerie['imdb_id'] is not None:
             self.ui.lineImdb.setText(self.datSerie['imdb_id'])
 
         self.ui.radioImdbNo.click()
 
-    def aplicaDatos(self) -> bool:
+    def apply_data(self) -> bool:
         """
         Recoge todos los valores que necesita, crea el update y lo ejecuta
         """
@@ -238,7 +238,7 @@ class ActualizarInsertar(QtWidgets.QDialog):
                     query = '''UPDATE series SET Nombre="{}", Temporada={}, Capitulo={}, Siguiendo="{}", Dia="{}", 
                     VOSE="{}", Acabada="{}", Estado="{}",imdb_id={} WHERE Nombre="{}"'''.format(
                         datos['Titulo'], datos['Temporada'], datos['Capitulo'], datos['Seguir'], datos['Emision'],
-                        datos['VOSE'], datos['Acabada'], datos['Estado'], datos['idImdb'], self.NombreOriginal)
+                        datos['VOSE'], datos['Acabada'], datos['Estado'], datos['idImdb'], self.name_original)
                 else:
                     query = '''INSERT INTO series(Nombre, Temporada, Capitulo, Siguiendo, Dia, VOSE, Acabada, Estado, 
                     imdb_id) VALUES ("{}", {}, {}, "{}", "{}", "{}", "{}", "{}", {})'''.format(
@@ -249,7 +249,7 @@ class ActualizarInsertar(QtWidgets.QDialog):
                     query = '''UPDATE series SET Nombre="{}", Temporada={}, Capitulo={}, Siguiendo="{}", Dia="{}", 
                     VOSE="{}", Acabada="{}", Estado="{}",imdb_id="{}" WHERE Nombre="{}"'''.format(
                         datos['Titulo'], datos['Temporada'], datos['Capitulo'], datos['Seguir'], datos['Emision'],
-                        datos['VOSE'], datos['Acabada'], datos['Estado'], datos['idImdb'], self.NombreOriginal)
+                        datos['VOSE'], datos['Acabada'], datos['Estado'], datos['idImdb'], self.name_original)
                 else:
                     query = '''INSERT INTO series(Nombre, Temporada, Capitulo, Siguiendo, Dia, VOSE, Acabada, Estado, 
                   imdb_id) VALUES ("{}", {}, {}, "{}", "{}", "{}", "{}", "{}", "{}")'''.format(
@@ -261,7 +261,7 @@ class ActualizarInsertar(QtWidgets.QDialog):
                     imbd_test = actualizaImdb()
 
                     if imbd_test.compruebaTitulo(datos['idImdb']):
-                        self.ejecutaImdb()
+                        self.execute_imdb()
                         conectionSQLite(self.db, query)
                         # Si es una inserccion despues de insertar vacio el
                         # titulo para poder hacer mas
@@ -292,7 +292,7 @@ class ActualizarInsertar(QtWidgets.QDialog):
             funciones.muestraMensaje(self.ui.label_Info, 'Titulo vacio', False)
             return False
 
-    def ejecutaImdb(self) -> NoReturn:
+    def execute_imdb(self) -> NoReturn:
         """
         Actualiza los datos de la serie de imdb siempre que el id no este vacio
         """
@@ -303,25 +303,25 @@ class ActualizarInsertar(QtWidgets.QDialog):
             logger.debug('actualiza imdb')
             a.actualizaSerie(id_imdb)
 
-    def aceptaDatos(self) -> NoReturn:
+    def accept_data(self) -> NoReturn:
         """
         Boton Aceptar, primero aplicas los datos, si retorna True, cierra la ventana
         """
 
-        if self.aplicaDatos():
+        if self.apply_data():
             self.accept()
 
-    def cancela(self) -> NoReturn:
+    def cancel(self) -> NoReturn:
         """
         Establece el estado actual en cancelado para retornar None y ejecuta reject
         """
 
-        self.estadoA = self.estadoF
+        self.state_current = self.state_cancel
         self.reject()
 
     @staticmethod
-    def getDatos(parent: object = None, datSerie: Dict = None, dbSeries: str = None) -> NoReturn:
-        dialog = ActualizarInsertar(parent, dbSeries, datSerie)
+    def get_data(parent: object = None, data_serie: Dict = None, database: str = None) -> NoReturn:
+        dialog = ActualizarInsertar(parent, database, data_serie)
         dialog.exec_()
 
 
@@ -331,7 +331,7 @@ def main():
     ser = None
     app = QtWidgets.QApplication(sys.argv)
     # hay que poner la base de datos como parametro
-    ActualizarInsertar.getDatos(dbSeries=ruta_db, datSerie=ser)
+    ActualizarInsertar.get_data(database=ruta_db, data_serie=ser)
     return app
 
 

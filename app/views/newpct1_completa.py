@@ -9,11 +9,11 @@ import time
 from typing import NoReturn
 
 from PyQt5 import QtWidgets, QtCore
+from app.views.ui.descarga_completa_ui import Ui_Dialog
 
 from app import logger
 from app.modulos import funciones
 from app.modulos.telegram2 import TG2
-from app.views.ui.descarga_completa_ui import Ui_Dialog
 
 
 # https://gist.github.com/kaotika/e8ca5c340ec94f599fb2
@@ -206,14 +206,14 @@ class torrentlocuraCompleta(QtWidgets.QDialog):
             self.ui.textEdit.append('Introduce una nombre')
 
     @staticmethod
-    def getDatos(parent: object = None) -> NoReturn:
+    def get_data(parent: object = None) -> NoReturn:
         dialog = torrentlocuraCompleta(parent)
         dialog.exec_()
 
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
-    torrentlocuraCompleta.getDatos()
+    torrentlocuraCompleta.get_data()
     return app
 
 

@@ -6,10 +6,10 @@ import sys
 from typing import NoReturn
 
 from PyQt5 import QtWidgets
+from app.views.ui.asistente_inicial_ui import Ui_Dialog
 
 from app import logger
 from app.modulos.settings import sync_sqlite, sync_gdrive
-from app.views.ui.asistente_inicial_ui import Ui_Dialog
 
 
 class AsistenteInicial(QtWidgets.QDialog):
@@ -195,14 +195,14 @@ class AsistenteInicial(QtWidgets.QDialog):
             return True
 
     @staticmethod
-    def getDatos(parent: object = None, ruta: str = None) -> NoReturn:
+    def get_data(parent: object = None, ruta: str = None) -> NoReturn:
         dialog = AsistenteInicial(parent, ruta)
         dialog.exec_()
 
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
-    AsistenteInicial.getDatos()
+    AsistenteInicial.get_data()
     return app
 
 
