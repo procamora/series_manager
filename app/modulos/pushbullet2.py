@@ -8,20 +8,20 @@ from app import logger
 # https://github.com/randomchars/pushbullet.py
 
 
-class PB2():
+class PB2:
     def __init__(self, api):
         self.pb = Pushbullet(api)
 
-    def sendTextPb(self, titulo, texto):
+    def send_text_pb(self, titulo, texto):
         self.pb.push_note(titulo, texto)
 
-    def sendLinkPb(self, titulo, link):
+    def send_link_pb(self, titulo, link):
         self.pb.push_link(titulo, link)
 
-    def sendFilePb(self, fichOriginal, fichFinal=None):
+    def send_file_pb(self, fichOriginal, fichFinal=None):
         """
-        Envia un fichero, primero lo sube y despues lo envia, si solo se le da el nombre del fichero a la funcion lo envia con ese nombre
-        si se le dan 2 nombres lo envia con el nombre del segundo
+        Envia un fichero, primero lo sube y despues lo envia, si solo se le da el nombre del fichero a la funcion lo
+         envia con ese nombre si se le dan 2 nombres lo envia con el nombre del segundo
         """
         if fichFinal is None:
             fichFinal = fichOriginal
@@ -30,10 +30,10 @@ class PB2():
 
         self.pb.push_file(**file_data)
 
-    def muestaTodos(self):
+    def show_all(self):
         for i in self.pb.devices:
             logger.info(i)
 
-    def enviaPrimerDispositivo(self):
+    def send_first_device(self):
         motog = self.pb.devices[0]
         motog.push_note("Hello world!", "We're using the api.")

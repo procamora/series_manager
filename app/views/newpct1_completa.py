@@ -26,7 +26,7 @@ class mythread(QtCore.QThread):
                  textEdit: QtWidgets.QTextEdit, sendTg: bool) -> NoReturn:
         super(mythread, self).__init__(parent)
 
-        self.conf = funciones.dbConfiguarion()
+        self.conf = funciones.db_configuarion()
         self.serie = serie.replace(' ', '-')  # ruta correcta
         self.cap = capitulo
         self.temp = temporada
@@ -51,9 +51,9 @@ class mythread(QtCore.QThread):
             try:
                 fichero = '{}/{}_{}x{}.torrent'.format(ruta, self.serie, self.temp, i)
                 # al ser un or si la primera retorna true no comprueba la segunda
-                if (self.tryGetUrl(self.url, i, fichero) or self.tryGetUrl(self.url2, i, fichero)):
+                if self.tryGetUrl(self.url, i, fichero) or self.tryGetUrl(self.url2, i, fichero):
                     if self.sendTg:
-                        self.telegram.sendFile(fichero)
+                        self.telegram.send_file(fichero)
                         # fichero = '{}/{}x{}.torrent'.format(ruta, self.serie, i)
                     self.textEdit.append('{} {}x{}'.format(self.serie, self.temp, i))
                 else:
@@ -73,10 +73,10 @@ class mythread(QtCore.QThread):
             logger.debug(urlFormat)
             logger.debug(capitulo, "Bien: ", urlTorrent)
 
-            if (urlTorrent is None):
+            if urlTorrent is None:
                 return False
 
-            funciones.descargaFichero(urlTorrent, fichero)
+            funciones.download_file(urlTorrent, fichero)
             return True
 
         except Exception as e:

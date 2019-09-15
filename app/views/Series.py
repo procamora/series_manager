@@ -12,11 +12,12 @@ from typing import List, NoReturn
 from PyQt5 import QtGui, QtWidgets, QtCore
 from app.views.ui.series_ui import Ui_MainWindow
 
+# PROPIAS
+import app.controller.Controller  as controller
 from app import logger
 from app.models.model_serie import Serie
-# PROPIAS
 from app.modulos import funciones
-from app.modulos.connect_sqlite import conectionSQLite, ejecutaScriptSqlite
+#from app.modulos.connect_sqlite import conection_sqlite, execute_script_sqlite
 from app.modulos.settings import directorio_trabajo, sistema, nombre_db, directorio_local
 from app.views import acerca_de
 from app.views import actualizar_insertar
@@ -38,39 +39,35 @@ class Series(QtWidgets.QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
-        self.database = '{}/{}'.format(directorio_trabajo, nombre_db)
+        self.database: str = '{}/{}'.format(directorio_trabajo, nombre_db)
 
-        self.otra = 'otra'  # campo otra del formulario
-        self.estadoI = 'Ok'  # estado inicial
-        self.estadoF = 'Cancelado'  # final
-        self.estadoA = self.estadoI  # actual
+        self.otra: str = 'otra'  # campo otra del formulario
+        self.estadoI: str = 'Ok'  # estado inicial
+        self.estadoF: str = 'Cancelado'  # final
+        self.estadoA: str = self.estadoI  # actual
         # CUIADO REVISAR ESTO Y UNIFICADO TODOS LOS NOMBRE DE LA DB
-        self.db = self.database
-        self.queryCompleta = str()  # lista de consultas que se ejecutaran al final
+        self.db: str = self.database
+        self.queryCompleta: str = str()  # lista de consultas que se ejecutaran al final
 
         self.setWindowTitle('Gestor de Series by Pablo')
 
         self.initListaActiva()  # Crea toda la vista del menu
-        funciones.crearBackUpCompletoDB()
+        funciones.create_full_backup_db()
         self.menus()
 
     def initListaActiva(self) -> NoReturn:
 
         self.ui.gridLayoutGobal = QtWidgets.QGridLayout(self.ui.scrollAreaWidgetContents)
-
-        query = """SELECT Nombre, Temporada, Capitulo, Dia, Capitulo_Descargado FROM Series 
-                WHERE Siguiendo = "Si" AND Capitulo <> 0 AND Estado='Activa'"""
-        series = conectionSQLite(self.db, query, True, Serie())
+        response_query = controller.get_all_series(self.db)
 
         # todo esto es para ordenar las series por fecha de proximidad de proximo capitulo
-        fecha2 = funciones.calculaDiaSemana()
-        fechaOrde = funciones.fechaToNumero(fecha2)
+        fecha2 = funciones.calculate_day_week()
+        fecha_orde = funciones.date_to_number(fecha2)
+        listado_final = self.ordenaSeries(fecha_orde, response_query.response)
 
-        listadoFinal = self.ordenaSeries(fechaOrde, series)
-
-        for texto, i in zip(listadoFinal, list(range(0, len(listadoFinal)))):  # el encabezado lo tengo encima
+        for texto, i in zip(listado_final, list(range(0, len(listado_final)))):  # el encabezado lo tengo encima
             self.creaListaSerie(i, texto)
-            logger.debug('{}**{}'.format(i, texto))
+            logger.debug('{}-> {}'.format(i, texto))
 
         self.ui.pushButtonAceptar.setVisible(False)
         self.ui.pushButtonAplicar.setText("Guardar")
@@ -78,7 +75,7 @@ class Series(QtWidgets.QMainWindow):
         self.ui.pushButtonCerrar.clicked.connect(self.cancela)
         self.ui.pushButtonAceptar.clicked.connect(self.aceptaDatos)
 
-    def creaListaSerie(self, n: int = 0, datos: Serie = None) -> NoReturn:
+    def creaListaSerie(self, n: int = 0, serie: Serie = None) -> NoReturn:
         """
         Crea la linea de cada serie completa, generada por qtdesigner y pasado
         el codigo a python, despues visto como se crea y hecho algunas modificaciones
@@ -89,91 +86,89 @@ class Series(QtWidgets.QMainWindow):
         param datos dict: diccionario con todos los datos de la serie a la que se crea una linea
         """
 
-        labelEmision = QtWidgets.QLabel(self.ui.scrollAreaWidgetContents)
-        self.ui.gridLayoutGobal.addWidget(labelEmision, n, 0, 1, 1, QtCore.Qt.AlignLeft)
+        label_emision = QtWidgets.QLabel(self.ui.scrollAreaWidgetContents)
+        self.ui.gridLayoutGobal.addWidget(label_emision, n, 0, 1, 1, QtCore.Qt.AlignLeft)
 
-        labelNombre = QtWidgets.QLabel(self.ui.scrollAreaWidgetContents)
-        self.ui.gridLayoutGobal.addWidget(labelNombre, n, 1, 1, 1, QtCore.Qt.AlignLeft)
+        label_nombre = QtWidgets.QLabel(self.ui.scrollAreaWidgetContents)
+        self.ui.gridLayoutGobal.addWidget(label_nombre, n, 1, 1, 1, QtCore.Qt.AlignLeft)
 
-        lineEpisodio = QtWidgets.QLineEdit(self.ui.scrollAreaWidgetContents)
-        lineEpisodio.setEnabled(False)
-        lineEpisodio.setMaximumSize(QtCore.QSize(50, 20))
-        lineEpisodio.setReadOnly(True)
-        self.ui.gridLayoutGobal.addWidget(lineEpisodio, n, 2, 1, 1, QtCore.Qt.AlignLeft)
+        line_episodio = QtWidgets.QLineEdit(self.ui.scrollAreaWidgetContents)
+        line_episodio.setEnabled(False)
+        line_episodio.setMaximumSize(QtCore.QSize(50, 20))
+        line_episodio.setReadOnly(True)
+        self.ui.gridLayoutGobal.addWidget(line_episodio, n, 2, 1, 1, QtCore.Qt.AlignLeft)
 
-        widgetBotones = QtWidgets.QWidget(self.ui.scrollAreaWidgetContents)
-        widgetBotones.setMaximumSize(QtCore.QSize(90, 45))
-        horizontalLayoutBotones = QtWidgets.QHBoxLayout(widgetBotones)
-        buttonRestar = QtWidgets.QPushButton(widgetBotones)
-        horizontalLayoutBotones.addWidget(buttonRestar)
-        buttonSumar = QtWidgets.QPushButton(widgetBotones)
-        horizontalLayoutBotones.addWidget(buttonSumar)
-        self.ui.gridLayoutGobal.addWidget(widgetBotones, n, 3, 1, 1, QtCore.Qt.AlignLeft)
+        widget_botones = QtWidgets.QWidget(self.ui.scrollAreaWidgetContents)
+        widget_botones.setMaximumSize(QtCore.QSize(90, 45))
+        horizontal_layout_botones = QtWidgets.QHBoxLayout(widget_botones)
+        button_restar = QtWidgets.QPushButton(widget_botones)
+        horizontal_layout_botones.addWidget(button_restar)
+        button_sumar = QtWidgets.QPushButton(widget_botones)
+        horizontal_layout_botones.addWidget(button_sumar)
+        self.ui.gridLayoutGobal.addWidget(widget_botones, n, 3, 1, 1, QtCore.Qt.AlignLeft)
 
-        labelEmision.setText(datos._day)
-        labelNombre.setText(datos._name)
+        label_emision.setText(serie.day)
+        label_nombre.setText(serie.name)
         # hago esto para que quede bonito los numeros de los capitulos
-        if len(str(datos._chapter)) == 1:
-            lineEpisodio.setText('{}x0{}'.format(datos._season, datos._chapter))
-        else:
-            lineEpisodio.setText('{}x{}'.format(datos._season, datos._chapter))
-        buttonSumar.setText("+1")
-        buttonRestar.setText("-1")
+        line_episodio.setText(f'{serie.get_season_chapter()}')
+        button_sumar.setText("+1")
+        button_restar.setText("-1")
 
         # Conexion de los botones sumar y restar enviando la referencia del objeto para trabajar con ella posteriormente
-        buttonSumar.clicked.connect(functools.partial(self.sumarSerie, lineEpisodio, datos))
-        buttonRestar.clicked.connect(functools.partial(self.restarSerie, lineEpisodio, datos))
+        button_sumar.clicked.connect(functools.partial(self.sumarSerie, line_episodio, serie))
+        button_restar.clicked.connect(functools.partial(self.restarSerie, line_episodio, serie))
 
         # Widget para meter el QLineEdit y QPushButton
-        widgetTeoricos = QtWidgets.QWidget(self.ui.scrollAreaWidgetContents)
-        widgetTeoricos.setMaximumSize(QtCore.QSize(90, 45))
-        horizontalLayoutTeoricos = QtWidgets.QHBoxLayout(widgetTeoricos)
+        widget_teoricos = QtWidgets.QWidget(self.ui.scrollAreaWidgetContents)
+        widget_teoricos.setMaximumSize(QtCore.QSize(90, 45))
+        horizontal_layout_teoricos = QtWidgets.QHBoxLayout(widget_teoricos)
 
         # Temporada y capitulo teorico
-        lineEpisodioTeorico = QtWidgets.QLineEdit(self.ui.scrollAreaWidgetContents)
-        lineEpisodioTeorico.setEnabled(False)
-        lineEpisodioTeorico.setReadOnly(True)
-        lineEpisodioTeorico.setMaximumSize(QtCore.QSize(30, 20))
+        line_episodio_teorico = QtWidgets.QLineEdit(self.ui.scrollAreaWidgetContents)
+        line_episodio_teorico.setEnabled(False)
+        line_episodio_teorico.setReadOnly(True)
+        line_episodio_teorico.setMaximumSize(QtCore.QSize(30, 20))
 
         # Boton para actualizar el estado conforme al descargado automaticamente
-        buttonTeorico = QtWidgets.QPushButton(widgetTeoricos)
+        button_teorico = QtWidgets.QPushButton(widget_teoricos)
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(":/Iconos/Icons/fatcow/add.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        buttonTeorico.setIcon(icon)
+        button_teorico.setIcon(icon)
 
         # Spacer para que se vea bonito cuando ocultamos el boton
-        spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        spacer_item = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
 
         # Incluimos todos al Widget
-        horizontalLayoutTeoricos.addWidget(lineEpisodioTeorico)
-        horizontalLayoutTeoricos.addWidget(buttonTeorico)
-        horizontalLayoutTeoricos.addItem(spacerItem)
-        self.ui.gridLayoutGobal.addWidget(widgetTeoricos, n, 4, 1, 1, QtCore.Qt.AlignLeft)
+        horizontal_layout_teoricos.addWidget(line_episodio_teorico)
+        horizontal_layout_teoricos.addWidget(button_teorico)
+        horizontal_layout_teoricos.addItem(spacer_item)
+        self.ui.gridLayoutGobal.addWidget(widget_teoricos, n, 4, 1, 1, QtCore.Qt.AlignLeft)
 
         # Si el capitulo es None o ya lo tengo actualizado no muestro el boton
-        if datos._chapter_downloaded is not None and datos._chapter != datos._chapter_downloaded:
-            lineEpisodioTeorico.setText(str(datos._chapter_downloaded))  # Asignamos el valor del capitulo
+        if serie.chapter_downloaded is not None and serie.chapter != serie.chapter_downloaded:
+            line_episodio_teorico.setText(str(serie.chapter_downloaded))  # Asignamos el valor del capitulo
         else:
-            lineEpisodioTeorico.setVisible(False)
-            buttonTeorico.setVisible(False)
+            line_episodio_teorico.setVisible(False)
+            button_teorico.setVisible(False)
 
-        buttonTeorico.clicked.connect(functools.partial(self.botonTeorico, lineEpisodioTeorico, lineEpisodio, datos))
+        button_teorico.clicked.connect(
+            functools.partial(self.botonTeorico, line_episodio_teorico, line_episodio, serie))
 
     def botonTeorico(self, capituloT: QtWidgets.QLineEdit, capitulo: QtWidgets.QLineEdit, dat: Serie) -> NoReturn:
         """
-        Calcula si el capitulo descargado es mayor o menor, despues el bucle se ejecuta la diferencia entre los capitulos ejecutando la funcion
-        de sumar o restar capitulos
+        Calcula si el capitulo descargado es mayor o menor, despues el bucle se ejecuta la diferencia entre los
+        capitulos ejecutando la funcion         de sumar o restar capitulos
         """
 
         cap = int(capitulo.text().split('x')[-1])
-        capT = int(capituloT.text())
+        cap_t = int(capituloT.text())
 
-        if capT > cap:
-            for i in range(0, capT - cap):
+        if cap_t > cap:
+            for i in range(0, cap_t - cap):
                 logger.debug('Suma: {}'.format(str(i)))
                 self.sumarSerie(capitulo, dat)
         else:
-            for i in range(0, capT - cap):
+            for i in range(0, cap_t - cap):
                 logger.debug('Resta: {}'.format(str(i)))
                 self.restarSerie(capitulo, dat)
 
@@ -193,6 +188,7 @@ class Series(QtWidgets.QMainWindow):
         else:
             n.setText('{}x{}'.format(dat._season, dat._chapter))
 
+        # fixme meter en controller
         query = """UPDATE series SET Capitulo=Capitulo+1 WHERE Nombre LIKE "{}";""".format(dat["Nombre"])
         self.queryCompleta += '\n' + query
         logger.debug(query)
@@ -208,11 +204,13 @@ class Series(QtWidgets.QMainWindow):
         """
 
         dat._chapter = dat._chapter - 1  # esto funciona porque hace referencia al objeto
+        # fixme cambiar por nuevo metodo y ver si funciona y ver access atributo protected
         if len(str(dat._chapter)) == 1:
             n.setText('{}x0{}'.format(dat._season, dat._chapter))
         else:
             n.setText('{}x{}'.format(dat._season, dat._chapter))
 
+        # fixme meter en controller
         query = 'UPDATE series SET Capitulo=Capitulo-1 WHERE Nombre LIKE "{}";'.format(dat["Nombre"])
         self.queryCompleta += '\n' + query
         logger.debug(query)
@@ -233,8 +231,7 @@ class Series(QtWidgets.QMainWindow):
         """
 
         logger.debug(self.queryCompleta)
-
-        ejecutaScriptSqlite(self.db, self.queryCompleta)
+        controller.execute_query_script_sqlite(self.db, self.queryCompleta)
 
         self.queryCompleta = str()  # por si vuelvo a darle al boton aplicar
         return True
@@ -251,9 +248,8 @@ class Series(QtWidgets.QMainWindow):
 
         for i in semana:
             for j in series:
-                if j._day == i:
+                if j.day == i:
                     lista.append(j)
-        logger.debug(lista)
         return lista
 
     def aceptaDatos(self) -> NoReturn:
@@ -379,27 +375,27 @@ class Series(QtWidgets.QMainWindow):
     @staticmethod
     def menActualizarImdb() -> NoReturn:
         import app.modulos.actualiza_imdb as actualiza_imdb
-        a = actualiza_imdb.actualizaImdb()
+        a = actualiza_imdb.UpdateImdb()
         logger.info('actulizaCompleto')
-        a.actulizaCompleto()
+        a.update_completed()
 
     def menNewpct1(self) -> NoReturn:
-        Conf = funciones.dbConfiguarion()
-        rutaDesc = str(Conf['RutaDescargas'])  # es unicode
+        conf = funciones.db_configuarion()
+        ruta_desc = str(conf['RutaDescargas'])  # es unicode
 
-        if not os.path.exists(rutaDesc):
-            dat = {'title': 'No existe el directorio', 'text': 'El directorio {} no existe'.format(rutaDesc)}
+        if not os.path.exists(ruta_desc):
+            dat = {'title': 'No existe el directorio', 'text': 'El directorio {} no existe'.format(ruta_desc)}
             msgbox.MsgBox.getData(datos=dat)
         else:
             descarga_automatica.DescargaAutomatica.get_data(database=self.database)
 
     @staticmethod
     def menCompletoNewpct1() -> NoReturn:
-        Conf = funciones.dbConfiguarion()
-        rutaDesc = str(Conf['RutaDescargas'])  # es unicode
+        conf = funciones.db_configuarion()
+        ruta_desc = str(conf['RutaDescargas'])  # es unicode
 
-        if not os.path.exists(rutaDesc):
-            dat = {'title': 'No existe el directorio', 'text': 'El directorio {} no existe'.format(rutaDesc)}
+        if not os.path.exists(ruta_desc):
+            dat = {'title': 'No existe el directorio', 'text': 'El directorio {} no existe'.format(ruta_desc)}
             msgbox.MsgBox.getData(datos=dat)
         else:
             newpct1_completa.Newpct1Completa.get_data()
@@ -409,18 +405,18 @@ class Series(QtWidgets.QMainWindow):
         if sistema == 'Windows':
             comando = 'explorer "{}"'.format(directorio_trabajo.replace('/', '\\'))
         else:
-            entornoGrafico = str()
+            entorno_grafico = str()
             for i in ["dolphin", "caja", "nautilus"]:
                 cmd = "{} -h".format(i)
                 ejecucion = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 ejecucion.communicate()
                 if ejecucion.returncode == 0:
-                    entornoGrafico = i
+                    entorno_grafico = i
                     break
 
-            if entornoGrafico is not None:
-                comando = '{} "{}"'.format(entornoGrafico, directorio_trabajo)  # no esta revisado
-                logger.info(entornoGrafico)
+            if entorno_grafico is not None:
+                comando = '{} "{}"'.format(entorno_grafico, directorio_trabajo)  # no esta revisado
+                logger.info(entorno_grafico)
 
         ejecucion = subprocess.Popen(comando, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         ejecucion.communicate()  # no se lanza un hilo, hasta que no se cierre la ventana no sepuede seguir usando
@@ -437,28 +433,27 @@ class Series(QtWidgets.QMainWindow):
         creo una lista con los directorios/ficheros que quiero borrar
         """
 
-        listaLog = list()
+        lista_log = list()
 
         with open(r'{}/id.conf'.format(directorio_local), 'r') as f:
             id_fich = f.readline().replace('/n', '')
 
-        query = 'SELECT * FROM Configuraciones, Credenciales WHERE ID LIKE {} LIMIT 1'.format(id_fich)
-        consultasLog = conectionSQLite(self.database, query, True)
+        consultas_log = controller.get_credentials(id_fich, self.db)
 
-        if len(consultasLog) > 0:
+        if not consultas_log.is_empty():
             if num == 'newpct1':
-                listaLog.append('{}/log/{}'.format(directorio_trabajo, consultasLog[0]['FicheroFeedNewpct']))
+                lista_log.append('{}/log/{}'.format(directorio_trabajo, consultas_log.response[0]['FicheroFeedNewpct']))
             elif num == 'showrss':
-                listaLog.append('{}/log/{}'.format(directorio_trabajo, consultasLog[0]['FicheroFeedShowrss']))
+                lista_log.append('{}/log/{}'.format(directorio_trabajo, consultas_log.response[0]['FicheroFeedShowrss']))
             elif num == 'Descargas':
-                listaLog.append('{}/log/{}'.format(directorio_trabajo, consultasLog[0]['FicheroDescargas']))
+                lista_log.append('{}/log/{}'.format(directorio_trabajo, consultas_log.response[0]['FicheroDescargas']))
             elif num == 'Todos':
-                listaLog.append('{}/log/{}'.format(directorio_trabajo, consultasLog[0]['FicheroFeedNewpct']))
-                listaLog.append('{}/log/{}'.format(directorio_trabajo, consultasLog[0]['FicheroFeedShowrss']))
-                listaLog.append('{}/log/{}'.format(directorio_trabajo, consultasLog[0]['FicheroDescargas']))
+                lista_log.append('{}/log/{}'.format(directorio_trabajo, consultas_log.response[0]['FicheroFeedNewpct']))
+                lista_log.append('{}/log/{}'.format(directorio_trabajo, consultas_log.response[0]['FicheroFeedShowrss']))
+                lista_log.append('{}/log/{}'.format(directorio_trabajo, consultas_log.response[0]['FicheroDescargas']))
 
         # print self.listaLog
-        self.menVaciaLog(listaLog)
+        self.menVaciaLog(lista_log)
 
     @staticmethod
     def menVaciaLog(listaLog) -> NoReturn:
@@ -489,7 +484,7 @@ def main():
         if contador == 3:
             return
 
-    funciones.creaDirectorioTrabajo()
+    funciones.create_directory_work()
 
     # global app  # sino lo pongo sale QObject::startTimer: QTimer can only be used with threads started with QThread
     app = QtWidgets.QApplication(sys.argv)

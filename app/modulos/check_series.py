@@ -1,40 +1,48 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import sys
+from typing import List
+
 try:  # Ejecucion desde Series.py
-    from .connect_sqlite import conectionSQLite, ejecutaScriptSqlite
+    from .connect_sqlite import conection_sqlite, execute_script_sqlite
     from .settings import modo_debug, ruta_db
-except:  # Ejecucion local
-    from app.modulos.connect_sqlite import conectionSQLite, ejecutaScriptSqlite
+    from app import logger
+except ModuleNotFoundError as e:  # Ejecucion local
+    new_path = '../../'
+    if new_path not in sys.path:
+        sys.path.append(new_path)
+    from app import logger
+
+    logger.debug(e)
+    from app.modulos.connect_sqlite import conection_sqlite, execute_script_sqlite
     from app.modulos.settings import modo_debug, ruta_db
 
-from app import logger
 
-
-def acabada(write=False):
+def finished(write: bool = False) -> str:
     queryAcabada = 'SELECT * FROM Series WHERE Acabada LIKE "Si" AND Estado <> "Finalizada"'
-    query = conectionSQLite(ruta_db, queryAcabada, True)
+    query = conection_sqlite(ruta_db, queryAcabada, True)
     update = 'UPDATE Series SET Estado="Finalizada" WHERE Nombre LIKE "{}";\n'
 
-    queryUpdate = makeUpdate(query, update, write)
+    queryUpdate = make_update(query, update, write)
 
     return queryUpdate
 
 
-def imdb(write=False):
+def imdb(write: bool = False) -> str:
     """
     Busca las series que tienen una fecha de finalizacion en imdb pero sigo intentando actualizarlas
     """
     queryImdb = 'SELECT * FROM Series WHERE imdb_finaliza <> "????" AND imdb_seguir LIKE "Si"'
-    query = conectionSQLite(ruta_db, queryImdb, True)
+    query = conection_sqlite(ruta_db, queryImdb, True)
     update = 'UPDATE Series SET imdb_seguir="No" WHERE Nombre LIKE "{}";\n'
 
-    queryUpdate = makeUpdate(query, update, write)
+    queryUpdate = make_update(query, update, write)
 
     return queryUpdate
 
 
-def makeUpdate(query, update, write=False):
+def make_update(query: List, update: str, write: bool = False) -> str:
     """
     Recibe una lista con los resultados de los datos a cambiar, y el update a falta del nombre
     """
@@ -47,11 +55,12 @@ def makeUpdate(query, update, write=False):
 
     if write and len(queryUpdate) != 0:
         logger.info('ejecutar script')
-        ejecutaScriptSqlite(ruta_db, queryUpdate)
+        execute_script_sqlite(ruta_db, queryUpdate)
 
     return queryUpdate
 
 
 if __name__ == '__main__':
-    logger.info(acabada(write=False))
-    logger.info(imdb(write=False))
+    # logger.info(finished(write=False))
+    # logger.info(imdb(write=False))
+    pass

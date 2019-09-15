@@ -3,14 +3,14 @@
 
 import os
 import sqlite3
-from typing import Dict, Union, Iterable
+from typing import Dict, Union, Iterable, List
 
 
-def conectionSQLite(db: str, query: str, is_dict: bool = False, toClass=None) -> list:
+def conection_sqlite(db: str, query: str, is_dict: bool = False, to_class:object=None) -> List:
     if os.path.exists(db):
         conn = sqlite3.connect(db)
         if is_dict:
-            conn.row_factory = __dictFactory
+            conn.row_factory = dict_factory
         cursor = conn.cursor()
         cursor.execute(query)
 
@@ -24,23 +24,23 @@ def conectionSQLite(db: str, query: str, is_dict: bool = False, toClass=None) ->
         conn.close()
 
         response = list()
-        if toClass is not None:
+        if to_class is not None:
             for i in data:
-                a = toClass.__class__
+                a = to_class.__class__
                 response.append(a.load(i))
             return response
 
         return data
 
 
-def __dictFactory(cursor, row) -> Dict:
+def dict_factory(cursor, row) -> Dict:
     d = dict()
     for idx, col in enumerate(cursor.description):
         d[col[0]] = row[idx]
     return d
 
 
-def ejecutaScriptSqlite(db: str, script: str) -> None:
+def execute_script_sqlite(db: str, script: str) -> None:
     conn = sqlite3.connect(db)
     cursor = conn.cursor()
     cursor.executescript(script)
@@ -49,7 +49,7 @@ def ejecutaScriptSqlite(db: str, script: str) -> None:
     conn.close()
 
 
-def dumpDatabase(db: str) -> Union[Iterable[str], None]:
+def dump_database(db: str) -> Union[Iterable[str], None]:
     """
     Hace un dump de la base de datos y lo retorna
     :param db: ruta de la base de datos

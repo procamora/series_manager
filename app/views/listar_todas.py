@@ -8,7 +8,7 @@ from PyQt5 import QtWidgets
 from app.views.ui.listar_todas_ui import Ui_Dialog
 
 from app import logger
-from app.modulos.connect_sqlite import conectionSQLite, ejecutaScriptSqlite
+from app.modulos.connect_sqlite import conection_sqlite, execute_script_sqlite
 from app.modulos.settings import ruta_db
 
 
@@ -49,7 +49,7 @@ class ListarTodas(QtWidgets.QDialog):
         Saca todas las series de la bd y las mete en una lista de diccionarios accesible en todo el objeto
         """
         query = 'SELECT * FROM Series ORDER BY Nombre'
-        self.seriesTest = conectionSQLite(self.db, query, True)
+        self.seriesTest = conection_sqlite(self.db, query, True)
         self.ui.radioButtonAct.setChecked(True)
         # lo ejecuto al principio ya que es el activado por defecto
         self.seriesActuales()
@@ -136,7 +136,7 @@ class ListarTodas(QtWidgets.QDialog):
 
         logger.debug(self.queryCompleta)
 
-        ejecutaScriptSqlite(self.db, self.queryCompleta)
+        execute_script_sqlite(self.db, self.queryCompleta)
 
         self.queryCompleta = str()
         return True

@@ -10,14 +10,14 @@ import colorlog  # https://medium.com/@galea/python-logging-example-with-color-f
 FILE_CONFIG = 'settings.conf'
 
 
-def getLogger(verbose, name='Series'):
-    logFormat = '%(levelname)s - %(module)s - %(message)s'
+def get_logger(verbose, name='Series'):
+    log_format = '%(levelname)s - %(module)s - %(message)s'
 
     bold_seq = '\033[1m'
     colorlog_format = (
         f'{bold_seq} '
         '%(log_color)s '
-        f'{logFormat}'
+        f'{log_format}'
     )
 
     colorlog.basicConfig(format=colorlog_format)
@@ -35,7 +35,7 @@ def getLogger(verbose, name='Series'):
 
 
 modo_debug = True
-logger = getLogger(modo_debug, 'series')
+logger = get_logger(modo_debug, 'series')
 
 PATH_FILE_CONFIG = '{}/../../{}'.format(os.path.dirname(os.path.realpath(__file__)), FILE_CONFIG)
 config = configparser.ConfigParser()

@@ -8,7 +8,7 @@ from PyQt5 import QtWidgets
 from app.views.ui.notificaciones_ui import Ui_Dialog
 
 from app import logger
-from app.modulos.connect_sqlite import conectionSQLite, ejecutaScriptSqlite
+from app.modulos.connect_sqlite import conection_sqlite, execute_script_sqlite
 from app.modulos.settings import ruta_db
 
 
@@ -27,21 +27,17 @@ class Notificaciones(QtWidgets.QDialog):
         self.datodDb = list(dict())
         self.operacionesIniciales()
 
-        self.ui.checkBox_Telegram.clicked.connect(lambda
-                                                      x=self.ui.checkBox_Telegram,
-                                                      y=self.ui.lineEdit_Telegram: self.compruebaCheck(x, y))
+        self.ui.checkBox_Telegram.clicked.connect(
+            lambda x=self.ui.checkBox_Telegram, y=self.ui.lineEdit_Telegram: self.compruebaCheck(x, y))
 
-        self.ui.checkBox_PushBullet.clicked.connect(lambda
-                                                        x=self.ui.checkBox_PushBullet,
-                                                        y=self.ui.lineEdit_PushBullet: self.compruebaCheck(x, y))
+        self.ui.checkBox_PushBullet.clicked.connect(
+            lambda x=self.ui.checkBox_PushBullet, y=self.ui.lineEdit_PushBullet: self.compruebaCheck(x, y))
 
-        self.ui.checkBox_Email.clicked.connect(lambda
-                                                   x=self.ui.checkBox_Email,
-                                                   y=self.ui.lineEdit_Email: self.compruebaCheck(x, y))
+        self.ui.checkBox_Email.clicked.connect(
+            lambda x=self.ui.checkBox_Email, y=self.ui.lineEdit_Email: self.compruebaCheck(x, y))
 
-        self.ui.checkBox_Hangouts.clicked.connect(lambda
-                                                      x=self.ui.checkBox_Hangouts,
-                                                      y=self.ui.lineEdit_Hangouts: self.compruebaCheck(x, y))
+        self.ui.checkBox_Hangouts.clicked.connect(
+            lambda x=self.ui.checkBox_Hangouts, y=self.ui.lineEdit_Hangouts: self.compruebaCheck(x, y))
 
         self.ui.pushButtonAplicar.clicked.connect(self.aplicaDatos)
         self.ui.pushButtonCerrar.clicked.connect(self.cancela)
@@ -72,7 +68,7 @@ class Notificaciones(QtWidgets.QDialog):
         """
 
         query = 'SELECT * FROM Notificaciones'
-        self.datodDb = conectionSQLite(self.db, query, True)
+        self.datodDb = conection_sqlite(self.db, query, True)
 
     def averiguaConf(self) -> NoReturn:
         """
@@ -143,7 +139,7 @@ class Notificaciones(QtWidgets.QDialog):
                     i['API'], i['Activo'], i['Nombre'])
 
         logger.debug(query)
-        ejecutaScriptSqlite(self.db, query)
+        execute_script_sqlite(self.db, query)
         return True
 
     def cancela(self) -> NoReturn:

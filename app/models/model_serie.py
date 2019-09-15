@@ -3,77 +3,68 @@
 
 from __future__ import annotations
 
-import inspect
-from typing import NoReturn, Dict, List
-
-
 # FIXME CAMBIAR NOMBRE POR model_serie??? o eliminar el model del resto
+from dataclasses import dataclass
+from typing import Dict
+
+
+@dataclass
 class Serie(object):
-    def __init__(self) -> NoReturn:
-        super().__init__()
-        self._name = str()
-        self._season = -1
-        self._chapter = -1
-        self._following = bool()
-        self._vose = bool()
-        self._finished = bool()
-        self._day = str()
-        self._state = str()
-        self._imdb_id = str()
-        self._imdb_season = -1
-        self._imdb_chapter = -1
-        self._imdb_finished = -1
-        self._imdn_following = bool()
-        self._chapter_downloaded = -1
+    name: str = str()
+    season: int = -1
+    chapter: int = -1
+    following: bool = bool()
+    vose: bool = bool()
+    finished: bool = bool()
+    day: str = str()
+    state: str = str()
+    imdb_id: str = str()
+    imdb_season: int = -1
+    imdb_chapter: int = -1
+    imdb_finished: int = -1
+    imdb_following: bool = bool()
+    chapter_downloaded: int = -1
 
-    def __str__(self) -> str:
-        attributes = inspect.getmembers(self, lambda a: not (inspect.isroutine(a)))
-        [a for a in attributes if not (a[0].startswith('__') and a[0].endswith('__'))]
+    def get_season_chapter(self) -> str:
+        if len(str(self.chapter)) == 1:
+            return f'{self.season}x0{self.chapter}'
+        else:
+            return f'{self.season}x{self.chapter}'
 
-        new_attributes = Serie.delete_none_values(attributes[2][1])
-        return str(new_attributes)
-
-    @staticmethod
-    def delete_none_values(attributes: List) -> Dict:
-        new_attributes = dict()
-        new_attributes['class'] = 'Serie'
-        for i in attributes:
-            if isinstance(attributes[i], str) and len(attributes[i]) > 1:
-                new_attributes[i] = attributes[i]
-            elif isinstance(attributes[i], int) and attributes[i] != -1:
-                new_attributes[i] = attributes[i]
-        return new_attributes
+    #def __str__(self) -> str:
+    #    return (f'{self.__class__.__name__}('
+    #            f'{self.name!r}, {self.season!r}x{self.chapter!r}, follow={self.following!r})')
 
     @staticmethod
     def load(dictionaty: Dict) -> Serie:
         s = Serie()
         for i in dictionaty:
             if i == 'Nombre':
-                s._name = dictionaty[i]
+                s.name = dictionaty[i]
             elif i == 'Temporada':
-                s._season = int(dictionaty[i])
+                s.season = int(dictionaty[i])
             elif i == 'Capitulo':
-                s._chapter = int(dictionaty[i])
+                s.chapter = int(dictionaty[i])
             elif i == 'Siguiendo':
-                s._following = bool(dictionaty[i])
+                s.following = bool(dictionaty[i])
             elif i == 'VOSE':
-                s._vose = dictionaty[i]
+                s.vose = dictionaty[i]
             elif i == 'Acabada':
-                s._finished = bool(dictionaty[i])
+                s.finished = bool(dictionaty[i])
             elif i == 'Dia':
-                s._day = dictionaty[i]
+                s.day = dictionaty[i]
             elif i == 'Estado':
-                s._state = dictionaty[i]
+                s.state = dictionaty[i]
             elif i == 'imdb_id':
-                s._imdb_id = dictionaty[i]
+                s.imdb_id = dictionaty[i]
             elif i == 'imdb_Temporada':
-                s._imdb_season = dictionaty[i]
+                s.imdb_season = dictionaty[i]
             elif i == 'imdb_Capitulos':
-                s._imdb_chapter = dictionaty[i]
+                s.imdb_chapter = dictionaty[i]
             elif i == 'imdb_Finaliza':
-                s._imdb_finished = dictionaty[i]
+                s.imdb_finished = dictionaty[i]
             elif i == 'imdb_seguir':
-                s._imdn_following = bool(dictionaty[i])
+                s.imdb_following = bool(dictionaty[i])
             elif i == 'Capitulo_Descargado':
                 s._chapter_downloaded = dictionaty[i]
         return s

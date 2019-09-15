@@ -8,7 +8,7 @@ from PyQt5 import QtWidgets
 from app.views.ui.estado_series_ui import Ui_Dialog
 
 from app import logger
-from app.modulos.connect_sqlite import conectionSQLite, ejecutaScriptSqlite
+from app.modulos.connect_sqlite import conection_sqlite, execute_script_sqlite
 from app.modulos.settings import ruta_db
 from app.modulos.tviso import conectTviso
 
@@ -54,26 +54,26 @@ class EstadoSeries(QtWidgets.QDialog):
         accesible en todo el objeto
         """
         query = """SELECT Nombre FROM Series WHERE Estado LIKE "En Espera" AND Capitulo LIKE 0"""
-        self.DatSeriesEmpiezanTemporada = conectionSQLite(self.db, query, True)
+        self.DatSeriesEmpiezanTemporada = conection_sqlite(self.db, query, True)
 
         query = """SELECT ID, Nombre, Estado, imdb_Finaliza FROM Series WHERE imdb_Finaliza <> "????" AND Capitulo 
         LIKE imdb_Capitulos AND Estado <> 'Finalizada'"""
-        self.DatSerieFinalizada = conectionSQLite(self.db, query, True)
+        self.DatSerieFinalizada = conection_sqlite(self.db, query, True)
 
         query = """SELECT ID, Nombre, Estado, imdb_Finaliza FROM Series WHERE imdb_Finaliza LIKE "????" AND Capitulo 
         LIKE imdb_Capitulos"""
-        self.DatTemporadaAcabada = conectionSQLite(self.db, query, True)
+        self.DatTemporadaAcabada = conection_sqlite(self.db, query, True)
 
         query = """SELECT ID, Nombre, Temporada, Capitulo, imdb_Temporada, imdb_Capitulos FROM Series WHERE Estado 
         LIKE "Finalizada" AND Acabada LIKE "Si" AND (Capitulo <> imdb_Capitulos OR Temporada <> imdb_Temporada)"""
-        self.DatSeriesFinalizadas = conectionSQLite(self.db, query, True)
+        self.DatSeriesFinalizadas = conection_sqlite(self.db, query, True)
 
         self.ui.radioButtonFinalizada.setChecked(True)
         # lo ejecuto al principio ya que es el activado por defecto
         self.serieFinalizada()
 
         query = """SELECT * FROM Credenciales"""
-        datos = conectionSQLite(self.db, query, True)
+        datos = conection_sqlite(self.db, query, True)
         if len(datos) > 0:
             self.actuales = conectTviso(datos[0]['user_tviso'], datos[0]['pass_tviso'])
 
@@ -98,7 +98,7 @@ class EstadoSeries(QtWidgets.QDialog):
 
         try:  # si no hay ninguno, da fallo establezco por defecto el ultimo, que es el que tiene el valordel item
             self.ui.listWidget.setCurrentItem(item)
-        except:
+        except Exception:
             pass
 
     def aplicaDatos(self) -> bool:
@@ -107,7 +107,7 @@ class EstadoSeries(QtWidgets.QDialog):
         """
         logger.debug(self.QueryCompleta)
 
-        ejecutaScriptSqlite(self.db, self.QueryCompleta)
+        execute_script_sqlite(self.db, self.QueryCompleta)
 
         self.QueryCompleta = str()
         return True
@@ -141,7 +141,7 @@ class EstadoSeries(QtWidgets.QDialog):
             query = """UPDATE series SET Temporada=imdb_Temporada, Capitulo=imdb_Capitulos
                 WHERE Nombre LIKE '{}'""".format(DatSer['Nombre'])
             logger.info(query)
-            conectionSQLite(self.db, query)
+            conection_sqlite(self.db, query)
 
     def seriesEmpiezanTemporada(self) -> NoReturn:
         # cuidado, si lo ejecutas la misma semana que acabas la temporada se pondra en activa,

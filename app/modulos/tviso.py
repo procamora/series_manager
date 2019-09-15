@@ -7,20 +7,23 @@ import requests
 
 try:  # Ejecucion desde Series.py
     from .settings import modo_debug
-except:  # Ejecucion local
+except Exception:  # Ejecucion local
     from app.modulos.settings import modo_debug
 
 from app import logger
 
+from typing import List
 
-def conectTvisoMechanize(USERNAME, PASSWORD):  # NO funciona en python 3
+
+# NO funciona en python 3
+def conect_tviso_mechanize(username: str, password: str) -> List[str]:
     # import mechanicalsoup as mechanize
     import mechanize  # no es compatible con python3
 
-    URLLOGIN = 'https://es.tviso.com/login'
-    URLAFTER = 'https://es.tviso.com/calendar?area=ES&all=true'
-    LOGINHTML = 'user'
-    LOGINPASS = 'pass'
+    urllogin = 'https://es.tviso.com/login'
+    urlafter = 'https://es.tviso.com/calendar?area=ES&all=true'
+    loginhtml = 'user'
+    loginpass = 'pass'
 
     # Browser
     br = mechanize.Browser()
@@ -43,18 +46,18 @@ def conectTvisoMechanize(USERNAME, PASSWORD):  # NO funciona en python 3
          'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.1) Gecko/2008071615 Fedora/3.0.1-1.fc9 Firefox/3.0.1')]
 
     # authenticate
-    br.open(URLLOGIN)
+    br.open(urllogin)
     br.select_form(nr=1)
     # br.select_form(name = 'entrada')
-    br.form[LOGINHTML] = USERNAME
-    br.form[LOGINPASS] = PASSWORD
+    br.form[loginhtml] = username
+    br.form[loginpass] = password
 
     # request2 = br.form.click()
     response1 = br.submit()
     logger.info(response1.read())
 
     # logger.info(cookiejar)
-    url = br.open(URLAFTER)
+    url = br.open(urlafter)
     returnPage = url.read()
     compl = re.findall('<span class="event-name full-name">.*</span>', returnPage)
     series = list()
@@ -68,13 +71,13 @@ def conectTvisoMechanize(USERNAME, PASSWORD):  # NO funciona en python 3
     return list(set(series))
 
 
-def conectTviso(USERNAME, PASSWORD):  # funciona en python 3
+# funciona en python 3
+def conectTviso(username: str, password: str) -> List[str]:
+    urllogin = 'https://es.tviso.com/login'
+    urlafter = 'https://es.tviso.com/calendar?area=ES&all=true'
 
-    URLLOGIN = 'https://es.tviso.com/login'
-    URLAFTER = 'https://es.tviso.com/calendar?area=ES&all=true'
-
-    formdata = {'user': USERNAME,
-                'pass': PASSWORD,
+    formdata = {'user': username,
+                'pass': password,
                 'r': 'on',
                 'call': '',
                 'ref': ''}
@@ -84,9 +87,9 @@ def conectTviso(USERNAME, PASSWORD):  # funciona en python 3
         'Content-Type': 'application/x-www-form-urlencoded'}
 
     session = requests.session()
-    login = session.post(URLLOGIN, data=formdata, headers=req_headers, verify=True)  # Authenticate
+    login = session.post(urllogin, data=formdata, headers=req_headers, verify=True)  # Authenticate
     # Accedo a la pagina donde esta el saldo total
-    series = session.get(URLAFTER, cookies=login.cookies, headers=req_headers, verify=True)
+    series = session.get(urlafter, cookies=login.cookies, headers=req_headers, verify=True)
 
     compl = re.findall('<span class="event-name full-name">.*</span>', series.text)
     series = list()

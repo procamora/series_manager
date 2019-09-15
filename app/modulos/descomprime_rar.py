@@ -17,7 +17,7 @@ import app.modulos.telegram2 as TG2
 from app import logger
 
 
-def busca_pass(url):
+def search_pass(url):
     """
     funcion para buscar la password en la url dada, parsea todo el html
     """
@@ -28,7 +28,7 @@ def busca_pass(url):
     return sopa.find('input', {"id": "txt_password"})['value']
 
 
-def descomprime(fichero):
+def unzip(fichero):
     # http://librosweb.es/libro/python/capitulo_6/metodos_de_union_y_division.html
     # partition(fichero.rar) = (antecedente, fichero.rar, consecuente), lo que
     # hago es sacar el directorio del fichero
@@ -43,10 +43,10 @@ def descomprime(fichero):
                 texto = str()
                 with open('{}{}'.format(directory, i), 'r', encoding="ISO-8859-1") as f:
                     texto = f.read()
-                url = re.findall("((https?\:\/\/)?(\w+\.)+\w{2,3}\/?.*\/)", texto)
+                url = re.findall(r"((https?\:\/\/)?(\w+\.)+\w{2,3}\/?.*\/)", texto)
 
         if len(url) is not None:
-            passwd = busca_pass(url[0][0])
+            passwd = search_pass(url[0][0])
             rar.setpassword(passwd)  # whatever the password is
 
     rar.extractall(path=directory)
@@ -58,14 +58,14 @@ def main(ruta):
     for i in glob.glob(ruta):
         logger.info(i)
         try:
-            a.sendTg(
+            a.send_tg(
                 'Empieza proceos descomprimir: {}'.format(i.split('/')[-1]))
-            descomprime(i)
-            a.sendTg(
+            unzip(i)
+            a.send_tg(
                 'Termina proceos descomprimir: {}'.format(i.split('/')[-1]))
         except Exception as e:
             if str(e) != "Need to start from first volume":
-                a.sendTg('Fallo al descomprimir: {} por: {}'.format(i.split('/')[-1], e))
+                a.send_tg('Fallo al descomprimir: {} por: {}'.format(i.split('/')[-1], e))
             logger.info("|{}|".format(e))
 
             with open('/tmp/unrar.log', 'a', encoding="UTF-8") as f:

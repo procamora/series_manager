@@ -6,19 +6,21 @@ import requests
 
 try:  # Ejecucion desde Series.py
     from .settings import modo_debug, ruta_db, directorio_local, sync_sqlite
-    from .connect_sqlite import conectionSQLite, ejecutaScriptSqlite
-except:  # Ejecucion local
+    from .connect_sqlite import conection_sqlite, execute_script_sqlite
+except Exception:  # Ejecucion local
     from app.modulos.settings import modo_debug, ruta_db, directorio_local, sync_sqlite
-    from app.modulos.connect_sqlite import conectionSQLite, ejecutaScriptSqlite
+    from app.modulos.connect_sqlite import conection_sqlite, execute_script_sqlite
 
 from app import logger
 
+from typing import NoReturn, Dict, Union, Any, List
 
-class TG2():
-    def __init__(self, chat_id):
-        datosIniciales = self.datosIniciales()
-        if datosIniciales is not None:
-            self.api = datosIniciales['api_telegram']
+
+class TG2:
+    def __init__(self, chat_id: str) -> NoReturn:
+        initial_data = self.initial_data()
+        if initial_data is not None:
+            self.api = initial_data['api_telegram']
         else:
             return
 
@@ -28,17 +30,17 @@ class TG2():
         requests.packages.urllib3.disable_warnings()
 
     @staticmethod
-    def datosIniciales():
+    def initial_data() -> Union[List, None]:
         with open(r'{}/{}'.format(directorio_local, sync_sqlite), 'r') as f:
             id_fich = f.readline().replace('/n', '')
 
         query = 'SELECT * FROM Credenciales'.format(id_fich)
-        consulta = conectionSQLite(ruta_db, query, True)
+        consulta = conection_sqlite(ruta_db, query, True)
         if len(consulta) > 0:
             return consulta[0]
         return None
 
-    def makeRequest(self, method_name, method='post', params=None, files=None):
+    def make_request(self, method_name, method='post', params=None, files=None) -> Dict:
         """
         Makes a request to the Telegram API.
         :param method_name: Name of the API method to be called. (E.g. 'getUpdates')
@@ -48,12 +50,11 @@ class TG2():
         :return: The result parsed to a JSON dictionary.
         """
 
-        CONNECT_TIMEOUT = 3.5
-        READ_TIMEOUT = 9999
+        connect_timeout = 3.5
+        read_timeout = 9999
 
         request_url = self.url.format(self.api, method_name)
-        read_timeout = READ_TIMEOUT
-        connect_timeout = CONNECT_TIMEOUT
+        connect_timeout = connect_timeout
         if params:
             if 'timeout' in params:
                 read_timeout = params['timeout'] + 10
@@ -69,7 +70,7 @@ class TG2():
         return json.loads(result.text)['ok']
 
     @staticmethod
-    def getMethodType(data_type):
+    def get_method_type(data_type) -> Dict:
         data_type = str(type(data_type))
         dic = {
             "<class 'str'>": 'sendMessage',
@@ -83,28 +84,27 @@ class TG2():
         # logger.debug(dic[data_type])
         return dic[data_type]
 
-    def sendTg(self, texto='ola k ase'):  # funciona en python 3
+    def send_tg(self, texto: str = 'ola k ase') -> Union[Dict, Any]:  # funciona en python 3
         payload = {'chat_id': self.chat_id,
                    'text': texto}
 
-        method_url = self.getMethodType(texto)
+        method_url = self.get_method_type(texto)
 
-        return self.makeRequest(method_url, params=payload, method='post')
+        return self.make_request(method_url, params=payload, method='post')
 
-    def sendFile(self, url_file):
+    def send_file(self, url_file) -> Union[Dict, Any]:
 
         payload = {'chat_id': self.chat_id}
-        files = None
+        # files = None
 
         data = open(url_file, 'rb')
-        method_url = self.getMethodType(data)
+        method_url = self.get_method_type(data)
 
         if str(type(data)) == "<class '_io.BufferedReader'>":
             files = {'document': data}
+            return self.make_request(method_url, params=payload, files=files, method='post')
 
-            return self.makeRequest(method_url, params=payload, files=files, method='post')
-
-    def recibeTg(self):  # no funciona de momento por la codificacion
+    def receives_tg(self) -> NoReturn:  # no funciona de momento por la codificacion
         URL = 'https://api.telegram.org/bot{}/getUpdates'.format(self.api)
         req_headers = {'Content-Type': 'application/x-www-form-urlencoded'}
 
@@ -112,17 +112,14 @@ class TG2():
         login = session.post(URL, headers=req_headers)  # Authenticate
 
         logger.info(type(login.text))
-
         # logger.info(str(login.text.strip().decode('utf-8')))
         # logger.info( json.loads( str(login.text.strip())))
-
         dat = json.loads(str(login.text.strip()))
-
         logger.info(dat)
 
 
 if __name__ == '__main__':
     a = TG2('33063767')
-    logger.info(a.sendTg('Test desde modulo de python'))
+    logger.info(a.send_tg('Test desde modulo de python'))
     # logger.info(a.sendFile('connect_sqlite.py'))
     # a.recibeTg()

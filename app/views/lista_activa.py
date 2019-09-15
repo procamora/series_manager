@@ -29,12 +29,12 @@ class ListaActiva(QtWidgets.QDialog):
         self.database = QtSql.QSqlDatabase.addDatabase('QSQLITE')
         self.crearConexion()
 
-        testModel = QtSql.QSqlTableModel()
-        testModel.setTable("Series")
-        testModel.setEditStrategy(QtSql.QSqlTableModel.OnFieldChange)
-        testModel.select()
-        testView = self.ui.tableView
-        testView.setModel(testModel)
+        test_model = QtSql.QSqlTableModel()
+        test_model.setTable("Series")
+        test_model.setEditStrategy(QtSql.QSqlTableModel.OnFieldChange)
+        test_model.select()
+        test_view = self.ui.tableView
+        test_view.setModel(test_model)
 
         # self.ui.pushButtonAplicar.clicked.connect(self.__aplicaDatos)
         # #actualmente no lo uso

@@ -8,8 +8,8 @@ from app.views.ui.actualizar_insertar_ui import Ui_Dialog
 
 from app import logger
 from app.modulos import funciones
-from app.modulos.actualiza_imdb import actualizaImdb
-from app.modulos.connect_sqlite import conectionSQLite
+from app.modulos.actualiza_imdb import UpdateImdb
+from app.modulos.connect_sqlite import conection_sqlite
 from app.modulos.settings import ruta_db
 from app.views.msgbox import MsgBox
 
@@ -55,7 +55,7 @@ class ActualizarInsertar(QtWidgets.QDialog):
             # el que sale
             all_items = [self.ui.BoxEmision.itemText(i) for i in range(self.ui.BoxEmision.count())]
             if len(all_items) > 0:
-                self.ui.BoxEmision.setCurrentIndex(all_items.index(funciones.calculaDiaSemana()))
+                self.ui.BoxEmision.setCurrentIndex(all_items.index(funciones.calculate_day_week()))
 
         # Ocultar textos
         self.ui.lineTemp.hide()
@@ -109,12 +109,12 @@ class ActualizarInsertar(QtWidgets.QDialog):
         luego lo crea con los rangos que le indico
         """
 
-        listTemp = list()
+        list_temp = list()
         for i in range(x, y):
-            listTemp.append(str(i))
+            list_temp.append(str(i))
 
         self.ui.BoxTemporada.clear()
-        self.ui.BoxTemporada.addItems(listTemp)
+        self.ui.BoxTemporada.addItems(list_temp)
         self.ui.BoxTemporada.addItem(self.other)
 
     def listaCapitulos(self, x: int, y: int) -> NoReturn:
@@ -123,12 +123,12 @@ class ActualizarInsertar(QtWidgets.QDialog):
         luego lo crea con los rangos que le indico
         """
 
-        listCap = list()
+        list_cap = list()
         for i in range(x, y):
-            listCap.append(str(i))
+            list_cap.append(str(i))
 
         self.ui.BoxCapitulo.clear()
-        self.ui.BoxCapitulo.addItems(listCap)
+        self.ui.BoxCapitulo.addItems(list_cap)
         self.ui.BoxCapitulo.addItem(self.other)
 
     def list_states(self) -> NoReturn:
@@ -137,13 +137,13 @@ class ActualizarInsertar(QtWidgets.QDialog):
         luego lo crea con los rangos que le indico
         """
         estados = 'SELECT * FROM ID_Estados'
-        query_estados = conectionSQLite(self.db, estados, True)
-        listEst = list()
+        query_estados = conection_sqlite(self.db, estados, True)
+        list_est = list()
         for i in query_estados:
-            listEst.append(i['Estados'])
+            list_est.append(i['Estados'])
 
         self.ui.BoxEstado.clear()
-        self.ui.BoxEstado.addItems(listEst)
+        self.ui.BoxEstado.addItems(list_est)
 
     def creaConf(self) -> NoReturn:
         """
@@ -258,29 +258,29 @@ class ActualizarInsertar(QtWidgets.QDialog):
             try:
                 logger.debug(query)
                 if datos['ImdbLanzar'] == 'Si':
-                    imbd_test = actualizaImdb()
+                    imbd_test = UpdateImdb()
 
-                    if imbd_test.compruebaTitulo(datos['idImdb']):
+                    if imbd_test.check_title(datos['idImdb']):
                         self.execute_imdb()
-                        conectionSQLite(self.db, query)
+                        conection_sqlite(self.db, query)
                         # Si es una inserccion despues de insertar vacio el
                         # titulo para poder hacer mas
                         if self.datSerie is None:
-                            funciones.muestraMensaje(self.ui.label_Info, 'Insertado con imdb', True)
+                            funciones.show_message(self.ui.label_Info, 'Insertado con imdb', True)
                             self.ui.lineTitulo.setText('')
                         else:
-                            funciones.muestraMensaje(self.ui.label_Info, 'Actualizado con imdb', True)
+                            funciones.show_message(self.ui.label_Info, 'Actualizado con imdb', True)
                     else:  # Si da error no quiero que borre el nombre
-                        funciones.muestraMensaje(self.ui.label_Info, 'fallo en imdb', False)
+                        funciones.show_message(self.ui.label_Info, 'fallo en imdb', False)
                 else:
-                    conectionSQLite(self.db, query)
+                    conection_sqlite(self.db, query)
                     # Si es una inserccion despues de insertar vacio el titulo
                     # para poder hacer mas
                     if self.datSerie is None:
-                        funciones.muestraMensaje(self.ui.label_Info, 'Insertado', True)
+                        funciones.show_message(self.ui.label_Info, 'Insertado', True)
                         self.ui.lineTitulo.setText('')
                     else:
-                        funciones.muestraMensaje(self.ui.label_Info, 'Actualizado', True)
+                        funciones.show_message(self.ui.label_Info, 'Actualizado', True)
                 return True
 
             except Exception as e:
@@ -289,7 +289,7 @@ class ActualizarInsertar(QtWidgets.QDialog):
                 MsgBox.getData(datos=dat)
                 return False
         else:
-            funciones.muestraMensaje(self.ui.label_Info, 'Titulo vacio', False)
+            funciones.show_message(self.ui.label_Info, 'Titulo vacio', False)
             return False
 
     def execute_imdb(self) -> NoReturn:
@@ -297,11 +297,11 @@ class ActualizarInsertar(QtWidgets.QDialog):
         Actualiza los datos de la serie de imdb siempre que el id no este vacio
         """
 
-        a = actualizaImdb()
+        a = UpdateImdb()
         id_imdb = str(self.ui.lineImdb.text())
         if len(id_imdb) > 0:
             logger.debug('actualiza imdb')
-            a.actualizaSerie(id_imdb)
+            a.update_series(id_imdb)
 
     def accept_data(self) -> NoReturn:
         """

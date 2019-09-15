@@ -22,7 +22,8 @@ class SampleBot(GtalkRobot):
     # "command_" is the command prefix, "001" is the priviledge num, "setState" is the method name.
     # This method is used to change the state and status text of the bot.
     def command_001_setState(self, user, message, args):
-        # the __doc__ of the function is the Regular Expression of this command, if matched, this command method will be called.
+        # the __doc__ of the function is the Regular Expression of this command, if matched,
+        # .this command method will be called.
         # The parameter "args" is a list, which will hold the matched string in
         # parenthesis of Regular Expression.
         """(available|online|on|busy|dnd|away|idle|out|off|xa)( +(.*))?$(?i)"""

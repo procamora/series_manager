@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 
-class algo():
+class algo:
     def __init__(self):
         self.a = "A"
         self._b = "B"
@@ -10,10 +10,10 @@ class algo():
         self.d = [1, 2, 3, 4]
 
     def otro(self):
-        return ("asd")
+        return "asd"
 
     def _privado(self):
-        return ("aasdasdsd")
+        return "aasdasdsd"
 
     @property
     def b(self):

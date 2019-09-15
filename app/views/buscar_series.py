@@ -7,7 +7,7 @@ from PyQt5 import QtWidgets
 from app.views.ui.buscar_series_ui import Ui_Dialog
 
 from app import logger
-from app.modulos.connect_sqlite import conectionSQLite
+from app.modulos.connect_sqlite import conection_sqlite
 from app.modulos.settings import ruta_db
 from app.views.actualizar_insertar import ActualizarInsertar
 
@@ -39,7 +39,7 @@ class BuscarSeries(QtWidgets.QDialog):
 
         query = 'SELECT Nombre FROM Series WHERE Nombre LIKE "%%{}%%"'.format(
             self.ui.lineEdit.text())
-        seriesTest = conectionSQLite(self.db, query, True)
+        seriesTest = conection_sqlite(self.db, query, True)
 
         if len(seriesTest) == 0:
             item = QtWidgets.QListWidgetItem()
@@ -63,7 +63,7 @@ class BuscarSeries(QtWidgets.QDialog):
 
             query = 'SELECT * FROM Series WHERE Nombre LIKE "{}"'.format(
                 i.text())
-            ser = conectionSQLite(self.db, query, True)[0]
+            ser = conection_sqlite(self.db, query, True)[0]
 
             ActualizarInsertar.get_data(
                 data_serie=ser, database=self.db)

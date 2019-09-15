@@ -9,7 +9,7 @@ from app.views.ui.preferencias_ui import Ui_Dialog
 
 from app import logger
 from app.modulos import funciones
-from app.modulos.connect_sqlite import conectionSQLite
+from app.modulos.connect_sqlite import conection_sqlite
 from app.modulos.settings import directorio_local, ruta_db
 
 
@@ -34,20 +34,20 @@ class Preferencias(QtWidgets.QDialog):
 
         # recogo todos los dias de la caja y le paso el indice del dia en el
         # que sale
-        allItems = [self.ui.BoxId.itemText(i) for i in range(self.ui.BoxId.count())]
+        all_items = [self.ui.BoxId.itemText(i) for i in range(self.ui.BoxId.count())]
 
-        logger.info(allItems)
+        logger.info(all_items)
         with open(r'{}/id.conf'.format(self.ruta), 'r') as f:
             id_fich = f.readline().replace('/n', '')
 
         try:
-            self.ui.BoxId.setCurrentIndex(allItems.index(id_fich))
+            self.ui.BoxId.setCurrentIndex(all_items.index(id_fich))
         except ValueError:
-            if len(allItems) == 1:  # si solo hay 1 es 'otra'
-                self.ui.BoxId.setCurrentIndex(allItems.index(self.otra))
+            if len(all_items) == 1:  # si solo hay 1 es 'otra'
+                self.ui.BoxId.setCurrentIndex(all_items.index(self.otra))
             else:
                 # si da error por algun motivo pongo el primero
-                self.ui.BoxId.setCurrentIndex(allItems.index('1'))
+                self.ui.BoxId.setCurrentIndex(all_items.index('1'))
 
         self.procesosComunes()
 
@@ -84,7 +84,7 @@ class Preferencias(QtWidgets.QDialog):
         """
 
         query = 'SELECT * FROM Configuraciones'
-        self.configuraciones = conectionSQLite(self.db, query, True)
+        self.configuraciones = conection_sqlite(self.db, query, True)
         if len(self.configuraciones) > 0:
             self.datodDb = self.configuraciones[0]
 
@@ -130,7 +130,7 @@ class Preferencias(QtWidgets.QDialog):
             'ID': str(self.ui.BoxId.currentText()),
             'Newpct': str(self.ui.lineNewpct.text()),
             'showrss': str(self.ui.lineShowrss.text()),
-            'Ruta': funciones.cambiaBarras(str(self.ui.lineRuta.text()))
+            'Ruta': funciones.change_bars(str(self.ui.lineRuta.text()))
         }
 
         if datos['ID'] == self.otra:
@@ -141,7 +141,7 @@ class Preferencias(QtWidgets.QDialog):
             logger.debug('update')
             logger.debug(query)
 
-            conectionSQLite(self.db, query)
+            conection_sqlite(self.db, query)
             self.operacionesIniciales()
         else:
             query = """UPDATE Configuraciones SET UrlFeedNewpct="{}", UrlFeedShowrss="{}", RutaDescargas="{}"
@@ -150,7 +150,7 @@ class Preferencias(QtWidgets.QDialog):
             logger.debug('update')
             logger.debug(query)
 
-            conectionSQLite(self.db, query)
+            conection_sqlite(self.db, query)
 
         with open(r'{}/id.conf'.format(self.ruta), 'w') as f:
             f.write(datos['ID'])

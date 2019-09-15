@@ -11,7 +11,7 @@ from PyQt5 import QtWidgets, QtCore
 from app.views.ui.descarga_automatica_ui import Ui_Dialog
 
 from app.modulos import funciones
-from app.modulos.connect_sqlite import conectionSQLite
+from app.modulos.connect_sqlite import conection_sqlite
 from app.modulos.settings import ruta_db
 from app.views.descarga_automatica_cli import DescargaAutomaticaCli
 from app.views.msgbox import MsgBox
@@ -65,7 +65,7 @@ class DescargaAutomatica(QtWidgets.QDialog):
         DescargaAutomatica.notificaciones = DescargaAutomaticaCli.muestraNotificaciones()
 
         query = """SELECT Nombre, Temporada, Capitulo, VOSE FROM Series WHERE Siguiendo = "Si" ORDER BY Nombre ASC"""
-        self.series = conectionSQLite(self.db, query, True)
+        self.series = conection_sqlite(self.db, query, True)
 
         # si le doy a ok cierro la ventana
         self.ui.pushButtonCerrar.clicked.connect(self.close)
@@ -83,7 +83,7 @@ class DescargaAutomatica(QtWidgets.QDialog):
 
     @staticmethod
     def get_data(parent: object = None, database: str = None) -> NoReturn:
-        if funciones.internetOn():
+        if funciones.internet_on():
             dialog = DescargaAutomatica(parent, database)
             dialog.exec_()
         else:

@@ -5,7 +5,7 @@ import glob
 import os
 import re
 import time
-from typing import List, NoReturn
+from typing import List, NoReturn, Dict
 
 import feedparser
 import requests
@@ -14,13 +14,13 @@ import urllib3
 from bs4 import BeautifulSoup
 
 from app import logger
-from app.modulos.connect_sqlite import conectionSQLite, ejecutaScriptSqlite, dumpDatabase
+from app.modulos.connect_sqlite import conection_sqlite, execute_script_sqlite, dump_database
 from app.modulos.settings import directorio_trabajo, directorio_local, nombre_db, ruta_db, sync_sqlite
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
-def creaDirectorioTrabajo() -> NoReturn:
+def create_directory_work() -> NoReturn:
     """
     Funcion encargada de checkear el correcto estado del directorio de trabajo
     Si el directorio no existe lo crea y crea la base de datos dejandola vacia
@@ -31,27 +31,27 @@ def creaDirectorioTrabajo() -> NoReturn:
     if not os.path.exists(directorio_trabajo):
         logger.debug("NO EXISTE DIRECTORIO TRABAJO, CREANDOLO")
         os.mkdir(directorio_trabajo)
-        plantillaDatabase()
-        plantillaFicheroConf()
+        template_database()
+        template_file_conf()
     else:
         if not os.path.exists(ruta_db) or os.stat(ruta_db).st_size == 0:
             logger.info(1)
-            plantillaDatabase()
+            template_database()
         if not os.path.exists(sync_sqlite) or os.stat(sync_sqlite).st_size == 0:
             logger.info(2)
-            plantillaFicheroConf()
+            template_file_conf()
 
 
-def crearFichero(fichero) -> NoReturn:
+def create_file(fichero) -> NoReturn:
     with open(fichero, 'w') as f:
         f.write("")
 
 
-def cambiaBarras(texto) -> str:
+def change_bars(texto) -> str:
     return texto.replace('\\', '/')
 
 
-def dbConfiguarion() -> List:
+def db_configuarion() -> Dict:
     """
     Funcion que obtiene los valores de la configuracion de un programa, devuelve el diciconario con los datos
 
@@ -61,16 +61,16 @@ def dbConfiguarion() -> List:
     try:
         with open(sync_sqlite, 'r') as f:
             id_db = f.readline()
-    except:
+    except Exception:
         logger.warning('fallo en dbConfiguarion')
         id_db = 1
 
     query = 'SELECT * FROM Configuraciones WHERE id IS {}'.format(id_db)
-    consulta = conectionSQLite('{}/{}'.format(directorio_trabajo, nombre_db), query, True)[0]
+    consulta = conection_sqlite('{}/{}'.format(directorio_trabajo, nombre_db), query, True)[0]
     return consulta
 
 
-def plantillaFicheroConf() -> NoReturn:
+def template_file_conf() -> NoReturn:
     """
     Si hay una configuracion en la la carpeta del programa la mueve a la carpeta
     de configuracion, sino la hay comprueba si existe el fichero, si existe y esta
@@ -91,7 +91,7 @@ def plantillaFicheroConf() -> NoReturn:
                 f.write("1")
 
 
-def plantillaDatabase() -> NoReturn:
+def template_database() -> NoReturn:
     """
     Funcion encargada de checkear el correcto estado de la base de datos, si no existe la base de datos o esta vacia le
     cargo la estructura basica
@@ -102,17 +102,17 @@ def plantillaDatabase() -> NoReturn:
 
     if not os.path.exists(fichero_db) or not os.stat(fichero_db).st_size > 50000:  # estructura pesa 72Kb
         logger.debug("creando db")
-        with open(cambiaBarras(ficheros_sql[-1]), 'r') as f:
+        with open(change_bars(ficheros_sql[-1]), 'r') as f:
             plantilla = f.read()
-        ejecutaScriptSqlite(fichero_db, plantilla)
+        execute_script_sqlite(fichero_db, plantilla)
 
 
-def crearBackUpCompletoDB() -> NoReturn:
+def create_full_backup_db() -> NoReturn:
     """
     Funcion encargada de generar backup de la base de datos y guardarlo 
     """
 
-    data = dumpDatabase(ruta_db)
+    data = dump_database(ruta_db)
     try:
         with open('{}/SQL/{}.sql'.format(directorio_local, time.strftime("%Y%m%d")), 'w') as f:
             f.write(data)
@@ -120,7 +120,7 @@ def crearBackUpCompletoDB() -> NoReturn:
         logger.error('error al hacer backup: {}'.format(e))
 
 
-def calculaDiaSemana():
+def calculate_day_week():
     """
     Te dice el dia de la semana en el que estamos, lo uso para ordenar serie de mas cerca a mas lejos
     """
@@ -142,31 +142,31 @@ def calculaDiaSemana():
 
     try:
         a = dicdias[fecha.strftime('%A').upper()]
-        return eliminaTildes(a)
+        return remove_tildes(a)
     # en linux en algunas distriuciones sale el dia en castellano, por eso lo paso directamente
     # poniendo la primera letra en mayusculas
     except KeyError:
         a = fecha.strftime('%A').capitalize()
-        return eliminaTildes(a)
+        return remove_tildes(a)
 
 
-def fechaToNumero(dia) -> List:
+def date_to_number(dia) -> List:
     """
     Convierte el dia de la semana a un numero, y luego te crea una lista ordenada
     de los dias de la semana de mas cerca a menos cerca
     """
 
-    DiaNombre = ["Lunes", "Martes", "Miercoles",
+    dia_nombre = ["Lunes", "Martes", "Miercoles",
                  "Jueves", "Viernes", "Sabado", "Domingo"]
     lista = list()
-    num = DiaNombre.index(dia)  # localizo en indice del dia en el que estoy
+    num = dia_nombre.index(dia)  # localizo en indice del dia en el que estoy
     # guardo la parte de la derecha de la semana y luego la izq
-    lista.extend(DiaNombre[num:])
-    lista.extend(DiaNombre[:num])
+    lista.extend(dia_nombre[num:])
+    lista.extend(dia_nombre[:num])
     return lista
 
 
-def eliminaTildes(cadena):
+def remove_tildes(cadena):
     """ http:/guimi.net/blogs/hiparco/funcion-para-eliminar-acentos-en-python/5"""
     # s = ''.join((c for c in unicodedata.normalize('NFD',unicode(cadena)) if unicodedata.category(c) != 'Mn'))
     # return s.decode()
@@ -175,7 +175,7 @@ def eliminaTildes(cadena):
     return unidecode.unidecode(cadena)
 
 
-def descargaFichero(url, destino, libreria='requests'):
+def download_file(url, destino, libreria='requests'):
     if libreria == 'urllib':
         import urllib
         urllib.urlretrieve(url, destino)
@@ -220,7 +220,7 @@ def __descargaUrlTorrent(direcc, bot=None, message=None):
     if not re.match(r"^(http:\/\/).*", direcc):
         direcc = 'http://' + direcc
 
-    regexRecursion = "(tumejortorrent|newpct1|newpct)"
+    regex_recursion = "(tumejortorrent|newpct1|newpct)"
 
     if re.search("torrentlocura", direcc):
         if bot is not None and message is not None:
@@ -241,8 +241,8 @@ def __descargaUrlTorrent(direcc, bot=None, message=None):
 
         return None
 
-    elif re.search(regexRecursion, direcc):
-        return __descargaUrlTorrent(re.sub(regexRecursion, "torrentlocura", direcc), message)
+    elif re.search(regex_recursion, direcc):
+        return __descargaUrlTorrent(re.sub(regex_recursion, "torrentlocura", direcc), message)
 
 
 # YA NO ES VALIDA
@@ -256,14 +256,14 @@ def __descargaUrlTorrentAux(page):
                 result):
             return result
         else:  # FIXME USAR selenium para simular navegador
-            """ si tiene puesto en href "javascript:void(0);" llamara a la funcion openTorrent() que tiene en la variable
+            """ si tiene puesto en href "javascript:void(0)" llamara a la funcion openTorrent() que tiene en la variable
             window.location.href la url del torrent a descaegar, por lo que lo buscamos a pelo en el html y eliminamos
             lo sobrante, feo pero funcional
             """
             javascript = re.findall(r'window\.location\.href\ =\ \".*\"\;', page)
             return javascript[0].replace("window.location.href = \"", "").replace("\";", "")
             # return sopa.find('div', {"id": "tab1"}).a['href']
-    except:
+    except Exception:
         return None
 
 
@@ -291,9 +291,9 @@ def __descargaUrlTorrentPctnew(direcc, bot=None, message=None):
             bot.reply_to(message, 'Buscando torrent en pctnew.com')
         session = requests.session()
 
-        myUrl = direcc.replace('pctnew.com/', 'pctnew.com/descarga-torrent/')
-        logger.debug(myUrl)
-        comp1 = __descargaUrlTorrentAuxPctnew(session.get(myUrl, verify=False).text)
+        my_url = direcc.replace('pctnew.com/', 'pctnew.com/descarga-torrent/')
+        logger.debug(my_url)
+        comp1 = __descargaUrlTorrentAuxPctnew(session.get(my_url, verify=False).text)
         if comp1 is not None:
             return comp1
 
@@ -317,7 +317,7 @@ def __descargaUrlTorrentAuxPctnew(page):
                 result):
             return result
         else:  # FIXME USAR selenium para simular navegador
-            """ si tiene puesto en href "javascript:void(0);" llamara a la funcion openTorrent() que tiene en la variable
+            """ si tiene puesto en href "javascript:void(0)" llamara a la funcion openTorrent() que tiene en la variable
             window.location.href la url del torrent a descaegar, por lo que lo buscamos a pelo en el html y eliminamos
             lo sobrante, feo pero funcional
             """
@@ -325,6 +325,7 @@ def __descargaUrlTorrentAuxPctnew(page):
             return javascript[0].replace("window.location.href = \"", "").replace("\";", "")
             # return sopa.find('div', {"id": "tab1"}).a['href']
     except Exception as e:
+        print(e)
         return None
 
 
@@ -345,7 +346,7 @@ def __buscaTorrentAntiguo(direcc):  # para newpct
     return sopa.find('span', id="content-torrent").a['href']
 
 
-def descargaUrlTorrentDonTorrent(direcc, bot=None, message=None):
+def get_url_torrent_dontorrent(direcc, bot=None, message=None):
     """
     Funcion que obtiene la url torrent del la dirreccion que recibe,hay que tener en cuenta que la url que recibe es la
     del feed y que no es la apgina que contiene el torrent, pero como todas tienen la misma forma se modifica la url
@@ -364,7 +365,6 @@ def descargaUrlTorrentDonTorrent(direcc, bot=None, message=None):
     if re.search("dontorrent", direcc):
         if bot is not None and message is not None:
             bot.reply_to(message, 'Buscando torrent en pctnew.com')
-        session = requests.session()
 
         req_headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; WOW64; rv:35.0) Gecko/20100101 Firefox/35.0',
                        'Content-Type': 'application/x-www-form-urlencoded'}
@@ -377,14 +377,14 @@ def descargaUrlTorrentDonTorrent(direcc, bot=None, message=None):
         # urls = re.findall(r'href\=\"(.*)" ', str(mtable)) # misma regex pero generica
         urls = re.findall(r'href\=\"((\/\w*)*.torrent)\"', str(mtable))
 
-        newUrls = list()
+        new_urls = list()
         for i in urls:
-            newUrls.append('https://dontorrent.com{}'.format(i[0]))
+            new_urls.append('https://dontorrent.com{}'.format(i[0]))
 
-        return newUrls
+        return new_urls
 
 
-def descargaUrlTorrentDonTorrentDirecto(direcc, bot=None, message=None):
+def get_url_torrent_dontorrent_direct(direcc, bot=None, message=None):
     """
     es similar a al ade arriba pero solo busca un torrent especifdico en un a
     """
@@ -398,7 +398,6 @@ def descargaUrlTorrentDonTorrentDirecto(direcc, bot=None, message=None):
     if re.search("dontorrent", direcc):
         if bot is not None and message is not None:
             bot.reply_to(message, 'Buscando torrent en pctnew.com')
-        session = requests.session()
 
         req_headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; WOW64; rv:35.0) Gecko/20100101 Firefox/35.0',
                        'Content-Type': 'application/x-www-form-urlencoded'}
@@ -413,7 +412,7 @@ def descargaUrlTorrentDonTorrentDirecto(direcc, bot=None, message=None):
         return 'https://dontorrent.com{}'.format(mtable['href'])
 
 
-def feedParser(url):
+def feed_parser(url):
     """
     Da un fallo en fedora 23, por eso hace falta esta funcion
     https://github.com/kurtmckee/feedparser/issues/30
@@ -429,7 +428,7 @@ def feedParser(url):
             raise
 
 
-def muestraMensaje(label, texto='Texto plantilla', estado=True):
+def show_message(label, texto='Texto plantilla', estado=True):
     """
     Muestra una determinada label con rojo o verde (depende del estado) y con el texto indicado
     """
@@ -441,14 +440,14 @@ def muestraMensaje(label, texto='Texto plantilla', estado=True):
         label.setStyleSheet('color: red')
 
 
-def escapaParentesis(texto):
+def scapes_parenthesis(texto):
     """
     No he probado si funciona con series como powers
     """
     return texto.replace('(', '\\(').replace(')', '\\)')
 
 
-def internetOn():
+def internet_on():
     try:
         session = requests.session()
         session.get('http://www.google.com', verify=False)
