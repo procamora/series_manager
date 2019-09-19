@@ -245,9 +245,10 @@ def send_show_torrent(message) -> Union[NoReturn, None]:
         return
     elif len(stdout) != 0:
         for line in stdout:
-            line = re.sub(
-                r'\[AC3 5\.1-Castellano-AC3 5.1 Ingles\+Subs\]|\[ES-EN\]|\[AC3 5.1 Español Castellano\]|\[HDTV 720p?\]|(\d+\.?\d+|None)( )+(MB|GB|kB|Unknown).*(Up & Down|Downloading|Queued|Idle|Uploading)( )*| - Temporada \d+ |(\d+\.\d+)( )+(\d+\.\d+)',
-                '', stdout)
+            regex = r'\[AC3 5\.1-Castellano-AC3 5.1 Ingles\+Subs\]|\[ES-EN\]|\[AC3 5.1 Español Castellano\]|' \
+                    r'\[HDTV 720p?\]|(\d+\.?\d+|None)( )+(MB|GB|kB|Unknown).*(Up & Down|Downloading|Queued|' \
+                    r'Idle|Uploading)( )*| - Temporada \d+ |(\d+\.\d+)( )+(\d+\.\d+)',
+            line = re.sub(regex, '', stdout)
         bot.reply_to(message, line)
     else:
         bot.reply_to(message, 'Ningun torrent activo en este momento.')
@@ -309,7 +310,7 @@ def handle_magnet(message) -> NoReturn:
         send_show_torrent(message)
 
 
-@bot.message_handler(regexp=r"^(https:\/\/)?(www.)?(dontorrent).com\/.*")
+@bot.message_handler(regexp=r"^(https://)?(www.)?(dontorrent).com\/.*")
 def handle_torrent(message) -> Union[NoReturn, None]:
     # si no envio yo la url no continuo
     if message.chat.id != administrador:
@@ -381,7 +382,7 @@ def my_voice(message) -> NoReturn:
 def my_document(message) -> NoReturn:
     if message.document.mime_type == 'application/x-bittorrent':
         file_info = bot.get_file(message.document.file_id)
-        # bot.send_message(message.chat.id, 'https://api.telegram.org/file/bot{0}/{1}'.format(TOKEN, file_info.file_path))
+        # bot.send_message(message.chat.id, f'https://api.telegram.org/file/bot{TOKEN}/{file_info.file_path}')
         file = requests.get(
             'https://api.telegram.org/file/bot{0}/{1}'.format(credentials['api_telegram'], file_info.file_path))
         with open('/home/pi/Downloads/{}.torrent'.format(message.document.file_id), "wb") as code:

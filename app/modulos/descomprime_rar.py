@@ -13,7 +13,7 @@ import rarfile
 import requests
 from bs4 import BeautifulSoup
 
-import app.modulos.telegram2 as TG2
+from app.modulos.telegram2 import Telegram
 from app import logger
 
 
@@ -40,10 +40,9 @@ def unzip(fichero):
         # con glob no me lista los ficheros
         for i in os.listdir('{}'.format(directory)):
             if i == 'CONTRASEÑA PARA DESCOMPRIMIR.txt':
-                texto = str()
                 with open('{}{}'.format(directory, i), 'r', encoding="ISO-8859-1") as f:
                     texto = f.read()
-                url = re.findall(r"((https?\:\/\/)?(\w+\.)+\w{2,3}\/?.*\/)", texto)
+                url = re.findall(r"((https?://)?(\w+\.)+\w{2,3}/?.*/)", texto)
 
         if len(url) is not None:
             passwd = search_pass(url[0][0])
@@ -54,7 +53,7 @@ def unzip(fichero):
 
 
 def main(ruta):
-    a = TG2('33063767')
+    a = Telegram('33063767')
     for i in glob.glob(ruta):
         logger.info(i)
         try:

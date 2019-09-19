@@ -20,31 +20,31 @@ from app.views.msgbox import MsgBox
 # https://gist.github.com/kaotika/e8ca5c340ec94f599fb2
 
 
-class mythread(QtCore.QThread, DescargaAutomaticaCli):
+class Mythread(QtCore.QThread, DescargaAutomaticaCli):
     total = QtCore.pyqtSignal(object)
     update = QtCore.pyqtSignal()
 
-    def __init__(self, parent: QtWidgets.QProgressBar, objVistas: QtWidgets.QTextEdit,
-                 objDescargas: QtWidgets.QTextEdit, database: str = None, query: str = None) -> NoReturn:
-        super(mythread, self).__init__(parent)
-        self.objVistas = objVistas
-        self.objDescargas = objDescargas
+    def __init__(self, parent: QtWidgets.QProgressBar, obj_vistas: QtWidgets.QTextEdit,
+                 obj_descargas: QtWidgets.QTextEdit, database: str = None, query: str = None) -> NoReturn:
+        super(Mythread, self).__init__(parent)
+        self.objVistas = obj_vistas
+        self.objDescargas = obj_descargas
         self.db = database
         self.query = query
 
     def run(self) -> NoReturn:
         # para saber cuantas series tiene en la barra de progreso (ajustarla y que marque bien los porcentajes)
-        self.total.emit(len(self.getSeries()))
+        self.total.emit(len(self.get_series()))
         DescargaAutomaticaCli.run(self)
 
-    def accionExtra(self, serie: str) -> NoReturn:
+    def extra_action(self, serie: str) -> NoReturn:
         self.objDescargas.append(serie)
 
-    def parseaFeed(self, serie: str, tem: str, cap: str, vose: str) -> str:
+    def parser_feed(self, serie: str, tem: str, cap: str, vose: str) -> str:
         """Solo funciona con series de 2 digitos por la expresion regular"""
 
         self.update.emit()
-        serie = DescargaAutomaticaCli.parseaFeed(self, serie, tem, cap, vose)
+        serie = DescargaAutomaticaCli.parser_feed(self, serie, tem, cap, vose)
 
         return serie
 
@@ -62,7 +62,7 @@ class DescargaAutomatica(QtWidgets.QDialog):
         self.ui.progressBar.setValue(self.n)
 
         # variable de acceso compartido, no se como hacerlo de otra forma
-        DescargaAutomatica.notificaciones = DescargaAutomaticaCli.muestraNotificaciones()
+        DescargaAutomatica.notificaciones = DescargaAutomaticaCli.show_notifications()
 
         query = """SELECT Nombre, Temporada, Capitulo, VOSE FROM Series WHERE Siguiendo = "Si" ORDER BY Nombre ASC"""
         self.series = conection_sqlite(self.db, query, True)
@@ -70,7 +70,7 @@ class DescargaAutomatica(QtWidgets.QDialog):
         # si le doy a ok cierro la ventana
         self.ui.pushButtonCerrar.clicked.connect(self.close)
 
-        self.thread = mythread(self.ui.progressBar, self.ui.textEditVistas, self.ui.textEditDescargadas, self.db, query)
+        self.thread = Mythread(self.ui.progressBar, self.ui.textEditVistas, self.ui.textEditDescargadas, self.db, query)
         self.thread.total.connect(self.ui.progressBar.setMaximum)
         self.thread.update.connect(self.update)
         self.thread.finished.connect(self.close)
@@ -88,7 +88,7 @@ class DescargaAutomatica(QtWidgets.QDialog):
             dialog.exec_()
         else:
             dat = {'title': 'Error de internet', 'text': 'No hay internet'}
-            MsgBox.getData(datos=dat)
+            MsgBox.get_data(datos=dat)
 
 
 def main():

@@ -13,11 +13,11 @@ from PyQt5 import QtGui, QtWidgets, QtCore
 from app.views.ui.series_ui import Ui_MainWindow
 
 # PROPIAS
-import app.controller.Controller  as controller
+import app.controller.Controller as controller
 from app import logger
 from app.models.model_serie import Serie
 from app.modulos import funciones
-#from app.modulos.connect_sqlite import conection_sqlite, execute_script_sqlite
+# from app.modulos.connect_sqlite import conection_sqlite, execute_script_sqlite
 from app.modulos.settings import directorio_trabajo, sistema, nombre_db, directorio_local
 from app.views import acerca_de
 from app.views import actualizar_insertar
@@ -41,21 +41,21 @@ class Series(QtWidgets.QMainWindow):
 
         self.database: str = '{}/{}'.format(directorio_trabajo, nombre_db)
 
-        self.otra: str = 'otra'  # campo otra del formulario
-        self.estadoI: str = 'Ok'  # estado inicial
-        self.estadoF: str = 'Cancelado'  # final
-        self.estadoA: str = self.estadoI  # actual
+        self.other: str = 'otra'  # campo otra del formulario
+        self.state_ok: str = 'Ok'  # estado inicial
+        self.state_cancel: str = 'Cancelado'  # final
+        self.state_current: str = self.state_ok  # actual
         # CUIADO REVISAR ESTO Y UNIFICADO TODOS LOS NOMBRE DE LA DB
         self.db: str = self.database
         self.queryCompleta: str = str()  # lista de consultas que se ejecutaran al final
 
         self.setWindowTitle('Gestor de Series by Pablo')
 
-        self.initListaActiva()  # Crea toda la vista del menu
+        self.init_active_list()  # Crea toda la vista del menu
         funciones.create_full_backup_db()
         self.menus()
 
-    def initListaActiva(self) -> NoReturn:
+    def init_active_list(self) -> NoReturn:
 
         self.ui.gridLayoutGobal = QtWidgets.QGridLayout(self.ui.scrollAreaWidgetContents)
         response_query = controller.get_all_series(self.db)
@@ -63,19 +63,19 @@ class Series(QtWidgets.QMainWindow):
         # todo esto es para ordenar las series por fecha de proximidad de proximo capitulo
         fecha2 = funciones.calculate_day_week()
         fecha_orde = funciones.date_to_number(fecha2)
-        listado_final = self.ordenaSeries(fecha_orde, response_query.response)
+        listado_final = self.sort_series(fecha_orde, response_query.response)
 
         for texto, i in zip(listado_final, list(range(0, len(listado_final)))):  # el encabezado lo tengo encima
-            self.creaListaSerie(i, texto)
+            self.create_list_serie(i, texto)
             logger.debug('{}-> {}'.format(i, texto))
 
         self.ui.pushButtonAceptar.setVisible(False)
         self.ui.pushButtonAplicar.setText("Guardar")
-        self.ui.pushButtonAplicar.clicked.connect(self.aplicaDatos)
-        self.ui.pushButtonCerrar.clicked.connect(self.cancela)
-        self.ui.pushButtonAceptar.clicked.connect(self.aceptaDatos)
+        self.ui.pushButtonAplicar.clicked.connect(self.apply_data)
+        self.ui.pushButtonCerrar.clicked.connect(self.cancel)
+        self.ui.pushButtonAceptar.clicked.connect(self.accept_data)
 
-    def creaListaSerie(self, n: int = 0, serie: Serie = None) -> NoReturn:
+    def create_list_serie(self, n: int = 0, serie: Serie = None) -> NoReturn:
         """
         Crea la linea de cada serie completa, generada por qtdesigner y pasado
         el codigo a python, despues visto como se crea y hecho algunas modificaciones
@@ -115,8 +115,8 @@ class Series(QtWidgets.QMainWindow):
         button_restar.setText("-1")
 
         # Conexion de los botones sumar y restar enviando la referencia del objeto para trabajar con ella posteriormente
-        button_sumar.clicked.connect(functools.partial(self.sumarSerie, line_episodio, serie))
-        button_restar.clicked.connect(functools.partial(self.restarSerie, line_episodio, serie))
+        button_sumar.clicked.connect(functools.partial(self.add_serie, line_episodio, serie))
+        button_restar.clicked.connect(functools.partial(self.sub_serie, line_episodio, serie))
 
         # Widget para meter el QLineEdit y QPushButton
         widget_teoricos = QtWidgets.QWidget(self.ui.scrollAreaWidgetContents)
@@ -152,27 +152,27 @@ class Series(QtWidgets.QMainWindow):
             button_teorico.setVisible(False)
 
         button_teorico.clicked.connect(
-            functools.partial(self.botonTeorico, line_episodio_teorico, line_episodio, serie))
+            functools.partial(self.button_teoric, line_episodio_teorico, line_episodio, serie))
 
-    def botonTeorico(self, capituloT: QtWidgets.QLineEdit, capitulo: QtWidgets.QLineEdit, dat: Serie) -> NoReturn:
+    def button_teoric(self, capitulo_t: QtWidgets.QLineEdit, capitulo: QtWidgets.QLineEdit, dat: Serie) -> NoReturn:
         """
         Calcula si el capitulo descargado es mayor o menor, despues el bucle se ejecuta la diferencia entre los
         capitulos ejecutando la funcion         de sumar o restar capitulos
         """
 
         cap = int(capitulo.text().split('x')[-1])
-        cap_t = int(capituloT.text())
+        cap_t = int(capitulo_t.text())
 
         if cap_t > cap:
             for i in range(0, cap_t - cap):
                 logger.debug('Suma: {}'.format(str(i)))
-                self.sumarSerie(capitulo, dat)
+                self.add_serie(capitulo, dat)
         else:
             for i in range(0, cap_t - cap):
                 logger.debug('Resta: {}'.format(str(i)))
-                self.restarSerie(capitulo, dat)
+                self.sub_serie(capitulo, dat)
 
-    def sumarSerie(self, n: QtWidgets.QLineEdit, dat: Serie) -> NoReturn:
+    def add_serie(self, n: QtWidgets.QLineEdit, dat: Serie) -> NoReturn:
         """
         Tiene 2 funcionalidades:
             - 1: sumar un capitulo a numero de capitulo que se ve por pantalla de la serie
@@ -193,7 +193,7 @@ class Series(QtWidgets.QMainWindow):
         self.queryCompleta += '\n' + query
         logger.debug(query)
 
-    def restarSerie(self, n: QtWidgets.QLineEdit, dat: Serie) -> NoReturn:
+    def sub_serie(self, n: QtWidgets.QLineEdit, dat: Serie) -> NoReturn:
         """
         Tiene 2 funcionalidades,
             - 1: restar un capitulo a numero de capitulo que se ve por pantalla de la serie
@@ -215,15 +215,15 @@ class Series(QtWidgets.QMainWindow):
         self.queryCompleta += '\n' + query
         logger.debug(query)
 
-    def cancela(self) -> NoReturn:
+    def cancel(self) -> NoReturn:
         """
         Establece el estado actual en cancelado para retornar None y ejecuta reject
         """
 
-        self.estadoA = self.estadoF
+        self.state_current = self.state_cancel
         self.close()
 
-    def aplicaDatos(self) -> bool:
+    def apply_data(self) -> bool:
         """
         Recorre toda la lista de updates alctualizando todas las series,
         cuando termina vacia la lista por si volvemos a darle a aplicar,
@@ -237,7 +237,7 @@ class Series(QtWidgets.QMainWindow):
         return True
 
     @staticmethod
-    def ordenaSeries(semana: List, series: List) -> List[Serie]:
+    def sort_series(semana: List, series: List) -> List[Serie]:
         """
         creo una lista ordenada por dia de la semana
         """
@@ -252,12 +252,12 @@ class Series(QtWidgets.QMainWindow):
                     lista.append(j)
         return lista
 
-    def aceptaDatos(self) -> NoReturn:
+    def accept_data(self) -> NoReturn:
         """
         Boton Aceptar, primero aplicas los datos, si retorna True, cierra la ventana
         """
 
-        if self.aplicaDatos():
+        if self.apply_data():
             self.accept()
 
     def menus(self) -> NoReturn:
@@ -269,17 +269,17 @@ class Series(QtWidgets.QMainWindow):
         """
 
         # SERIES
-        self.ui.actionSeries_Activas.triggered.connect(self.menSeriesActivas)
+        self.ui.actionSeries_Activas.triggered.connect(self.menu_series_actives)
         self.ui.actionSeries_Activas.setShortcut('Ctrl+A')
         self.ui.actionSeries_Activas.setStatusTip('Edicion rapida de series activas')
-        self.ui.actionModificacion_masiva.triggered.connect(self.menListar)
-        self.ui.actionModificacion_individual.triggered.connect(self.menActualizaSerie)
+        self.ui.actionModificacion_masiva.triggered.connect(self.menu_list)
+        self.ui.actionModificacion_individual.triggered.connect(self.menu_serie_update)
         self.ui.actionModificacion_individual.setShortcut('Ctrl+F')
-        self.ui.actionInsertar_Serie.triggered.connect(self.menInsertar)
+        self.ui.actionInsertar_Serie.triggered.connect(self.menu_insert)
         self.ui.actionInsertar_Serie.setShortcut('Ctrl+I')
         self.ui.actionInsertar_Serie.setStatusTip('insertar una nueva serie')
 
-        self.ui.actionRevisar_Estados.triggered.connect(self.RevisaEstadoSeries)
+        self.ui.actionRevisar_Estados.triggered.connect(self.check_series_states)
         self.ui.actionRevisar_Estados.setShortcut('Ctrl+E')
         self.ui.actionRevisar_Estados.setStatusTip('Revisar estados de series')
 
@@ -288,42 +288,42 @@ class Series(QtWidgets.QMainWindow):
         self.ui.actionSalir.setStatusTip('Cerrar el programa')
 
         # HERRAMIENTRAS
-        self.ui.actionActualizar_bd_de_Imdb.triggered.connect(self.menActualizarImdb)
-        self.ui.actionDescarga_Automatica.triggered.connect(self.menNewpct1)
+        self.ui.actionActualizar_bd_de_Imdb.triggered.connect(self.menu_imdb_update)
+        self.ui.actionDescarga_Automatica.triggered.connect(self.menu_download_automatic)
         self.ui.actionDescarga_Automatica.setShortcut('Ctrl+N')
         self.ui.actionDescarga_Automatica.setStatusTip('Descargar series')
-        self.ui.actionDescargar_Serie_Completa.triggered.connect(self.menCompletoNewpct1)
+        self.ui.actionDescargar_Serie_Completa.triggered.connect(self.menu_download_automatic_complete)
         self.ui.actionDescargar_Serie_Completa.setShortcut('Ctrl+M')
         self.ui.actionDescargar_Serie_Completa.setStatusTip('Descargar series por temporada')
-        self.ui.actionAbrir_carpeta_de_datos.triggered.connect(self.abrirDirectorioDatos)
+        self.ui.actionAbrir_carpeta_de_datos.triggered.connect(self.open_directory_data)
         self.ui.actionAbrir_carpeta_de_datos.setStatusTip('Abrir directorio de datos del programa')
 
         # OPCIONES
-        self.ui.actionPreferencias.triggered.connect(self.menPreferencias)
+        self.ui.actionPreferencias.triggered.connect(self.menu_preferences)
         self.ui.actionPreferencias.setShortcut('Ctrl+P')
         self.ui.actionPreferencias.setStatusTip('Edicion de preferencias')
 
-        self.ui.actionNotificaciones.triggered.connect(self.menNotificaciones)
+        self.ui.actionNotificaciones.triggered.connect(self.menu_notifications)
         self.ui.actionNotificaciones.setShortcut('Ctrl+K')
         self.ui.actionNotificaciones.setStatusTip('Edicion de notificaciones')
 
-        self.ui.actionLogNewpct1.triggered.connect(lambda: self.menSeleccionaLog('newpct1'))
+        self.ui.actionLogNewpct1.triggered.connect(lambda: self.menu_select_log('newpct1'))
         self.ui.actionLogNewpct1.setShortcut('Ctrl+1')
         self.ui.actionLogNewpct1.setStatusTip('Vaciar el log de newpct1')
 
-        self.ui.actionLogShowrss.triggered.connect(lambda: self.menSeleccionaLog('showrss'))
+        self.ui.actionLogShowrss.triggered.connect(lambda: self.menu_select_log('showrss'))
         self.ui.actionLogShowrss.setShortcut('Ctrl+2')
         self.ui.actionLogShowrss.setStatusTip('Vaciar el log de showrss')
 
-        self.ui.actionLogDescargas.triggered.connect(lambda: self.menSeleccionaLog('Descargas'))
+        self.ui.actionLogDescargas.triggered.connect(lambda: self.menu_select_log('Descargas'))
         self.ui.actionLogDescargas.setShortcut('Ctrl+3')
         self.ui.actionLogDescargas.setStatusTip('Vaciar el log de Descargas')
 
-        self.ui.actionLogTodos.triggered.connect(lambda: self.menSeleccionaLog('Todos'))
+        self.ui.actionLogTodos.triggered.connect(lambda: self.menu_select_log('Todos'))
         self.ui.actionLogTodos.setShortcut('Ctrl+4')
         self.ui.actionLogTodos.setStatusTip('Vaciar todos los log')
 
-        self.ui.actionAsistente_inicial.triggered.connect(self.menAsistenteInicial)
+        self.ui.actionAsistente_inicial.triggered.connect(self.menu_initial_assistant)
         self.ui.actionAsistente_inicial.setStatusTip('Edicion de preferencias')
 
         ################################################################################################################
@@ -333,39 +333,39 @@ class Series(QtWidgets.QMainWindow):
         # self.ui.actionId_de_Opcion.addAction('Desplegable 2')
 
         # A CERCA DE
-        self.ui.actionAcerca_de.triggered.connect(self.menAcercaDe)
+        self.ui.actionAcerca_de.triggered.connect(self.menu_about)
         self.ui.actionAcerca_de.setShortcut('Ctrl+H')
         self.ui.actionAcerca_de.setStatusTip('A cerca de')
 
-    def menSeriesActivas(self) -> NoReturn:
+    def menu_series_actives(self) -> NoReturn:
         """
         Muestra todas las series activas con un boton de sumar o restar capitulos
         """
 
         lista_activa.ListaActiva.get_data(database=self.database)
 
-    def menListar(self) -> NoReturn:
+    def menu_list(self) -> NoReturn:
         """
         Muestra las series para hacer modificaciones en masa
         """
 
         listar_todas.ListarTodas.get_data(database=self.database)
 
-    def menActualizaSerie(self) -> NoReturn:
+    def menu_serie_update(self) -> NoReturn:
         """
         Busca una serie especifica en la bd y te abre la ventana de modificacion de la serie
         """
 
         buscar_series.BuscarSeries.get_data(database=self.database)
 
-    def menInsertar(self) -> NoReturn:
+    def menu_insert(self) -> NoReturn:
         """
         Abre una ventana para meter una nueva serie en la bd
         """
 
         actualizar_insertar.ActualizarInsertar.get_data(database=self.database)
 
-    def RevisaEstadoSeries(self):
+    def check_series_states(self):
         """
         Revisa los estados de las series, si empiezan temporada, acaban temporadao acaban serie
         """
@@ -373,35 +373,35 @@ class Series(QtWidgets.QMainWindow):
         estado_series.EstadoSeries.get_data(database=self.database)
 
     @staticmethod
-    def menActualizarImdb() -> NoReturn:
+    def menu_imdb_update() -> NoReturn:
         import app.modulos.actualiza_imdb as actualiza_imdb
         a = actualiza_imdb.UpdateImdb()
         logger.info('actulizaCompleto')
         a.update_completed()
 
-    def menNewpct1(self) -> NoReturn:
+    def menu_download_automatic(self) -> NoReturn:
         conf = funciones.db_configuarion()
         ruta_desc = str(conf['RutaDescargas'])  # es unicode
 
         if not os.path.exists(ruta_desc):
             dat = {'title': 'No existe el directorio', 'text': 'El directorio {} no existe'.format(ruta_desc)}
-            msgbox.MsgBox.getData(datos=dat)
+            msgbox.MsgBox.get_data(datos=dat)
         else:
             descarga_automatica.DescargaAutomatica.get_data(database=self.database)
 
     @staticmethod
-    def menCompletoNewpct1() -> NoReturn:
+    def menu_download_automatic_complete() -> NoReturn:
         conf = funciones.db_configuarion()
         ruta_desc = str(conf['RutaDescargas'])  # es unicode
 
         if not os.path.exists(ruta_desc):
             dat = {'title': 'No existe el directorio', 'text': 'El directorio {} no existe'.format(ruta_desc)}
-            msgbox.MsgBox.getData(datos=dat)
+            msgbox.MsgBox.get_data(datos=dat)
         else:
             newpct1_completa.Newpct1Completa.get_data()
 
     @staticmethod
-    def abrirDirectorioDatos() -> NoReturn:
+    def open_directory_data() -> NoReturn:
         if sistema == 'Windows':
             comando = 'explorer "{}"'.format(directorio_trabajo.replace('/', '\\'))
         else:
@@ -422,13 +422,13 @@ class Series(QtWidgets.QMainWindow):
         ejecucion.communicate()  # no se lanza un hilo, hasta que no se cierre la ventana no sepuede seguir usando
 
     # PREFERENCIAS
-    def menPreferencias(self) -> NoReturn:
+    def menu_preferences(self) -> NoReturn:
         preferencias.Preferencias.get_data(database=self.database)
 
-    def menNotificaciones(self) -> NoReturn:
+    def menu_notifications(self) -> NoReturn:
         notificaciones.Notificaciones.get_data(database=self.database)
 
-    def menSeleccionaLog(self, num: str) -> NoReturn:
+    def menu_select_log(self, num: str) -> NoReturn:
         """
         creo una lista con los directorios/ficheros que quiero borrar
         """
@@ -444,41 +444,43 @@ class Series(QtWidgets.QMainWindow):
             if num == 'newpct1':
                 lista_log.append('{}/log/{}'.format(directorio_trabajo, consultas_log.response[0]['FicheroFeedNewpct']))
             elif num == 'showrss':
-                lista_log.append('{}/log/{}'.format(directorio_trabajo, consultas_log.response[0]['FicheroFeedShowrss']))
+                lista_log.append(
+                    '{}/log/{}'.format(directorio_trabajo, consultas_log.response[0]['FicheroFeedShowrss']))
             elif num == 'Descargas':
                 lista_log.append('{}/log/{}'.format(directorio_trabajo, consultas_log.response[0]['FicheroDescargas']))
             elif num == 'Todos':
                 lista_log.append('{}/log/{}'.format(directorio_trabajo, consultas_log.response[0]['FicheroFeedNewpct']))
-                lista_log.append('{}/log/{}'.format(directorio_trabajo, consultas_log.response[0]['FicheroFeedShowrss']))
+                lista_log.append(
+                    '{}/log/{}'.format(directorio_trabajo, consultas_log.response[0]['FicheroFeedShowrss']))
                 lista_log.append('{}/log/{}'.format(directorio_trabajo, consultas_log.response[0]['FicheroDescargas']))
 
         # print self.listaLog
-        self.menVaciaLog(lista_log)
+        self.menu_empty_log(lista_log)
 
     @staticmethod
-    def menVaciaLog(listaLog) -> NoReturn:
+    def menu_empty_log(list_log) -> NoReturn:
         """
         Borra los ficheros que estan la la lista (si existen)
         """
 
-        for files in listaLog:
+        for files in list_log:
             if os.path.exists(files):
                 with open(files, 'w'):
                     pass
 
     @staticmethod
-    def menAsistenteInicial() -> NoReturn:
+    def menu_initial_assistant() -> NoReturn:
         asistente_inicial.AsistenteInicial.get_data(ruta=directorio_trabajo)
 
     @staticmethod
-    def menAcercaDe() -> NoReturn:
+    def menu_about() -> NoReturn:
         acerca_de.AcercaDe.get_data()
 
 
 def main():
     # intentamos crear los ficheros de configuracion necesarios un maximo de 3 veces
     contador = 0
-    while not asistente_inicial.AsistenteInicial.checkIntegridadFicheros():
+    while not asistente_inicial.AsistenteInicial.check_integrity_files():
         contador += 1
         logger.info("Intento {} de 3".format(contador))
         if contador == 3:

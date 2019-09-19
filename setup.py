@@ -5,12 +5,14 @@ import glob
 import shutil
 import sys
 
+import requests.certs
 from cx_Freeze import setup, Executable
 
 
-def CogeFich(ruta='./'):
+def get_file(ruta='./'):
     """
-    Con la lista que tengo de extensiones voy haciendo una lista de todos los ficheros de esa extension y despues la uno en una unica lista con todos los ficheros
+    Con la lista que tengo de extensiones voy haciendo una lista de todos los ficheros de esa extension y despues la
+    uno en una unica lista con todos los ficheros
 
     http:/www.genbetadev.com/python/python-mezclar-listas-sin-duplicados-o-aibalaostia
     """
@@ -40,7 +42,6 @@ listaFicheros = list()
 listaFicheros.append('SQL/')
 # listaFicheros.append('Icons/')
 
-import requests.certs
 
 listaFicheros.append((requests.certs.where(), 'cacert.pem'))
 

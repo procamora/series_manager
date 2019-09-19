@@ -7,6 +7,7 @@
 import os
 import re
 import time
+from typing import Dict
 
 import feedparser
 
@@ -16,7 +17,7 @@ from app.modulos.connect_sqlite import conection_sqlite, execute_script_sqlite
 from app.modulos.mail2 import ML2
 from app.modulos.pushbullet2 import PB2
 from app.modulos.settings import directorio_trabajo, ruta_db
-from app.modulos.telegram2 import TG2
+from app.modulos.telegram2 import Telegram
 
 # https://gist.github.com/kaotika/e8ca5c340ec94f599fb2
 
@@ -31,7 +32,7 @@ class DescargaAutomaticaCli:
             else:
                 self.db = database
 
-            self.notificaciones = self.muestraNotificaciones()  # variable publica
+            self.notificaciones = self.show_notificacions()  # variable publica
 
             self.query = """SELECT Nombre, Temporada, Capitulo, VOSE FROM Series WHERE Siguiendo = "Si"
                           ORDER BY Nombre ASC"""
@@ -45,10 +46,12 @@ class DescargaAutomaticaCli:
             url_show = self.conf['UrlFeedShowrss']
 
             # Diccionario con las series y capitulos para actualizar la bd el capitulo descargado
-            self.capDescargado = dict()
-            self.consultaUpdate = str()
-            self.rutlog = str()
-
+            self.capDescargado: Dict = dict()
+            self.consultaUpdate: str = str()
+            self.rutlog: str = str()
+            self.ultimaSerieNew: str = str()
+            self.ultimaSerieShow: str = str()
+            self.titleSerie: str = str()
             try:
                 self.feedNew = feedparser.parse(url_new)
             except TypeError:  # Para el fallo en fedora
@@ -88,7 +91,7 @@ class DescargaAutomaticaCli:
         for i in self.consultaSeries:
             try:
                 logger.info(('Revisa: {}'.format(funciones.remove_tildes(i['Nombre']))))
-                serie_actual_temp = self.parseaFeed(
+                serie_actual_temp = self.parser_feed(
                     i['Nombre'], i['Temporada'], i['Capitulo'], i['VOSE'])
                 if i['VOSE'] == 'Si':
                     serie_actual_show = serie_actual_temp
@@ -128,7 +131,7 @@ class DescargaAutomaticaCli:
         else:
             logger.warning('PROBLEMA CON if SerieActualShow is not None and SerieActualNew is not None:')
 
-    def parseaFeed(self, serie, tem, cap, vose):
+    def parser_feed(self, serie, tem, cap, vose):
         """Solo funciona con series de 2 digitos por la expresion regular"""
         cap = str(cap)
         ruta = str(self.conf['RutaDescargas'])  # es unicode
@@ -153,12 +156,13 @@ class DescargaAutomaticaCli:
                 # retornamos el valor que luego usaremos en ultima serie para guardarlo en el fichero
                 return funciones.remove_tildes(d.entries[0].title)
 
-            regex_vose = r'(?i){} ({}|{}|{}).*'.format(funciones.scapes_parenthesis(serie.lower()), tem, tem + 1, tem + 2)
-            regex_cast = r'(?i){}( \(Proper\))?( )*- Temporada( )?\d+ \[HDTV 720p?\]\[Cap\.({}|{}|{})\d+(_\d+)?\]\[A.*' \
+            regex_vose = r'(?i){} ({}|{}|{}).*'.format(funciones.scapes_parenthesis(serie.lower()), tem, tem + 1,
+                                                       tem + 2)
+            regex_esp = r'(?i){}( \(Proper\))?( )*- Temporada( )?\d+ \[HDTV 720p?\]\[Cap\.({}|{}|{})\d+(_\d+)?\]\[A.*' \
                 .format(funciones.scapes_parenthesis(serie.lower()), tem, tem + 1, tem + 2)
 
             if serie.lower() == SERIE_DEBUG.lower():
-                logger.info('{}->{}'.format(regex_cast, self.titleSerie))
+                logger.info('{}->{}'.format(regex_esp, self.titleSerie))
                 logger.info(i.link)
 
             estado = False
@@ -166,7 +170,7 @@ class DescargaAutomaticaCli:
                 if re.search(regex_vose, self.titleSerie):
                     estado = True
             else:
-                if re.search(regex_cast, self.titleSerie):
+                if re.search(regex_esp, self.titleSerie):
                     estado = True
 
             if estado:
@@ -187,14 +191,14 @@ class DescargaAutomaticaCli:
                         f.write('{} {}\n'.format(time.strftime('%Y%m%d'), title_serie))
 
                     if vose == 'Si':
-                        self.accionExtra(title_serie)
+                        self.extra_action(title_serie)
                         # creo un string para solo mandar una notificacion
                         self.listaNotificaciones += '{}\n'.format(title_serie)
                     else:
                         # En pelis que son VOSE no se si da fallo, esto solo es para no VOSE
                         var_nom = self.titleSerie.split('-')[0]
                         var_epi = self.titleSerie.split('][')[1]
-                        self.accionExtra('{} {}'.format(var_nom, var_epi))
+                        self.extra_action('{} {}'.format(var_nom, var_epi))
                         # creo un string para solo mandar una notificacion
                         self.listaNotificaciones += '{} {}\n'.format(var_nom, var_epi)
                     funciones.download_file(torrent, r'{}/{}.torrent'.format(ruta, str(title_serie)))
@@ -216,7 +220,7 @@ class DescargaAutomaticaCli:
 
         return funciones.remove_tildes(d.entries[0].title)
 
-    def accionExtra(self, serie):
+    def extra_action(self, serie):
         """
         Metodo que no hace nada en esta clase pero que en herencia es
         usado para usar el entorno ggrafico que QT
@@ -224,14 +228,14 @@ class DescargaAutomaticaCli:
         """
         pass
 
-    def getSeries(self):
+    def get_series(self):
         return self.consultaSeries
 
-    def getSerieActual(self):
+    def get_actual_serie(self):
         return self.titleSerie
 
     @staticmethod
-    def muestraNotificaciones():
+    def show_notificacions():
         """
         poner las api de la base de datos
         """
@@ -243,7 +247,7 @@ class DescargaAutomaticaCli:
         for i in datos:
             if i['Activo'] == 'True':
                 if i['Nombre'] == 'Telegram':
-                    tg3 = TG2(i['API'])
+                    tg3 = Telegram(i['API'])
 
                 elif i['Nombre'] == 'Pushbullet':
                     pb3 = PB2(i['API'])

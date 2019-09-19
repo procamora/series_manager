@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 
-class algo:
+class Algo:
     def __init__(self):
         self.a = "A"
         self._b = "B"
@@ -20,7 +20,7 @@ class algo:
         return self._b
 
 
-a = algo()
+a = Algo()
 print(a.a)
 print(a.b)
 print(a.d)

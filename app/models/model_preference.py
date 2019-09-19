@@ -5,8 +5,10 @@ from __future__ import annotations
 
 from typing import Dict
 
+from app.models import Model
 
-class ModelPreference(object):
+
+class ModelPreference(Model):
     id: int = int()
     url_feed: str = str()
     url_feed_vose: str = str()

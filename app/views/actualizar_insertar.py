@@ -15,7 +15,7 @@ from app.views.msgbox import MsgBox
 
 
 class ActualizarInsertar(QtWidgets.QDialog):
-    def __init__(self, parent=None, database: str = None, datSerie: Dict = None) -> NoReturn:
+    def __init__(self, parent=None, database: str = None, data_serie: Dict = None) -> NoReturn:
         QtWidgets.QWidget.__init__(self, parent)
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
@@ -24,7 +24,7 @@ class ActualizarInsertar(QtWidgets.QDialog):
         self.state_cancel = 'Cancelado'  # final
         self.state_current = self.state_ok  # actual
         self.db = database
-        self.datSerie = datSerie
+        self.datSerie = data_serie
 
         # para todos establezco esto que el estado es Activa, si actualizo lo
         # modifico en la funcion creaConf
@@ -41,14 +41,14 @@ class ActualizarInsertar(QtWidgets.QDialog):
             self.name_original = str(self.datSerie['Nombre'])
 
             self.ui.pushButtonAplicar.setText('Actualizar')
-            self.creaConf()
+            self.create_configuration()
         else:  # Insertar
             self.setWindowTitle('Insertar Serie')
             self.ui.pushButtonAplicar.setText('Insertar')
 
             # Generar checkbox
-            self.listaTemporadas(1, 5)
-            self.listaCapitulos(1, 13)
+            self.list_seasons(1, 5)
+            self.list_chapters(1, 13)
 
             # pongo la fecha de hoy para insertar por defecto
             # recogo todos los dias de la caja y le paso el indice del dia en
@@ -65,14 +65,14 @@ class ActualizarInsertar(QtWidgets.QDialog):
         self.ui.lineCapitulo.setText(str(self.ui.BoxCapitulo.currentText()))
 
         # conectores
-        self.ui.BoxTemporada.activated.connect(self.campoTemp)
-        self.ui.BoxCapitulo.activated.connect(self.campoCap)
+        self.ui.BoxTemporada.activated.connect(self.field_season)
+        self.ui.BoxCapitulo.activated.connect(self.field_chapter)
 
         self.ui.pushButtonAplicar.clicked.connect(self.apply_data)
         self.ui.pushButtonCerrar.clicked.connect(self.cancel)
         self.ui.pushButtonAceptar.clicked.connect(self.accept_data)
 
-    def campoTemp(self) -> NoReturn:
+    def field_season(self) -> NoReturn:
         """
         Si en la lista de temporadas seleccionamos otra se abre un line edit
         para poner el numero de temporada que no esta, si lo cambiamos se oculta
@@ -87,7 +87,7 @@ class ActualizarInsertar(QtWidgets.QDialog):
             self.ui.lineTemp.setVisible(False)
             self.ui.lineTemp.setText(str(self.ui.BoxTemporada.currentText()))
 
-    def campoCap(self) -> NoReturn:
+    def field_chapter(self) -> NoReturn:
         """
         Si en la lista de capitulos seleccionamos otra se abre un line edit
         para poner el numero de capitulo que no esta, si lo cambiamos se oculta
@@ -103,7 +103,7 @@ class ActualizarInsertar(QtWidgets.QDialog):
             self.ui.lineCapitulo.setText(
                 str(self.ui.BoxCapitulo.currentText()))
 
-    def listaTemporadas(self, x: int, y: int) -> NoReturn:
+    def list_seasons(self, x: int, y: int) -> NoReturn:
         """
         Crea el comboBox de las temporadas, primero lo vacia y
         luego lo crea con los rangos que le indico
@@ -117,7 +117,7 @@ class ActualizarInsertar(QtWidgets.QDialog):
         self.ui.BoxTemporada.addItems(list_temp)
         self.ui.BoxTemporada.addItem(self.other)
 
-    def listaCapitulos(self, x: int, y: int) -> NoReturn:
+    def list_chapters(self, x: int, y: int) -> NoReturn:
         """
         Crea el comboBox de los capitulos, primero lo vacia y
         luego lo crea con los rangos que le indico
@@ -145,7 +145,7 @@ class ActualizarInsertar(QtWidgets.QDialog):
         self.ui.BoxEstado.clear()
         self.ui.BoxEstado.addItems(list_est)
 
-    def creaConf(self) -> NoReturn:
+    def create_configuration(self) -> NoReturn:
         """
         Establece los valores por defecto que se le indican en caso de que se indiquen
         """
@@ -154,8 +154,8 @@ class ActualizarInsertar(QtWidgets.QDialog):
         self.ui.lineTitulo.setText(self.datSerie['Nombre'])
 
         # Generar checkbox
-        self.listaTemporadas(self.datSerie['Temporada'], self.datSerie['Temporada'] + 2)
-        self.listaCapitulos(self.datSerie['Capitulo'], self.datSerie['Capitulo'] + 8)
+        self.list_seasons(self.datSerie['Temporada'], self.datSerie['Temporada'] + 2)
+        self.list_chapters(self.datSerie['Capitulo'], self.datSerie['Capitulo'] + 8)
 
         if self.datSerie['Siguiendo'] == 'Si':
             self.ui.radioSeguirSi.click()
@@ -286,7 +286,7 @@ class ActualizarInsertar(QtWidgets.QDialog):
             except Exception as e:
                 logger.error(e)
                 dat = {'title': 'Error en bd', 'text': str(e)}
-                MsgBox.getData(datos=dat)
+                MsgBox.get_data(datos=dat)
                 return False
         else:
             funciones.show_message(self.ui.label_Info, 'Titulo vacio', False)

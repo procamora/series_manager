@@ -58,8 +58,8 @@ def conect_tviso_mechanize(username: str, password: str) -> List[str]:
 
     # logger.info(cookiejar)
     url = br.open(urlafter)
-    returnPage = url.read()
-    compl = re.findall('<span class="event-name full-name">.*</span>', returnPage)
+    return_page = url.read()
+    compl = re.findall('<span class="event-name full-name">.*</span>', return_page)
     series = list()
 
     for i in compl:
@@ -72,7 +72,7 @@ def conect_tviso_mechanize(username: str, password: str) -> List[str]:
 
 
 # funciona en python 3
-def conectTviso(username: str, password: str) -> List[str]:
+def conect_tviso(username: str, password: str) -> List[str]:
     urllogin = 'https://es.tviso.com/login'
     urlafter = 'https://es.tviso.com/calendar?area=ES&all=true'
 
@@ -104,7 +104,7 @@ def conectTviso(username: str, password: str) -> List[str]:
 
 
 def main():
-    opcion1 = conectTviso("user", "pass")
+    opcion1 = conect_tviso("user", "pass")
 
     for i in opcion1:
         logger.info(i)

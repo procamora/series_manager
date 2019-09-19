@@ -20,44 +20,42 @@ except ModuleNotFoundError as e:  # Ejecucion local
 
 
 def finished(write: bool = False) -> str:
-    queryAcabada = 'SELECT * FROM Series WHERE Acabada LIKE "Si" AND Estado <> "Finalizada"'
-    query = conection_sqlite(ruta_db, queryAcabada, True)
+    query_finished = 'SELECT * FROM Series WHERE Acabada LIKE "Si" AND Estado <> "Finalizada"'
+    response_query = conection_sqlite(ruta_db, query_finished, True)
     update = 'UPDATE Series SET Estado="Finalizada" WHERE Nombre LIKE "{}";\n'
 
-    queryUpdate = make_update(query, update, write)
-
-    return queryUpdate
+    query_update = make_update(response_query, update, write)
+    return query_update
 
 
 def imdb(write: bool = False) -> str:
     """
     Busca las series que tienen una fecha de finalizacion en imdb pero sigo intentando actualizarlas
     """
-    queryImdb = 'SELECT * FROM Series WHERE imdb_finaliza <> "????" AND imdb_seguir LIKE "Si"'
-    query = conection_sqlite(ruta_db, queryImdb, True)
+    query_imdb = 'SELECT * FROM Series WHERE imdb_finaliza <> "????" AND imdb_seguir LIKE "Si"'
+    query_response = conection_sqlite(ruta_db, query_imdb, True)
     update = 'UPDATE Series SET imdb_seguir="No" WHERE Nombre LIKE "{}";\n'
 
-    queryUpdate = make_update(query, update, write)
-
-    return queryUpdate
+    query_update = make_update(query_response, update, write)
+    return query_update
 
 
 def make_update(query: List, update: str, write: bool = False) -> str:
     """
     Recibe una lista con los resultados de los datos a cambiar, y el update a falta del nombre
     """
-    queryUpdate = str()
+    query_update_str = str()
     for i in query:
         update.format(i['Nombre'])
-        queryUpdate += update
+        query_update_str += update
 
-    logger.debug(queryUpdate)
+    logger.debug(query_update_str)
 
-    if write and len(queryUpdate) != 0:
+    if write and len(query_update_str) != 0:
         logger.info('ejecutar script')
-        execute_script_sqlite(ruta_db, queryUpdate)
+        execute_script_sqlite(ruta_db, query_update_str)
 
-    return queryUpdate
+    return query_update_str
 
 
 if __name__ == '__main__':

@@ -3,21 +3,19 @@
 
 from __future__ import annotations
 
-import inspect
-from typing import NoReturn, Dict, List
+from typing import Dict, List
+
+from app.models import Model
 
 
-class ModelStates(object):
-    def __init__(self) -> NoReturn:
-        super().__init__()
-        self._state = str()
+class ModelStates(Model):
+    state: str = str()
 
-    def __str__(self) -> str:
-        attributes = inspect.getmembers(self, lambda a: not (inspect.isroutine(a)))
-        [a for a in attributes if not (a[0].startswith('__') and a[0].endswith('__'))]
-
-        new_attributes = ModelStates.delete_none_values(attributes[2][1])
-        return str(new_attributes)
+    # def __str__(self) -> str:
+    #    attributes = inspect.getmembers(self, lambda a: not (inspect.isroutine(a)))
+    #    [a for a in attributes if not (a[0].startswith('__') and a[0].endswith('__'))]
+    #   new_attributes = ModelStates.delete_none_values(attributes[2][1])
+    #    return str(new_attributes)
 
     @staticmethod
     def delete_none_values(attributes: List) -> Dict:

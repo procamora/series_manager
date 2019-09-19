@@ -17,18 +17,18 @@ class BuscarSeries(QtWidgets.QDialog):
         QtWidgets.QWidget.__init__(self, parent)
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
-        self.EstadoI = 'Ok'  # estado inicial
-        self.EstadoF = 'Cancelado'  # final
-        self.EstadoA = self.EstadoI  # actual
+        self.state_ok = 'Ok'  # estado inicial
+        self.state_cancel = 'Cancelado'  # final
+        self.state_current = self.state_ok  # actual
         self.db = database
 
         self.setWindowTitle('Buscador de series')
 
-        self.ui.pushButtonBuscar.clicked.connect(self.operacionesIniciales)
-        self.ui.pushButtonAplicar.clicked.connect(self.actualizaSerie)
-        self.ui.pushButtonCerrar.clicked.connect(self.cancela)
+        self.ui.pushButtonBuscar.clicked.connect(self.initial_operations)
+        self.ui.pushButtonAplicar.clicked.connect(self.update_serie)
+        self.ui.pushButtonCerrar.clicked.connect(self.cancel)
 
-    def operacionesIniciales(self) -> NoReturn:
+    def initial_operations(self) -> NoReturn:
         """
         Busca todas las series que haya con el patron buscado y crea una lista
         para seleccionar posteriormente una %% es para escapar el tanto por ciento
@@ -39,20 +39,20 @@ class BuscarSeries(QtWidgets.QDialog):
 
         query = 'SELECT Nombre FROM Series WHERE Nombre LIKE "%%{}%%"'.format(
             self.ui.lineEdit.text())
-        seriesTest = conection_sqlite(self.db, query, True)
+        response_query = conection_sqlite(self.db, query, True)
 
-        if len(seriesTest) == 0:
+        if len(response_query) == 0:
             item = QtWidgets.QListWidgetItem()
             item.setText('Serie no encontrada')
             self.ui.listWidget.addItem(item)
 
         else:
-            for i in seriesTest:
+            for i in response_query:
                 item = QtWidgets.QListWidgetItem()
                 item.setText(i['Nombre'])
                 self.ui.listWidget.addItem(item)
 
-    def actualizaSerie(self) -> NoReturn:
+    def update_serie(self) -> NoReturn:
         """
         cojo la serie escogida, saco todos sus datos y se los mando a la libreria
         de actualizar_insertar serie
@@ -63,17 +63,17 @@ class BuscarSeries(QtWidgets.QDialog):
 
             query = 'SELECT * FROM Series WHERE Nombre LIKE "{}"'.format(
                 i.text())
-            ser = conection_sqlite(self.db, query, True)[0]
+            response_query = conection_sqlite(self.db, query, True)[0]
 
             ActualizarInsertar.get_data(
-                data_serie=ser, database=self.db)
+                data_serie=response_query, database=self.db)
 
-    def cancela(self) -> NoReturn:
+    def cancel(self) -> NoReturn:
         """
         Establece el estado actual en cancelado para retornar None y ejecuta reject
         """
 
-        self.EstadoA = self.EstadoF
+        self.state_current = self.state_cancel
         self.reject()
 
     @staticmethod

@@ -3,10 +3,10 @@
 
 import os
 import sqlite3
-from typing import Dict, Union, Iterable, List
+from typing import Dict, List, Tuple, Optional
 
 
-def conection_sqlite(db: str, query: str, is_dict: bool = False, to_class:object=None) -> List:
+def conection_sqlite(db: str, query: str, is_dict: bool = False, to_class: object = None) -> List:
     if os.path.exists(db):
         conn = sqlite3.connect(db)
         if is_dict:
@@ -27,13 +27,14 @@ def conection_sqlite(db: str, query: str, is_dict: bool = False, to_class:object
         if to_class is not None:
             for i in data:
                 a = to_class.__class__
+                # fixme usar introspeccion para confirmar que tiene el metodo load
                 response.append(a.load(i))
             return response
 
         return data
 
 
-def dict_factory(cursor, row) -> Dict:
+def dict_factory(cursor: sqlite3.Cursor, row: Tuple[str]) -> Dict:
     d = dict()
     for idx, col in enumerate(cursor.description):
         d[col[0]] = row[idx]
@@ -49,7 +50,7 @@ def execute_script_sqlite(db: str, script: str) -> None:
     conn.close()
 
 
-def dump_database(db: str) -> Union[Iterable[str], None]:
+def dump_database(db: str) -> Optional[str]:
     """
     Hace un dump de la base de datos y lo retorna
     :param db: ruta de la base de datos
@@ -58,3 +59,4 @@ def dump_database(db: str) -> Union[Iterable[str], None]:
     if os.path.exists(db):
         con = sqlite3.connect(db)
         return '\n'.join(con.iterdump())
+    return None

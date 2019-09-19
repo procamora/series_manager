@@ -18,15 +18,15 @@ class PB2:
     def send_link_pb(self, titulo, link):
         self.pb.push_link(titulo, link)
 
-    def send_file_pb(self, fichOriginal, fichFinal=None):
+    def send_file_pb(self, fich_original, fich_final=None):
         """
         Envia un fichero, primero lo sube y despues lo envia, si solo se le da el nombre del fichero a la funcion lo
          envia con ese nombre si se le dan 2 nombres lo envia con el nombre del segundo
         """
-        if fichFinal is None:
-            fichFinal = fichOriginal
-        with open(fichOriginal, "rb") as pic:
-            file_data = self.pb.upload_file(pic, fichFinal)
+        if fich_final is None:
+            fich_final = fich_original
+        with open(fich_original, "rb") as pic:
+            file_data = self.pb.upload_file(pic, fich_final)
 
         self.pb.push_file(**file_data)
 

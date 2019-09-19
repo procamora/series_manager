@@ -27,69 +27,53 @@ from app.modulos.connect_sqlite import conection_sqlite, execute_script_sqlite
 from app.modulos.mail2 import ML2
 from app.modulos.pushbullet2 import PB2
 from app.modulos.settings import directorio_trabajo, ruta_db
-from app.modulos.telegram2 import TG2
+from app.modulos.telegram2 import Telegram
 from app import logger
 
-from typing import List, NoReturn
+from typing import List, NoReturn, Dict
+from dataclasses import dataclass
 
 SERIE_DEBUG = "SEAL Team"
 
 
 # https://gist.github.com/kaotika/e8ca5c340ec94f599fb2
 
-class feed:
-    def __init__(self, title: str, cap: str, link: str) -> NoReturn:
-        self.title = title
-        self.link = link
-        self.cap = cap
+@dataclass
+class Feed:
+    title: str
+    link: str
+    chapter: int
+    name: str = str()
+    season: int = int()
+    epi: str = str()
 
-        """
-        regex = r'.*Temporada \d+ Capitulo \d+.*'
-
-        if re.match(regex, title):
-            epiList = re.search(regex, title).group(0)
-        else:
-            regex = r'.*Temporada (\d+).*'
-            if re.match(regex, title):
-                temp = re.search(regex, title).group(1)
-            else:
-                temp = 1
-
-            regex = r'.*Capitulos? (\d+) al (\d+).*'
-            if re.match(regex, title):
-                cap = re.search(regex, title).group(2)
-            else:
-                cap = 1
-
-            epiList = 'Temporada {} Capitulo {}'.format(temp, cap)
-
-        lista = re.findall(r'\d+', epiList)
-        """
-
-        self.name = title.split('-')[0]
-        temp = re.search(r'(\d+). Temporada', self.title)
-        if temp is not None:
-            self.temp = temp.group(1)
+    def update_fields(self) -> NoReturn:
+        self.name = self.title.split('-')[0]
+        season = re.search(r'(\d+). Temporada', self.title)
+        if season is not None:
+            self.season = int(season.group(1))
         else:  # por ejeplo una miniserie no tiene temporada
-            self.temp = 1
+            self.season = 1
 
-        self.epi = re.findall(r'\d+', self.cap)[-1]
+        self.epi = re.findall(r'\d+', str(self.chapter))[-1]
         # self.cap = "{}x{}".format(self.temp, self.epi)
 
-    def toString(self) -> NoReturn:
-        return '{} - {} - {}'.format(self.title, self.cap, self.link)
+    def __str__(self) -> NoReturn:
+        return f'{self.title} - {self.chapter} - {self.link}'
 
 
-class feedparserPropio:
+class FeedparserPropio:
     def __init__(self) -> NoReturn:
         self.entries = list()
 
     def add(self, title: str, cap: str, link: str) -> NoReturn:
-        f = feed(title.strip(), cap, link)
+        print(cap)
+        f = Feed(title.strip(), link, cap)
+        f.update_fields()
         self.entries.append(f)
 
     @staticmethod
-    def parse(logger: logging, url: str = 'https://dontorrent.com/series/hd') -> feedparserPropio:
+    def parse(logger: logging, url: str = 'https://dontorrent.com/series/hd') -> FeedparserPropio:
         """
         """
         req_headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; WOW64; rv:35.0) Gecko/20100101 Firefox/35.0',
@@ -107,7 +91,7 @@ class feedparserPropio:
         days = sopa.findAll('div', {"class": "card-body"})
         # result = sopa.findAll('ul', {"class": "noticias-series"})
 
-        f = feedparserPropio()
+        f = FeedparserPropio()
         for day in days:
             if not day.findAll('h5'):  # si tiene h5 signigica que es una caja de imagenes de las series
                 for serie, capitulo in zip(day.findAll('a'), day.findAll('b')):
@@ -136,7 +120,7 @@ class DescargaAutomaticaCli:
             else:
                 self.db = database
 
-            self.notificaciones = self.muestraNotificaciones()  # variable publica
+            self.notificaciones = self.show_notifications()  # variable publica
 
             self.query = 'SELECT Nombre, Temporada, Capitulo, VOSE FROM Series WHERE Siguiendo = "Si" ' \
                          'ORDER BY Nombre ASC'
@@ -150,11 +134,14 @@ class DescargaAutomaticaCli:
             url_show = self.conf['UrlFeedShowrss']
 
             # Diccionario con las series y capitulos para actualizar la bd el capitulo descargado
-            self.capDescargado = dict()
-            self.consultaUpdate = str()
-            self.rutlog = str()
+            self.capDescargado: Dict = dict()
+            self.consultaUpdate: str = str()
+            self.rutlog: str = str()
+            self.ultimaSerieNew: str = str()
+            self.ultimaSerieShow: str = str()
+            self.titleSerie: str = str()
 
-            self.feedNew = feedparserPropio.parse(self._logger)
+            self.feedNew = FeedparserPropio.parse(self._logger)
             """
             try:
                 self.feedNew = feedparser.parse(urlNew)
@@ -196,7 +183,7 @@ class DescargaAutomaticaCli:
         for i in self.consultaSeries:
             try:
                 self._logger.info(('Revisa: {}'.format(funciones.remove_tildes(i['Nombre']))))
-                serie_actual_temp = self.parseaFeed(i['Nombre'], i['Temporada'], i['Capitulo'], i['VOSE'])
+                serie_actual_temp = self.parser_feed(i['Nombre'], i['Temporada'], i['Capitulo'], i['VOSE'])
                 if i['VOSE'] == 'Si':
                     serie_actual_show = serie_actual_temp
                 else:
@@ -237,15 +224,15 @@ class DescargaAutomaticaCli:
         else:
             self._logger.error('PROBLEMA CON if SerieActualShow is not None and SerieActualNew is not None:')
 
-    def parseaFeed(self, serie: str, tem: str, cap: str, vose: str) -> str:
+    def parser_feed(self, serie: str, tem: str, cap: str, vose: str) -> str:
         """Solo funciona con series de 2 digitos por la expresion regular"""
         cap = str(cap)
         ruta = str(self.conf['RutaDescargas'])  # es unicode
         if vose == 'Si':
-            ultimaSerie = self.ultimaSerieShow
+            last_serie = self.ultimaSerieShow
             d = self.feedShow
         else:
-            ultimaSerie = self.ultimaSerieNew
+            last_serie = self.ultimaSerieNew
             d = self.feedNew
 
         if not os.path.exists(ruta):
@@ -258,7 +245,7 @@ class DescargaAutomaticaCli:
             self.titleSerie = funciones.remove_tildes(i.title)
             # cuando llegamos al ultimo capitulo pasamos a la siguiente serie
             # self._logger.info(self.titleSerie, ".........", ultimaSerie, ".FIN")
-            if self.titleSerie == ultimaSerie:
+            if self.titleSerie == last_serie:
                 # retornamos el valor que luego usaremos en ultima serie para guardarlo en el fichero
                 pass
                 # return funciones.eliminaTildes(d.entries[0].title)  # FIXME DESCOMENTAR
@@ -299,11 +286,11 @@ class DescargaAutomaticaCli:
                         f.write('{} {}\n'.format(time.strftime('%Y%m%d'), title_serie))
 
                     if vose == 'Si':
-                        self.accionExtra(title_serie)
+                        self.extra_action(title_serie)
                         # creo un string para solo mandar una notificacion
                         self.listaNotificaciones += '{}\n'.format(title_serie)
                     else:
-                        self.accionExtra('{} {}'.format(i.name, i.cap))
+                        self.extra_action('{} {}'.format(i.name, i.cap))
                         # creo un string para solo mandar una notificacion
                         self.listaNotificaciones += '{} {}\n'.format(i.name, i.cap)
 
@@ -320,7 +307,7 @@ class DescargaAutomaticaCli:
 
         return funciones.remove_tildes(d.entries[0].title)
 
-    def accionExtra(self, serie: str) -> NoReturn:
+    def extra_action(self, serie: str) -> NoReturn:
         """
         Metodo que no hace nada en esta clase pero que en herencia es
         usado para usar el entorno ggrafico que QT
@@ -328,14 +315,14 @@ class DescargaAutomaticaCli:
         """
         pass
 
-    def getSeries(self) -> List:
+    def get_series(self) -> List:
         return self.consultaSeries
 
-    def getSerieActual(self) -> str:
+    def get_actual_serie(self) -> str:
         return self.titleSerie
 
     @staticmethod
-    def muestraNotificaciones() -> List:
+    def show_notifications() -> List:
         """
         poner las api de la base de datos
         """
@@ -347,7 +334,7 @@ class DescargaAutomaticaCli:
         for i in datos:
             if i['Activo'] == 'True':
                 if i['Nombre'] == 'Telegram':
-                    tg3 = TG2(i['API'])
+                    tg3 = Telegram(i['API'])
 
                 elif i['Nombre'] == 'Pushbullet':
                     pb3 = PB2(i['API'])

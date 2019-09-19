@@ -26,7 +26,7 @@ class MsgBox(QtWidgets.QDialog):
         # self.ui.ButtonOk.clicked.connect(self.retornaDatos)
 
     @staticmethod
-    def getData(parent: object = None, datos: Dict = None) -> NoReturn:
+    def get_data(parent: object = None, datos: Dict = None) -> NoReturn:
         dialog = MsgBox(parent, datos)
         dialog.exec_()
 
@@ -52,7 +52,7 @@ tincidunt tempus.
 
     res = {'title': 'titulo de prueba', 'text': a}
     # MiFormulario.getData(parent=None, datos=res)
-    MsgBox.getData(datos=res)
+    MsgBox.get_data(datos=res)
     return app
 
 

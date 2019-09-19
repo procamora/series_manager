@@ -18,13 +18,13 @@ class ML2:
         self.mail.use_tls = True  # sin esto no se establece la conexion
         self.mail.login(user, passwd)
 
-    def sendMail(self, remitente, texto):
+    def send_mail(self, remitente, texto):
         self.message.To = remitente
         self.message.Html = texto
         # self.message.Html = open('letter.txt', 'rb').read()
         self.mail.send(self.message)
 
-    def sendMailAdjunto(self, remitente, texto, adjuntos=''):
+    def send_mail_adjunto(self, remitente, texto, adjuntos=''):
         self.message.To = remitente
         self.message.Html = texto
         # self.message.Html = open('letter.txt', 'rb').read()

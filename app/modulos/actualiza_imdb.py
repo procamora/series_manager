@@ -31,20 +31,23 @@ class UpdateImdb:
         self.nombre_db = ruta_db
         # self.imdb = Imdb(cache=True, cache_dir='/tmp/imdbpie-cache-here', anonymize=False)
 
-    def check_data(self, data, series):
+    @staticmethod
+    def check_data(data, series):
         if str(series['imdb_Temporada']) == data['Temp'] and str(series['imdb_Finaliza']) == data['year'] and str(
                 series['imdb_Capitulos']) == data['Cap']:
             return True
         else:
             return False
 
-    def check_data_partial(self, data, series):
+    @staticmethod
+    def check_data_partial(data, series):
         if str(series['imdb_Temporada']) == data['Temp'] and str(series['imdb_Finaliza']) == data['year']:
             return True
         else:
             return False
 
-    def search_chapter(self, id_imdb):
+    @staticmethod
+    def search_chapter(id_imdb):
         # Para buscar el capitulo en vez de coger el la primera temporada, coger la ultima
         # problema de que la ultima temporada no este completa
         url = 'http://www.imdb.com/title/{}/episodes?season=1'.format(id_imdb)
@@ -76,18 +79,18 @@ class UpdateImdb:
                 title = self.imdb.get_title_by_id(i['imdb_id'])
 
                 if title.data['seasons'][-1] == 'unknown':  # en algunas series la ultima temporada pone unknown
-                    Temporada = title.data['seasons'][-2]
+                    season = title.data['seasons'][-2]
                 else:
-                    Temporada = title.data['seasons'][-1]
+                    season = title.data['seasons'][-1]
 
-                DatosImdb = {'Titulo': title.data['title'], 'Temp': Temporada, 'year': title.data['year_end'],
+                data_imdb = {'Titulo': title.data['title'], 'Temp': season, 'year': title.data['year_end'],
                              'id_imdb': i['imdb_id']}
-                Cap = self.search_chapter(i['imdb_id'])
-                DatosImdb['Cap'] = Cap
+                cap = self.search_chapter(i['imdb_id'])
+                data_imdb['Cap'] = cap
 
-                if not self.check_data_partial(DatosImdb, i):
-                    logger.info(DatosImdb)
-                    self._update_serie_partial(DatosImdb)
+                if not self.check_data_partial(data_imdb, i):
+                    logger.info(data_imdb)
+                    self._update_serie_partial(data_imdb)
 
             except Exception as e:
                 logger.error('FALLO: {}'.format(i['Nombre']))
@@ -109,18 +112,18 @@ class UpdateImdb:
                 title = self.imdb.get_title_by_id(i['imdb_id'])
 
                 if title.data['seasons'][-1] == 'unknown':  # en algunas series la ultima temporada pone unknown
-                    Temporada = title.data['seasons'][-2]
+                    season = title.data['seasons'][-2]
                 else:
-                    Temporada = title.data['seasons'][-1]
+                    season = title.data['seasons'][-1]
 
-                DatosImdb = {'Titulo': title.data['title'], 'Temp': Temporada, 'year': title.data['year_end'],
+                data_imdb = {'Titulo': title.data['title'], 'Temp': season, 'year': title.data['year_end'],
                              'id_imdb': i['imdb_id']}
-                Cap = self.search_chapter(i['imdb_id'])
-                DatosImdb['Cap'] = Cap
+                cap = self.search_chapter(i['imdb_id'])
+                data_imdb['Cap'] = cap
 
-                if not self.check_data(DatosImdb, i):
+                if not self.check_data(data_imdb, i):
                     # logger.info('completo')
-                    self._update_serie(DatosImdb)
+                    self._update_serie(data_imdb)
 
             except Exception as e:
                 logger.error('FALLO: {}'.format(i['Nombre']))
@@ -165,14 +168,14 @@ class UpdateImdb:
         query = 'SELECT * FROM Series Where Estado LIKE "Finalizada" AND imdb_seguir LIKE "Si"'
         series = conection_sqlite(self.nombre_db, query, True)
 
-        queryCompleta = str()
+        query_all = str()
 
         for i in series:
             query = 'UPDATE series SET imdb_seguir="No" WHERE Nombre LIKE "{}";'.format(i["Nombre"])
-            queryCompleta += '\n' + query
+            query_all += '\n' + query
 
         # logger.info(queryCompleta)
-        execute_script_sqlite(self.nombre_db, queryCompleta)
+        execute_script_sqlite(self.nombre_db, query_all)
 
 
 def main():

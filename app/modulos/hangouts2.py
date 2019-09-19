@@ -21,7 +21,7 @@ class SampleBot(GtalkRobot):
 
     # "command_" is the command prefix, "001" is the priviledge num, "setState" is the method name.
     # This method is used to change the state and status text of the bot.
-    def command_001_setState(self, user, message, args):
+    def command_001_set_state(self, user, message, args):
         # the __doc__ of the function is the Regular Expression of this command, if matched,
         # .this command method will be called.
         # The parameter "args" is a list, which will hold the matched string in
@@ -39,9 +39,8 @@ class SampleBot(GtalkRobot):
             self.replyMessage(user, "State settings changed！")
 
     # This method is used to send email for users.
-    def command_002_SendEmail(self, user, message, args):
+    def command_002_send_email(self, user, message, args):
         # email ldmiao@gmail.com hello dmeiao, nice to meet you, bla bla ...
-        """[email|mail|em|m]\s+(.*?@.+?)\s+(.*?),\s*(.*?)(?i)"""
         email_addr = args[0]
         subject = args[1]
         body = args[2]

@@ -22,7 +22,7 @@ class AsistenteInicial(QtWidgets.QDialog):
 
         self.setWindowTitle('Asistente Inicial')
 
-        self.rutaSistemaDefecto = self.muestraDirectorioTemporal()
+        self.rutaSistemaDefecto = self.show_directory_temporary()
         # Si paso una ruta la pongo por defecto
         if ruta is None:
             self.ui.checkBoxSync.setChecked(False)
@@ -32,17 +32,17 @@ class AsistenteInicial(QtWidgets.QDialog):
             self.ui.checkBoxSync.setChecked(True)
 
         self.ui.checkBoxValido.setChecked(True)
-        self.muestraMensaje(self.ui.checkBoxValido, 'Valido', True)
+        self.show_message(self.ui.checkBoxValido, 'Valido', True)
 
-        self.ui.checkBoxSync.clicked.connect(self.checkSync)
-        self.ui.pushButtonRuta.clicked.connect(self.buscarDirectorio)
+        self.ui.checkBoxSync.clicked.connect(self.check_sync)
+        self.ui.pushButtonRuta.clicked.connect(self.search_directory)
 
-        self.ui.pushButtonAplicar.clicked.connect(self.aplicaDatos)
+        self.ui.pushButtonAplicar.clicked.connect(self.apply_data)
         self.ui.pushButtonCerrar.clicked.connect(self.close)
-        self.ui.pushButtonAceptar.clicked.connect(self.aceptaDatos)
+        self.ui.pushButtonAceptar.clicked.connect(self.accept_data)
 
     @staticmethod
-    def muestraDirectorioTemporal() -> NoReturn:
+    def show_directory_temporary() -> NoReturn:
         """
         IMPORTANTE
         Esta funcion es la misma que la de settings, solo la hago por visibilidad,
@@ -56,7 +56,7 @@ class AsistenteInicial(QtWidgets.QDialog):
             directorio_trabajo = '{}/.{}'.format(os.environ['HOME'], 'Gestor-Series')
         return directorio_trabajo
 
-    def buscarDirectorio(self) -> NoReturn:
+    def search_directory(self) -> NoReturn:
         """
         Se encarga de coger la ruta en la que vamos a guardar el fichero,
         en este caso solo buscamos directorios,y establecemos que la ruta raiz sea
@@ -71,50 +71,50 @@ class AsistenteInicial(QtWidgets.QDialog):
         self.ui.lineRuta.setText(filenames)
         if os.path.exists(filenames):
             self.ui.checkBoxValido.setChecked(True)
-            self.muestraMensaje(self.ui.checkBoxValido, 'Valido', True)
+            self.show_message(self.ui.checkBoxValido, 'Valido', True)
         else:
-            self.muestraMensaje(self.ui.checkBoxValido, 'No Valido 1', False)
+            self.show_message(self.ui.checkBoxValido, 'No Valido 1', False)
             self.ui.checkBoxValido.setChecked(False)
 
-    def checkSync(self) -> NoReturn:
+    def check_sync(self) -> NoReturn:
         if self.ui.checkBoxSync.isChecked():
             # self.__cambiaVisibilidad(True)
             self.ui.checkBoxValido.setChecked(False)
-            self.muestraMensaje(self.ui.checkBoxValido, 'Ruta vacia', False)
+            self.show_message(self.ui.checkBoxValido, 'Ruta vacia', False)
             self.ui.lineRuta.setText("")
         else:
             # self.__cambiaVisibilidad(False)
             self.ui.checkBoxValido.setChecked(True)
-            self.muestraMensaje(self.ui.checkBoxValido, 'Valido', True)
+            self.show_message(self.ui.checkBoxValido, 'Valido', True)
             self.ui.lineRuta.setText(self.rutaSistemaDefecto)
 
-    def aplicaDatos(self) -> bool:
+    def apply_data(self) -> bool:
         if self.ui.checkBoxValido.isChecked():
             if self.ui.checkBoxSync.isChecked():
                 with open(sync_gdrive, 'w') as f:
                     f.write('1\n')
-                    f.write(self.cambiaBarras(self.ui.lineRuta.text()))
+                    f.write(self.change_bars(self.ui.lineRuta.text()))
             else:
                 with open(sync_gdrive, 'w') as f:
                     f.write('0')
             with open(sync_sqlite, 'w') as f:
                 f.write('1\n')
-            self.muestraMensaje(self.ui.label, 'Exito', True)
+            self.show_message(self.ui.label, 'Exito', True)
             return True
         else:
-            self.muestraMensaje(self.ui.label, 'Error', False)
+            self.show_message(self.ui.label, 'Error', False)
             return False
 
-    def aceptaDatos(self) -> NoReturn:
+    def accept_data(self) -> NoReturn:
         """
         Boton Aceptar, primero aplicas los datos, si retorna True, cierra la ventana
         """
 
-        if self.aplicaDatos():
+        if self.apply_data():
             self.accept()
 
     @staticmethod
-    def muestraMensaje(label: QtWidgets.QLabel, texto: str = 'Texto plantilla', estado: bool = True) -> NoReturn:
+    def show_message(label: QtWidgets.QLabel, texto: str = 'Texto plantilla', estado: bool = True) -> NoReturn:
         """
         Muestra una determinada label con rojo o verde (depende del estado) y
         con el texto indicado
@@ -127,7 +127,7 @@ class AsistenteInicial(QtWidgets.QDialog):
             label.setStyleSheet('color: red')
 
     @staticmethod
-    def cambiaBarras(texto: str) -> str:
+    def change_bars(texto: str) -> str:
         """
         Funcion para sustituir las barra de windows por las de linux, esta implementada
         en funciones.py, pero este fichero no puede importar nada de otros, ya que
@@ -136,20 +136,20 @@ class AsistenteInicial(QtWidgets.QDialog):
         return texto.replace('\\', '/')
 
     @staticmethod
-    def checkIntegridadSqlite(idSqlite: str) -> bool:
+    def check_integrity_sqlite(id_sqlite: str) -> bool:
         """
         Metodo para checkear que es correcto el fichero que contiene el id de la configuracion de la base de datos
         :return boolean: indicando si el valor es un integer o no 
         """
 
         try:
-            int(idSqlite)  # si falla la conversion no es un integer
+            int(id_sqlite)  # si falla la conversion no es un integer
             return True
         except ValueError:
             return False
 
     @staticmethod
-    def checkIntegridadGdrive(idGdrive: str) -> bool:
+    def check_integrity_gdrive(id_gdrive: str) -> bool:
         """
         Metodo para checkear que es correcto el fichero que contiene el la ruta del directorio de rtrabajo con la base 
         de datos
@@ -158,13 +158,13 @@ class AsistenteInicial(QtWidgets.QDialog):
         """
 
         try:
-            int(idGdrive)  # si falla la conversion no es un integer
+            int(id_gdrive)  # si falla la conversion no es un integer
             return True
         except ValueError:
             return False
 
     @staticmethod
-    def checkIntegridadFicheros() -> bool:
+    def check_integrity_files() -> bool:
         """
         Comprobamos que existen los ficheros de cofiguracion necesarios y son correctos, en caso contrario llamamos a 
         asistente_inicial y terminamos
@@ -182,13 +182,13 @@ class AsistenteInicial(QtWidgets.QDialog):
         else:
             # comprobamos que es correcto el fichero sync_sqlite
             with open(sync_sqlite, 'r') as f:
-                retornoSqlite = AsistenteInicial.checkIntegridadSqlite(f.readline())
+                response_sqlite = AsistenteInicial.check_integrity_sqlite(f.readline())
 
             # comprobamos que es correcto el fichero sync_gdrive
             with open(sync_gdrive, 'r') as f:
-                retornoGdrive = AsistenteInicial.checkIntegridadGdrive(f.readlines()[0])  # linea 1 es un 1 o un 0
+                response_gdrive = AsistenteInicial.check_integrity_gdrive(f.readlines()[0])  # linea 1 es un 1 o un 0
 
-            if not retornoGdrive or not retornoSqlite:
+            if not response_gdrive or not response_sqlite:
                 main()  # main de la funcion
                 return False
 

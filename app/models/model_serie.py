@@ -7,9 +7,11 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Dict
 
+from app.models import Model
+
 
 @dataclass
-class Serie(object):
+class Serie(Model):
     name: str = str()
     season: int = -1
     chapter: int = -1
@@ -31,7 +33,7 @@ class Serie(object):
         else:
             return f'{self.season}x{self.chapter}'
 
-    #def __str__(self) -> str:
+    # def __str__(self) -> str:
     #    return (f'{self.__class__.__name__}('
     #            f'{self.name!r}, {self.season!r}x{self.chapter!r}, follow={self.following!r})')
 

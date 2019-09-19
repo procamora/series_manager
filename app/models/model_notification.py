@@ -5,8 +5,10 @@ from __future__ import annotations
 
 from typing import Dict
 
+from app.models import Model
 
-class ModelNotification(object):
+
+class ModelNotification(Model):
     name: str = str()
     api: str = str()
     active: bool = bool()

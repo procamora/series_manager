@@ -18,10 +18,10 @@ class Preferencias(QtWidgets.QDialog):
         QtWidgets.QWidget.__init__(self, parent)
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
-        self.otra = 'otra'  # campo otra del formulario
-        self.estadoI = 'Ok'  # estado inicial
-        self.estadoF = 'Cancelado'  # final
-        self.estadoA = self.estadoI  # actual
+        self.other = 'otra'  # campo otra del formulario
+        self.state_ok = 'Ok'  # estado inicial
+        self.state_cancel = 'Cancelado'  # final
+        self.state_current = self.state_ok  # actual
         self.db = database
         self.ruta = directorio_local
 
@@ -29,8 +29,8 @@ class Preferencias(QtWidgets.QDialog):
         self.ui.tabWidget.setCurrentIndex(0)
 
         self.configuraciones = list(dict())
-        self.datodDb = dict()
-        self.operacionesIniciales()
+        self.data_db = dict()
+        self.initials_operations()
 
         # recogo todos los dias de la caja y le paso el indice del dia en el
         # que sale
@@ -44,25 +44,25 @@ class Preferencias(QtWidgets.QDialog):
             self.ui.BoxId.setCurrentIndex(all_items.index(id_fich))
         except ValueError:
             if len(all_items) == 1:  # si solo hay 1 es 'otra'
-                self.ui.BoxId.setCurrentIndex(all_items.index(self.otra))
+                self.ui.BoxId.setCurrentIndex(all_items.index(self.other))
             else:
                 # si da error por algun motivo pongo el primero
                 self.ui.BoxId.setCurrentIndex(all_items.index('1'))
 
-        self.procesosComunes()
+        self.common_processes()
 
-        self.ui.pushButton.clicked.connect(self.buscarDirectorio)
-        self.ui.BoxId.activated.connect(self.procesosComunes)
+        self.ui.pushButton.clicked.connect(self.search_directory)
+        self.ui.BoxId.activated.connect(self.common_processes)
 
-        self.ui.pushButtonAplicar.clicked.connect(self.aplicaDatos)
-        self.ui.pushButtonCerrar.clicked.connect(self.cancela)
-        self.ui.pushButtonAceptar.clicked.connect(self.aceptaDatos)
+        self.ui.pushButtonAplicar.clicked.connect(self.apply_data)
+        self.ui.pushButtonCerrar.clicked.connect(self.cancel)
+        self.ui.pushButtonAceptar.clicked.connect(self.accept_data)
 
-    def operacionesIniciales(self) -> NoReturn:
-        self.sacaDatos()
-        self.listaId()
+    def initials_operations(self) -> NoReturn:
+        self.get_all_notifications()
+        self.list_id()
 
-    def buscarDirectorio(self) -> NoReturn:
+    def search_directory(self) -> NoReturn:
         """
         Se encarga de coger la ruta en la que vamos a guardar el fichero, en este caso solo buscamos directorios,
         y establecemos que la ruta raiz sea el escrotorio, que se establece en el init
@@ -78,7 +78,7 @@ class Preferencias(QtWidgets.QDialog):
             # QString sino str
             self.ui.lineRuta.setText(filenames)
 
-    def sacaDatos(self) -> NoReturn:
+    def get_all_notifications(self) -> NoReturn:
         """
 
         """
@@ -86,9 +86,9 @@ class Preferencias(QtWidgets.QDialog):
         query = 'SELECT * FROM Configuraciones'
         self.configuraciones = conection_sqlite(self.db, query, True)
         if len(self.configuraciones) > 0:
-            self.datodDb = self.configuraciones[0]
+            self.data_db = self.configuraciones[0]
 
-    def listaId(self) -> NoReturn:
+    def list_id(self) -> NoReturn:
         """
 
         """
@@ -99,9 +99,9 @@ class Preferencias(QtWidgets.QDialog):
 
         self.ui.BoxId.clear()
         self.ui.BoxId.addItems(lista)
-        self.ui.BoxId.addItem(self.otra)
+        self.ui.BoxId.addItem(self.other)
 
-    def averiguaConf(self) -> NoReturn:
+    def get_configuration(self) -> NoReturn:
         """
 
         """
@@ -110,22 +110,22 @@ class Preferencias(QtWidgets.QDialog):
             if str(self.ui.BoxId.currentText()) == str(i['id']):
                 logger.debug(self.ui.BoxId.currentText())
                 logger.debug(i)
-                self.datodDb = i
-        if self.ui.BoxId.currentText() == self.otra:
-            self.datodDb = {'UrlFeedShowrss': '',
+                self.data_db = i
+        if self.ui.BoxId.currentText() == self.other:
+            self.data_db = {'UrlFeedShowrss': '',
                             'RutaDescargas': '',
                             'UrlFeedNewpct': '',
                             'id': ''}
 
-    def procesosComunes(self) -> NoReturn:
+    def common_processes(self) -> NoReturn:
         """
 
         """
 
-        self.averiguaConf()
-        self.insertarSerie()
+        self.get_configuration()
+        self.insert_serie()
 
-    def aplicaDatos(self) -> bool:
+    def apply_data(self) -> bool:
         datos = {
             'ID': str(self.ui.BoxId.currentText()),
             'Newpct': str(self.ui.lineNewpct.text()),
@@ -133,7 +133,7 @@ class Preferencias(QtWidgets.QDialog):
             'Ruta': funciones.change_bars(str(self.ui.lineRuta.text()))
         }
 
-        if datos['ID'] == self.otra:
+        if datos['ID'] == self.other:
             logger.info('insert')
             query = """INSERT INTO Configuraciones(UrlFeedNewpct, UrlFeedShowrss, RutaDescargas) VALUES ("{}", "{}", 
             "{}")""".format(datos['Newpct'], datos['showrss'], datos['Ruta'])
@@ -142,7 +142,7 @@ class Preferencias(QtWidgets.QDialog):
             logger.debug(query)
 
             conection_sqlite(self.db, query)
-            self.operacionesIniciales()
+            self.initials_operations()
         else:
             query = """UPDATE Configuraciones SET UrlFeedNewpct="{}", UrlFeedShowrss="{}", RutaDescargas="{}"
             WHERE ID LIKE {}""".format(datos['Newpct'], datos['showrss'], datos['Ruta'], datos['ID'])
@@ -157,29 +157,29 @@ class Preferencias(QtWidgets.QDialog):
 
         return True
 
-    def insertarSerie(self) -> NoReturn:
+    def insert_serie(self) -> NoReturn:
         """
 
         """
 
-        self.ui.lineNewpct.setText(self.datodDb['UrlFeedNewpct'])
-        self.ui.lineShowrss.setText(self.datodDb['UrlFeedShowrss'])
-        self.ui.lineRuta.setText(str(self.datodDb['RutaDescargas']))
+        self.ui.lineNewpct.setText(self.data_db['UrlFeedNewpct'])
+        self.ui.lineShowrss.setText(self.data_db['UrlFeedShowrss'])
+        self.ui.lineRuta.setText(str(self.data_db['RutaDescargas']))
 
-    def cancela(self) -> NoReturn:
+    def cancel(self) -> NoReturn:
         """
         Establece el estado actual en cancelado para retornar None y ejecuta reject
         """
 
-        self.estadoA = self.estadoF
+        self.state_current = self.state_cancel
         self.reject()
 
-    def aceptaDatos(self) -> NoReturn:
+    def accept_data(self) -> NoReturn:
         """
         Boton Aceptar, primero aplicas los datos, si retorna True, cierra la ventana
         """
 
-        if self.aplicaDatos():
+        if self.apply_data():
             self.accept()
 
     @staticmethod

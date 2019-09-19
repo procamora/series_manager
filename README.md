@@ -9,7 +9,7 @@ README
 + [ ] Hacer un modulo que compruebe los estados de las series y pregunte si actualizarlos, que funcione tanto por consola como por gui
 + [ ] En el update del capitulo descargado poner también update de siguiendo y activa
 + [ ] Hacer ventana para añadir credenciales
-
++ [ ] Dao modelos persistencia (https://github.com/fedecarg/webpy-mvc/blob/master/src/app/models/user.py)
 # Errores a corregir
 + [ ] Repasar todas las funciones de funciones y sustituir donde se pueda name_db por ruta_db
 + [ ] lista activa QSqlDatabasePrivate::addDatabase: duplicate connection name 'qt_sql_default_connection', old connection removed.

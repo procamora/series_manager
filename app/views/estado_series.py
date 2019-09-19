@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import sys
-from typing import List, NoReturn
+from typing import List, NoReturn, Dict
 
 from PyQt5 import QtWidgets
 from app.views.ui.estado_series_ui import Ui_Dialog
@@ -10,7 +10,7 @@ from app.views.ui.estado_series_ui import Ui_Dialog
 from app import logger
 from app.modulos.connect_sqlite import conection_sqlite, execute_script_sqlite
 from app.modulos.settings import ruta_db
-from app.modulos.tviso import conectTviso
+from app.modulos.tviso import conect_tviso
 
 
 class EstadoSeries(QtWidgets.QDialog):
@@ -18,14 +18,19 @@ class EstadoSeries(QtWidgets.QDialog):
         QtWidgets.QWidget.__init__(self, parent)
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
-        self.EstadoI = 'Ok'  # estado inicial
-        self.EstadoF = 'Cancelado'  # final
-        self.EstadoA = self.EstadoI  # actual
+        self.state_ok = 'Ok'  # estado inicial
+        self.state_cancel = 'Cancelado'  # final
+        self.state_current = self.state_ok  # actual
         self.db = database
 
         # str de consultas que se ejecutaran al final
-        self.QueryCompleta = str()
-        self.actuales = list()
+        self.query_complete_str = str()
+        self.list_actuals = list()
+
+        self.DatSeriesEmpiezanTemporada: List[Dict] = list()
+        self.DatSerieFinalizada: List[Dict] = list()
+        self.DatTemporadaAcabada: List[Dict] = list()
+        self.DatSeriesFinalizadas: List[Dict] = list()
 
         self.setWindowTitle('Estado de series Activas')
 
@@ -33,22 +38,22 @@ class EstadoSeries(QtWidgets.QDialog):
         self.ui.listWidget.setSelectionMode(
             QtWidgets.QAbstractItemView.ExtendedSelection)
 
-        self.sacaSeries()
+        self.get_all_series()
 
         self.ui.radioButtonEmpieza.clicked.connect(
-            self.seriesEmpiezanTemporada)
-        self.ui.radioButtonAcabaT.clicked.connect(self.temporadaAcabada)
-        self.ui.radioButtonFinalizada.clicked.connect(self.serieFinalizada)
+            self.series_start_season)
+        self.ui.radioButtonAcabaT.clicked.connect(self.session_finished)
+        self.ui.radioButtonFinalizada.clicked.connect(self.serie_finished)
 
-        self.ui.pushButtonRefresh.clicked.connect(self.sacaSeries)
+        self.ui.pushButtonRefresh.clicked.connect(self.get_all_series)
 
-        self.ui.pushButtonAnadir.clicked.connect(self.__printCurrentItems)
+        self.ui.pushButtonAnadir.clicked.connect(self._print_current_items)
 
-        self.ui.pushButtonAplicar.clicked.connect(self.aplicaDatos)
-        self.ui.pushButtonCerrar.clicked.connect(self.cancela)
-        self.ui.pushButtonAceptar.clicked.connect(self.aceptaDatos)
+        self.ui.pushButtonAplicar.clicked.connect(self.apply_data)
+        self.ui.pushButtonCerrar.clicked.connect(self.cancel)
+        self.ui.pushButtonAceptar.clicked.connect(self.accept_data)
 
-    def sacaSeries(self) -> NoReturn:
+    def get_all_series(self) -> NoReturn:
         """
         Saca todas las series de la bd y las mete en una lista de diccionarios
         accesible en todo el objeto
@@ -70,21 +75,21 @@ class EstadoSeries(QtWidgets.QDialog):
 
         self.ui.radioButtonFinalizada.setChecked(True)
         # lo ejecuto al principio ya que es el activado por defecto
-        self.serieFinalizada()
+        self.serie_finished()
 
         query = """SELECT * FROM Credenciales"""
         datos = conection_sqlite(self.db, query, True)
         if len(datos) > 0:
-            self.actuales = conectTviso(datos[0]['user_tviso'], datos[0]['pass_tviso'])
+            self.list_actuals = conect_tviso(datos[0]['user_tviso'], datos[0]['pass_tviso'])
 
-    def botonSiguiendo(self, seriesTest: List) -> NoReturn:
+    def button_next(self, series_test: List) -> NoReturn:
         """
         Creo una lista con todas las series que estoy siguiendo
         """
 
         self.ui.listWidget.clear()
-        if len(seriesTest) != 0:
-            for i in seriesTest:
+        if len(series_test) != 0:
+            for i in series_test:
                 item = QtWidgets.QListWidgetItem()
                 item.setText(i['Nombre'])
                 self.ui.listWidget.addItem(item)
@@ -101,41 +106,41 @@ class EstadoSeries(QtWidgets.QDialog):
         except Exception:
             pass
 
-    def aplicaDatos(self) -> bool:
+    def apply_data(self) -> bool:
         """
         Ejecuta todas las consultas que hay en la lista
         """
-        logger.debug(self.QueryCompleta)
+        logger.debug(self.query_complete_str)
 
-        execute_script_sqlite(self.db, self.QueryCompleta)
+        execute_script_sqlite(self.db, self.query_complete_str)
 
-        self.QueryCompleta = str()
+        self.query_complete_str = str()
         return True
 
-    def cancela(self) -> NoReturn:
+    def cancel(self) -> NoReturn:
         """
         Establece el estado actual en cancelado para retornar None y ejecuta reject
         """
 
-        self.EstadoA = self.EstadoF
+        self.state_current = self.state_cancel
         self.reject()
 
-    def serieFinalizada(self) -> NoReturn:
+    def serie_finished(self) -> NoReturn:
         # coge las series de imdb y actualiza la table de estado
         # query = 'SELECT ID, Nombre, Estado, imdb_Finaliza FROM Series'
         # revisar porque puedo ESTAR VIENDO UNA SERIE FINALIZADA Y NO QUIERO
         # QUE CAMBIE ESTADO
-        self.botonSiguiendo(self.DatSerieFinalizada)
+        self.button_next(self.DatSerieFinalizada)
 
-    def temporadaAcabada(self) -> NoReturn:
-        self.botonSiguiendo(self.DatTemporadaAcabada)
+    def session_finished(self) -> NoReturn:
+        self.button_next(self.DatTemporadaAcabada)
 
-    def seriesFinalizadas(self) -> NoReturn:
+    def series_finished(self) -> NoReturn:
         # busca las series finalizadas y las actualiza con el ultimo episodio si la he acabado de ver,
         # NO HAY IMPLEMENTADO BOTON PARA ELLO, solo lo ejecuto a pelo cuando lo
         # necesito
 
-        self.botonSiguiendo(self.DatSeriesFinalizadas)
+        self.button_next(self.DatSeriesFinalizadas)
 
         for DatSer in self.DatSeriesFinalizadas:
             query = """UPDATE series SET Temporada=imdb_Temporada, Capitulo=imdb_Capitulos
@@ -143,14 +148,14 @@ class EstadoSeries(QtWidgets.QDialog):
             logger.info(query)
             conection_sqlite(self.db, query)
 
-    def seriesEmpiezanTemporada(self) -> NoReturn:
+    def series_start_season(self) -> NoReturn:
         # cuidado, si lo ejecutas la misma semana que acabas la temporada se pondra en activa,
         # hay que ejecurtarlo 1 vez a la semana
         # buscar forma de hacer que haga una comprobacion con las series que
         # den positivo
 
         calendario = list(dict())
-        for i in self.actuales:  # lista de series de tviso
+        for i in self.list_actuals:  # lista de series de tviso
             # lista de series que estan a la espera de una nueva temporada
             for j in self.DatSeriesEmpiezanTemporada:
                 # http:/stackoverflow.com/questions/8214932/how-to-check-if-a-value-exists-in-a-dictionary-python
@@ -159,9 +164,9 @@ class EstadoSeries(QtWidgets.QDialog):
                     # deficina de __botonSiguiendo
                     calendario.append({'Nombre': str(i)})
 
-        self.botonSiguiendo(calendario)
+        self.button_next(calendario)
 
-    def __printCurrentItems(self) -> NoReturn:
+    def _print_current_items(self) -> NoReturn:
         """
         Coge todas las series seleccionadas y las mete en una lista con su
         respectiva consulta para despues ejecutarlas
@@ -173,22 +178,22 @@ class EstadoSeries(QtWidgets.QDialog):
                 query = """UPDATE series SET Temporada=Temporada+1, Capitulo="00", Estado="En Espera" 
                 WHERE Nombre Like "{}";""".format(
                     i.text())
-                self.QueryCompleta += '\n' + query
+                self.query_complete_str += '\n' + query
 
             elif self.ui.radioButtonEmpieza.isChecked():
                 query = """UPDATE series SET Capitulo="01", Estado="Activa" WHERE Nombre Like "{}";""".format(i.text())
-                self.QueryCompleta += '\n' + query
+                self.query_complete_str += '\n' + query
 
             elif self.ui.radioButtonFinalizada.isChecked():
                 query = """UPDATE series SET Estado="Finalizada", Acabada="Si", Siguiendo="No" 
                 WHERE Nombre Like "{}";""".format(
                     i.text())
-                self.QueryCompleta += '\n' + query
+                self.query_complete_str += '\n' + query
 
-        logger.debug(self.QueryCompleta)
+        logger.debug(self.query_complete_str)
 
-    def aceptaDatos(self) -> NoReturn:
-        if self.aplicaDatos():
+    def accept_data(self) -> NoReturn:
+        if self.apply_data():
             self.accept()
 
     @staticmethod

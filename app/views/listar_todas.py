@@ -17,9 +17,9 @@ class ListarTodas(QtWidgets.QDialog):
         QtWidgets.QWidget.__init__(self, parent)
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
-        self.estadoI = 'Ok'  # estado inicial
-        self.estadoF = 'Cancelado'  # final
-        self.estadoA = self.estadoI  # actual
+        self.state_ok = 'Ok'  # estado inicial
+        self.state_cancel = 'Cancelado'  # final
+        self.state_current = self.state_ok  # actual
         self.db = database
 
         # lista de consultas que se ejecutaran al final
@@ -30,21 +30,21 @@ class ListarTodas(QtWidgets.QDialog):
         self.ui.listWidget.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
 
         self.seriesTest = list(dict())
-        self.sacaSeries()
+        self.get_all_series()
 
-        self.ui.radioButtonAct.clicked.connect(self.seriesActuales)
-        self.ui.radioButtonTemp.clicked.connect(self.seriesTemporales)
-        self.ui.radioButtonPausada.clicked.connect(self.seriesPausadas)
-        self.ui.radioButtonTodas.clicked.connect(self.seriesTodas)
-        self.ui.pushButtonRefresh.clicked.connect(self.sacaSeries)
+        self.ui.radioButtonAct.clicked.connect(self.series_actuals)
+        self.ui.radioButtonTemp.clicked.connect(self.series_finished_season)
+        self.ui.radioButtonPausada.clicked.connect(self.series_stopped)
+        self.ui.radioButtonTodas.clicked.connect(self.series_all)
+        self.ui.pushButtonRefresh.clicked.connect(self.get_all_series)
 
-        self.ui.pushButtonAnadir.clicked.connect(self.printCurrentItems)
+        self.ui.pushButtonAnadir.clicked.connect(self.print_current_items)
 
-        self.ui.pushButtonAplicar.clicked.connect(self.aplicaDatos)
+        self.ui.pushButtonAplicar.clicked.connect(self.apply_data)
         self.ui.pushButtonCerrar.clicked.connect(self.cancela)
-        self.ui.pushButtonAceptar.clicked.connect(self.aceptaDatos)
+        self.ui.pushButtonAceptar.clicked.connect(self.accept_data)
 
-    def sacaSeries(self) -> NoReturn:
+    def get_all_series(self) -> NoReturn:
         """
         Saca todas las series de la bd y las mete en una lista de diccionarios accesible en todo el objeto
         """
@@ -52,9 +52,9 @@ class ListarTodas(QtWidgets.QDialog):
         self.seriesTest = conection_sqlite(self.db, query, True)
         self.ui.radioButtonAct.setChecked(True)
         # lo ejecuto al principio ya que es el activado por defecto
-        self.seriesActuales()
+        self.series_actuals()
 
-    def seriesActuales(self) -> NoReturn:
+    def series_actuals(self) -> NoReturn:
         """
         Creo una lista con todas las series que estoy siguiendo
         """
@@ -66,7 +66,7 @@ class ListarTodas(QtWidgets.QDialog):
                 item.setText(i['Nombre'])
                 self.ui.listWidget.addItem(item)
 
-    def seriesTemporales(self) -> NoReturn:
+    def series_finished_season(self) -> NoReturn:
         """
         Creo una lista con todas las series que han acabado temporada
         """
@@ -78,7 +78,7 @@ class ListarTodas(QtWidgets.QDialog):
                 item.setText(i['Nombre'])
                 self.ui.listWidget.addItem(item)
 
-    def seriesPausadas(self) -> NoReturn:
+    def series_stopped(self) -> NoReturn:
         """
         Creo una lista con todas las series que han acabado temporada
         """
@@ -90,7 +90,7 @@ class ListarTodas(QtWidgets.QDialog):
                 item.setText(i['Nombre'])
                 self.ui.listWidget.addItem(item)
 
-    def seriesTodas(self) -> NoReturn:
+    def series_all(self) -> NoReturn:
         """
         Creo una lista con todas las series
         """
@@ -101,7 +101,7 @@ class ListarTodas(QtWidgets.QDialog):
             item.setText(i['Nombre'])
             self.ui.listWidget.addItem(item)
 
-    def printCurrentItems(self) -> NoReturn:
+    def print_current_items(self) -> NoReturn:
         """
         Coge todas las series seleccionadas y las mete en una lista con su respectiva consulta para despues ejecutarlas
         """
@@ -129,7 +129,7 @@ class ListarTodas(QtWidgets.QDialog):
 
         logger.debug(self.queryCompleta)
 
-    def aplicaDatos(self) -> bool:
+    def apply_data(self) -> bool:
         """
         Ejecuta todas las consultas que hay en la lista
         """
@@ -146,11 +146,11 @@ class ListarTodas(QtWidgets.QDialog):
         Establece el estado actual en cancelado para retornar None y ejecuta reject
         """
 
-        self.estadoA = self.estadoF
+        self.state_current = self.state_cancel
         self.reject()
 
-    def aceptaDatos(self) -> NoReturn:
-        if self.aplicaDatos():
+    def accept_data(self) -> NoReturn:
+        if self.apply_data():
             self.accept()
 
     @staticmethod

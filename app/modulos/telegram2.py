@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 import json
 
 import requests
@@ -13,10 +14,10 @@ except Exception:  # Ejecucion local
 
 from app import logger
 
-from typing import NoReturn, Dict, Union, Any, List
+from typing import NoReturn, Dict, Union, Any, Optional
 
 
-class TG2:
+class Telegram:
     def __init__(self, chat_id: str) -> NoReturn:
         initial_data = self.initial_data()
         if initial_data is not None:
@@ -30,7 +31,7 @@ class TG2:
         requests.packages.urllib3.disable_warnings()
 
     @staticmethod
-    def initial_data() -> Union[List, None]:
+    def initial_data() -> Optional[Dict[str, str]]:
         with open(r'{}/{}'.format(directorio_local, sync_sqlite), 'r') as f:
             id_fich = f.readline().replace('/n', '')
 
@@ -70,7 +71,7 @@ class TG2:
         return json.loads(result.text)['ok']
 
     @staticmethod
-    def get_method_type(data_type) -> Dict:
+    def get_method_type(data_type) -> str:
         data_type = str(type(data_type))
         dic = {
             "<class 'str'>": 'sendMessage',
@@ -105,11 +106,11 @@ class TG2:
             return self.make_request(method_url, params=payload, files=files, method='post')
 
     def receives_tg(self) -> NoReturn:  # no funciona de momento por la codificacion
-        URL = 'https://api.telegram.org/bot{}/getUpdates'.format(self.api)
+        url = 'https://api.telegram.org/bot{}/getUpdates'.format(self.api)
         req_headers = {'Content-Type': 'application/x-www-form-urlencoded'}
 
         session = requests.session()
-        login = session.post(URL, headers=req_headers)  # Authenticate
+        login = session.post(url, headers=req_headers)  # Authenticate
 
         logger.info(type(login.text))
         # logger.info(str(login.text.strip().decode('utf-8')))
@@ -119,7 +120,7 @@ class TG2:
 
 
 if __name__ == '__main__':
-    a = TG2('33063767')
+    a = Telegram('33063767')
     logger.info(a.send_tg('Test desde modulo de python'))
     # logger.info(a.sendFile('connect_sqlite.py'))
     # a.recibeTg()
