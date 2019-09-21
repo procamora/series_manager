@@ -51,7 +51,7 @@ def change_bars(texto) -> str:
     return texto.replace('\\', '/')
 
 
-def db_configuarion() -> Dict:
+def db_configuarion() -> List[Dict[str, str]]:
     """
     Funcion que obtiene los valores de la configuracion de un programa, devuelve el diciconario con los datos
 
@@ -123,7 +123,7 @@ def create_full_backup_db() -> NoReturn:
         logger.error('error al hacer backup: {}'.format(e))
 
 
-def calculate_day_week():
+def calculate_day_week() -> str:
     """
     Te dice el dia de la semana en el que estamos, lo uso para ordenar serie de mas cerca a mas lejos
     """
@@ -153,14 +153,14 @@ def calculate_day_week():
         return remove_tildes(a)
 
 
-def date_to_number(dia) -> List:
+def date_to_number(dia: str) -> List[str]:
     """
     Convierte el dia de la semana a un numero, y luego te crea una lista ordenada
     de los dias de la semana de mas cerca a menos cerca
     """
 
     dia_nombre = ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado", "Domingo"]
-    lista = list()
+    lista: List[str] = list()
     num = dia_nombre.index(dia)  # localizo en indice del dia en el que estoy
     # guardo la parte de la derecha de la semana y luego la izq
     lista.extend(dia_nombre[num:])

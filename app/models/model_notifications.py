@@ -17,7 +17,7 @@ class Notifications(Model):
     active: bool = bool()
 
     @staticmethod
-    def load(dictionaty: Dict) -> Notifications:
+    def load(dictionaty: Dict[str, str]) -> Notifications:
         notifications = Notifications()
         for keys in dictionaty:
             if keys == 'ID':

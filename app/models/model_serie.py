@@ -38,7 +38,7 @@ class Serie(Model):
     #            f'{self.name!r}, {self.season!r}x{self.chapter!r}, follow={self.following!r})')
 
     @staticmethod
-    def load(dictionaty: Dict) -> Serie:
+    def load(dictionaty: Dict[str, str]) -> Serie:
         s = Serie()
         for i in dictionaty:
             if i == 'Nombre':

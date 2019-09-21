@@ -14,7 +14,7 @@ class Model(ABC, object):
 
     @staticmethod
     @abstractmethod
-    def load(dictionaty: Dict) -> Model:
+    def load(dictionaty: Dict[str, str]) -> Model:
         """
         Metodo para crear un objeto a partir de un diccionario
         :param dictionaty:

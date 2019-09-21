@@ -165,14 +165,14 @@ class Series(QtWidgets.QMainWindow):
 
         if cap_t > cap:
             for i in range(0, cap_t - cap):
-                logger.debug('Suma: {}'.format(str(i)))
+                logger.debug(f'Suma: {i}')
                 self.add_serie(capitulo, dat)
         else:
             for i in range(0, cap_t - cap):
-                logger.debug('Resta: {}'.format(str(i)))
+                logger.debug(f'Resta: {i}')
                 self.sub_serie(capitulo, dat)
 
-    def add_serie(self, n: QtWidgets.QLineEdit, dat: Serie) -> NoReturn:
+    def add_serie(self, qline_edit: QtWidgets.QLineEdit, serie: Serie) -> NoReturn:
         """
         Tiene 2 funcionalidades:
             - 1: sumar un capitulo a numero de capitulo que se ve por pantalla de la serie
@@ -182,18 +182,15 @@ class Series(QtWidgets.QMainWindow):
         param dat dict: diccionario con todos los datos de la serie que me modificara
         """
 
-        dat._chapter = dat._chapter + 1  # esto funciona porque hace referencia al objeto
-        if len(str(dat._chapter)) == 1:
-            n.setText('{}x0{}'.format(dat._season, dat._chapter))
-        else:
-            n.setText('{}x{}'.format(dat._season, dat._chapter))
+        serie.chapter += 1  # esto funciona porque hace referencia al objeto
+        qline_edit.setText(serie.get_season_chapter())
 
         # fixme meter en controller
-        query = """UPDATE series SET Capitulo=Capitulo+1 WHERE Nombre LIKE "{}";""".format(dat["Nombre"])
+        query = f'''UPDATE series SET Capitulo=Capitulo+1 WHERE Nombre LIKE "{serie.title}";'''
         self.queryCompleta += '\n' + query
         logger.debug(query)
 
-    def sub_serie(self, n: QtWidgets.QLineEdit, dat: Serie) -> NoReturn:
+    def sub_serie(self, qline_edit: QtWidgets.QLineEdit, serie: Serie) -> NoReturn:
         """
         Tiene 2 funcionalidades,
             - 1: restar un capitulo a numero de capitulo que se ve por pantalla de la serie
@@ -203,15 +200,11 @@ class Series(QtWidgets.QMainWindow):
         param dat dict: diccionario con todos los datos de la serie que me modificara
         """
 
-        dat._chapter = dat._chapter - 1  # esto funciona porque hace referencia al objeto
-        # fixme cambiar por nuevo metodo y ver si funciona y ver access atributo protected
-        if len(str(dat._chapter)) == 1:
-            n.setText('{}x0{}'.format(dat._season, dat._chapter))
-        else:
-            n.setText('{}x{}'.format(dat._season, dat._chapter))
+        serie.chapter = serie.chapter - 1  # esto funciona porque hace referencia al objeto
+        qline_edit.setText(serie.get_season_chapter())
 
         # fixme meter en controller
-        query = 'UPDATE series SET Capitulo=Capitulo-1 WHERE Nombre LIKE "{}";'.format(dat["Nombre"])
+        query = 'UPDATE series SET Capitulo=Capitulo-1 WHERE Nombre LIKE "{}";'.format(serie.title)
         self.queryCompleta += '\n' + query
         logger.debug(query)
 
@@ -406,12 +399,12 @@ class Series(QtWidgets.QMainWindow):
             comando = 'explorer "{}"'.format(directorio_trabajo.replace('/', '\\'))
         else:
             entorno_grafico = str()
-            for i in ["dolphin", "caja", "nautilus"]:
-                cmd = "{} -h".format(i)
+            for command in ["dolphin", "caja", "nautilus"]:
+                cmd = f"{command} -h"
                 ejecucion = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 ejecucion.communicate()
                 if ejecucion.returncode == 0:
-                    entorno_grafico = i
+                    entorno_grafico = command
                     break
 
             if entorno_grafico is not None:

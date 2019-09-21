@@ -18,7 +18,7 @@ from app.models.model_credentials import Credentials
 @dataclass
 class Query(object):
     query: str
-    response: List[Union[Dict, States, Preferences, Notifications, Serie, Credentials]]
+    response: List[Union[Dict[str, str], States, Preferences, Notifications, Serie, Credentials]]
 
     def is_empty(self) -> bool:
         if len(self.response) == 0:

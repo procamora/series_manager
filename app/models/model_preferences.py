@@ -17,7 +17,7 @@ class Preferences(Model):
     path_download: str = str()
 
     @staticmethod
-    def load(dictionaty: Dict) -> Preferences:
+    def load(dictionaty: Dict[str, str]) -> Preferences:
         preferences = Preferences()
         for i in dictionaty:
             if i == 'id':

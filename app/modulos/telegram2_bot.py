@@ -28,10 +28,10 @@ import app.modulos.funciones as funciones
 
 
 def initial_data():
-    with open(r'{}/id.conf'.format(directorio_local), 'r') as f:
+    with open(rf'{directorio_local}/id.conf', 'r') as f:
         id_fich = f.readline().replace('/n', '')
 
-    query = 'SELECT * FROM Configuraciones, Credenciales WHERE ID LIKE {} LIMIT 1'.format(id_fich)
+    query = f'SELECT * FROM Configuraciones, Credenciales WHERE ID LIKE {id_fich} LIMIT 1'
     return conection_sqlite(ruta_db, query, True)[0]
 
 
@@ -79,7 +79,7 @@ def download_file(url: str, destino: str) -> NoReturn:
 @bot.message_handler(commands=["start"])
 def command_start(message) -> NoReturn:
     bot.send_message(
-        message.chat.id, "Bienvenido al bot\nTu id es: {}".format(message.chat.id))
+        message.chat.id, f"Bienvenido al bot\nTu id es: {message.chat.id}")
     command_system(message)
 
 
@@ -116,7 +116,7 @@ def send_cgs(message) -> Union[NoReturn, None]:
     # stdout = formatea(stdout) # sino stdout esta en bytes
 
     if check_error(ejecucion, stderr):
-        bot.reply_to(message, 'Error: {}'.format(stderr))
+        bot.reply_to(message, f'Error: {stderr}')
         return
     elif len(stdout) == 0:
         bot.reply_to(message, 'Ejecutado, puede que haya fallado o sea muy largo el resultado')
@@ -126,7 +126,7 @@ def send_cgs(message) -> Union[NoReturn, None]:
 
 @bot.message_handler(func=lambda message: message.chat.id == administrador, commands=['/empty_log'])
 def send_log(message) -> NoReturn:
-    fichero = '{}/log/{}'.format(directorio_trabajo, credentials['FicheroFeedNewpct'])
+    fichero = f'{directorio_trabajo}/log/{credentials["FicheroFeedNewpct"]}'
 
     with open(fichero, 'w'):
         pass
@@ -142,7 +142,7 @@ def send_mount(message) -> Union[NoReturn, None]:
     stdout = format_text(stdout)  # sino stdout esta en bytes
 
     if check_error(ejecucion, stderr):
-        bot.reply_to(message, 'Error: {}'.format(stderr))
+        bot.reply_to(message, f'Error: {stderr}')
         return
     elif len(stdout) == 0:
         bot.reply_to(message, 'Ejecutado mount')
@@ -161,7 +161,7 @@ def send_descomprime(message) -> Union[NoReturn, None]:
     # stdout = formatea(stdout) # sino stdout esta en bytes
 
     if check_error(ejecucion, stderr):
-        bot.reply_to(message, 'Error: {}'.format(stderr))
+        bot.reply_to(message, f'Error: {stderr}')
         return
     elif len(stdout) == 0:
         bot.reply_to(message, 'Ejecutado, puede que haya fallado o sea muy largo el resultado')
@@ -177,7 +177,7 @@ def send_ts(message) -> Union[NoReturn, None]:
     stdout = format_text(stdout)  # sino stdout esta en bytes
 
     if check_error(ejecucion, stderr):
-        bot.reply_to(message, 'Error: {}'.format(stderr))
+        bot.reply_to(message, f'Error: {stderr}')
         return
     elif len(stdout) == 0:
         bot.reply_to(message, 'Ejecutado  reboot ts')
@@ -195,7 +195,7 @@ def send_sys(message) -> Union[NoReturn, None]:
     # stdout = formatea(stdout)  # sino stdout esta en bytes
 
     if check_error(ejecucion, stderr):
-        bot.reply_to(message, 'Error: {}'.format(stderr))
+        bot.reply_to(message, f'Error: {stderr}')
         return
 
 
@@ -207,7 +207,7 @@ def send_df(message) -> Union[NoReturn, None]:
     stdout = format_text(stdout)  # sino stdout esta en bytes
 
     if check_error(ejecucion, stderr):
-        bot.reply_to(message, 'Error: {}'.format(stderr))
+        bot.reply_to(message, f'Error: {stderr}')
         return
     elif len(stdout) == 0:
         bot.reply_to(message, 'Ejecutado df -h')
@@ -224,7 +224,7 @@ def send_info(message) -> Union[NoReturn, None]:
     stdout = format_text(stdout)  # sino stdout esta en bytes
 
     if check_error(ejecucion, stderr):
-        bot.reply_to(message, 'Error: {}'.format(stderr))
+        bot.reply_to(message, 'Error: {stderr}')
         return
     elif len(stderr) == 0:
         bot.reply_to(message, 'Ejecutado, pero esta en proceso')
@@ -234,14 +234,13 @@ def send_info(message) -> Union[NoReturn, None]:
 
 @bot.message_handler(func=lambda message: message.chat.id == administrador, commands=['show_torrent'])
 def send_show_torrent(message) -> Union[NoReturn, None]:
-    comando = 'transmission-remote 127.0.0.1:9091 --auth=pi:{} -l | egrep -v "Finished|Stopped|Seeding|ID|Sum:"'.format(
-        pass_transmission)
+    comando = f'transmission-remote 127.0.0.1:9091 --auth=pi:{pass_transmission} -l | egrep -v "Finished|Stopped|Seeding|ID|Sum:"'
     ejecucion = subprocess.Popen(comando, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = ejecucion.communicate()
     stdout = format_text(stdout)  # sino stdout esta en bytes
 
     if check_error(ejecucion, stderr):
-        bot.reply_to(message, 'Error: {}'.format(stderr))
+        bot.reply_to(message, f'Error: {stderr}')
         return
     elif len(stdout) != 0:
         for line in stdout:
@@ -262,7 +261,7 @@ def send_exit(message) -> NoReturn:
     stdout = format_text(stdout)  # sino stdout esta en bytes
 
     if check_error(ejecucion, stderr):
-        bot.reply_to(message, 'Error: {}'.format(stderr))
+        bot.reply_to(message, f'Error: {stderr}')
         return
     elif len(stdout) == 0:
         bot.reply_to(message, 'Ejecutado, no hace nada')
@@ -282,10 +281,10 @@ def handle_cmd(message) -> NoReturn:
         stdout = format_text(stdout)  # sino stdout esta en bytes
 
         if check_error(ejecucion, stderr):
-            bot.reply_to(message, 'Error: {}'.format(stderr))
+            bot.reply_to(message, f'Error: {stderr}')
             return
         elif len(stdout) == 0:
-            bot.reply_to(message, 'Ejecutado: {}'.format(comando))
+            bot.reply_to(message, f'Ejecutado: {comando}')
         else:
             bot.reply_to(message, stdout)
     else:
@@ -296,7 +295,7 @@ def handle_cmd(message) -> NoReturn:
 def handle_magnet(message) -> NoReturn:
     bot.reply_to(message, 'Ejecutado add torrent')
 
-    comando = 'transmission-remote 127.0.0.1:9091 --auth=pi:{} --add "{}"'.format(pass_transmission, message.text)
+    comando = f'transmission-remote 127.0.0.1:9091 --auth=pi:{pass_transmission} --add "{message.text}"'
     ejecucion = subprocess.Popen(comando, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = ejecucion.communicate()
     # stdout = formatea(stdout)  # sino stdout esta en bytes
@@ -304,7 +303,7 @@ def handle_magnet(message) -> NoReturn:
     logger.debug(comando)
 
     if check_error(ejecucion, stderr):
-        bot.reply_to(message, 'Error: {}'.format(stderr))
+        bot.reply_to(message, f'Error: {stderr}')
         return
     else:
         send_show_torrent(message)
@@ -336,8 +335,7 @@ def handle_torrent(message) -> Union[NoReturn, None]:
                 bot.reply_to(message, 'Ha ocurrido un error al descargar')
 
         with open('/tmp/descarga_torrent.log', "a") as f:
-            f.write('{}, {}, {} -> {}\n'.format(message.chat.id, message.chat.first_name, message.chat.username,
-                                                message.text))
+            f.write(f'{message.chat.id}, {message.chat.first_name}, {message.chat.username} -> {message.text}\n')
     else:
         bot.reply_to(message, 'handle_torrent retorna None')
 
@@ -384,14 +382,13 @@ def my_document(message) -> NoReturn:
         file_info = bot.get_file(message.document.file_id)
         # bot.send_message(message.chat.id, f'https://api.telegram.org/file/bot{TOKEN}/{file_info.file_path}')
         file = requests.get(
-            'https://api.telegram.org/file/bot{0}/{1}'.format(credentials['api_telegram'], file_info.file_path))
-        with open('/home/pi/Downloads/{}.torrent'.format(message.document.file_id), "wb") as code:
+            f'https://api.telegram.org/file/bot{credentials["api_telegram"]}/{file_info.file_path}')
+        with open(f'/home/pi/Downloads/{message.document.file_id}.torrent', "wb") as code:
             code.write(file.content)
-        bot.reply_to(message, 'Descargando torrent: "{}"'.format(message.document.file_name))
+        bot.reply_to(message, f'Descargando torrent: "{message.document.file_name}"')
         send_show_torrent(message)
     else:
-        bot.reply_to(message, 'Aun no he implementado este tipo de ficheros: "{}"'.format(
-            message.document.mime_type))
+        bot.reply_to(message, f'Aun no he implementado este tipo de ficheros: "{message.document.mime_type}"')
 
 
 @bot.message_handler(regexp=".*")

@@ -137,7 +137,7 @@ class DescargaAutomaticaCli:
             url_show = self.conf['UrlFeedShowrss']
 
             # Diccionario con las series y capitulos para actualizar la bd el capitulo descargado
-            self.capDescargado: Dict = dict()
+            self.capDescargado: Dict[str, str] = dict()
             self.consultaUpdate: str = str()
             self.rutlog: str = str()
             self.ultimaSerieNew: str = str()
@@ -312,7 +312,7 @@ class DescargaAutomaticaCli:
         """
         pass
 
-    def get_series(self) -> List:
+    def get_series(self) -> List[Serie]:
         return self.consultaSeries
 
     def get_actual_serie(self) -> str:

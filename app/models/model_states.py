@@ -32,7 +32,7 @@ class States(Model):
     #    return new_attributes
 
     @staticmethod
-    def load(dictionaty: Dict) -> States:
+    def load(dictionaty: Dict[str, str]) -> States:
         states: States = States()
         for i in dictionaty:
             if i == 'Estados':

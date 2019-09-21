@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import sys
-from typing import List
+from typing import List, Dict
 
 try:  # Ejecucion desde Series.py
     from .connect_sqlite import conection_sqlite, execute_script_sqlite
@@ -40,7 +40,7 @@ def imdb(write: bool = False) -> str:
     return query_update
 
 
-def make_update(query: List, update: str, write: bool = False) -> str:
+def make_update(query: List[Dict], update: str, write: bool = False) -> str:
     """
     Recibe una lista con los resultados de los datos a cambiar, y el update a falta del nombre
     """
