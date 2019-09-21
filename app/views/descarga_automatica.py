@@ -38,10 +38,10 @@ class Mythread(QtCore.QThread, DescargaAutomaticaCli):
     def extra_action(self, serie: str) -> NoReturn:
         self.objDescargas.append(serie)
 
-    def parser_feed(self, serie: str, tem: str, cap: str, vose: str) -> str:
+    def parser_feed(self, serie: Serie) -> str:
         """Solo funciona con series de 2 digitos por la expresion regular"""
         self.update.emit()
-        serie = DescargaAutomaticaCli.parser_feed(self, serie, tem, cap, vose)
+        serie = DescargaAutomaticaCli.parser_feed(self, serie)
         return serie
 
 

@@ -52,7 +52,7 @@ class Feed:
     chapter: int
     name: str = str()
     season: int = int()
-    epi: str = str()
+    epi: str = str()  # formato de temporada y sesion TxS
 
     def update_fields(self) -> NoReturn:
         self.name = self.title.split('-')[0]
@@ -71,10 +71,10 @@ class Feed:
 
 class FeedparserPropio:
     def __init__(self) -> NoReturn:
-        self.entries = list()
+        self.entries: List[Feed] = list()
 
-    def add(self, title: str, cap: str, link: str) -> NoReturn:
-        print(cap)
+    def add(self, title: str, cap: int, link: str) -> NoReturn:
+        # print(cap)
         f = Feed(title.strip(), link, cap)
         f.update_fields()
         self.entries.append(f)
@@ -108,10 +108,11 @@ class FeedparserPropio:
                         # logger.debug(serie['href'])
                         # logger.debug(capitulo.text)
                         url = '{}{}'.format('https://dontorrent.com', serie['href'])
-                        f.add(serie.text, capitulo.text, url)
+                        # obtenemos todos los episodios y mandamos unicammente el ultimo
+                        chapters = re.findall('\d+', str(capitulo.text))
+                        f.add(serie.text, int(chapters[-1]), url)
 
-        for i in f.entries:
-            logger.debug(f'-> {i}')
+        # [logger.debug(f'-> {i}') for i in f.entries]
         return f
 
 
@@ -144,12 +145,6 @@ class DescargaAutomaticaCli:
             self.titleSerie: str = str()
 
             self.feedNew = FeedparserPropio.parse(self._logger)
-            """
-            try:
-                self.feedNew = feedparser.parse(urlNew)
-            except TypeError:  # Para el fallo en fedora
-                self.feedNew = funciones.feedParser(urlNew)
-            """
 
             try:
                 self.feedShow = feedparser.parse(url_show)
@@ -192,7 +187,7 @@ class DescargaAutomaticaCli:
                 else:
                     serie_actual_new = serie_actual_temp
             except Exception as e:
-                self._logger.error('################ {} FALLO {}'.format(serie['Nombre'], e))
+                self._logger.error('################ {} FALLO {}'.format(serie.title, e))
 
         if len(self.ultimaSerieNew) != 0:  # or len(self.ultimaSerieShow) != 0:
             # self._logger.info(self.actualizaDia)
@@ -229,14 +224,14 @@ class DescargaAutomaticaCli:
 
     def parser_feed(self, serie: Serie) -> str:
         """Solo funciona con series de 2 digitos por la expresion regular"""
-        cap = str(cap)
+        cap = str(serie.chapter)
         ruta = str(self.conf['RutaDescargas'])  # es unicode
         if serie.vose:
             last_serie = self.ultimaSerieShow
-            d = self.feedShow
+            feed = self.feedShow
         else:
             last_serie = self.ultimaSerieNew
-            d = self.feedNew
+            feed = self.feedNew
 
         if not os.path.exists(ruta):
             os.mkdir(ruta)
@@ -244,8 +239,8 @@ class DescargaAutomaticaCli:
         if len(str(cap)) == 1:
             cap = '0' + str(cap)
 
-        for i in d.entries:
-            self.titleSerie = funciones.remove_tildes(i.title)
+        for entrie in feed.entries:
+            self.titleSerie = funciones.remove_tildes(entrie.title)
             # cuando llegamos al ultimo capitulo pasamos a la siguiente serie
             # self._logger.info(self.titleSerie, ".........", ultimaSerie, ".FIN")
             if self.titleSerie == last_serie:
@@ -260,7 +255,7 @@ class DescargaAutomaticaCli:
 
             if serie.title.lower() == SERIE_DEBUG.lower():
                 self._logger.info(f"{regex_cast} - {self.titleSerie}")
-                self._logger.info(i.link)
+                self._logger.info(entrie.link)
 
             estado = False
             if serie.vose:
@@ -268,15 +263,15 @@ class DescargaAutomaticaCli:
                     estado = True
             else:
                 if re.search(regex_cast, self.titleSerie, re.IGNORECASE):
-                    self._logger.debug(f'DESCARGA: {i}')
+                    self._logger.debug(f'DESCARGA: {entrie}')
                     estado = True
 
             if estado:
                 title_serie = self.titleSerie  # conversion necesaria para usar como str
                 if serie.vose:
-                    torrents = list(i.link)
+                    torrents = list(entrie.link)
                 else:
-                    torrents = funciones.get_url_torrent_dontorrent(i.link)
+                    torrents = funciones.get_url_torrent_dontorrent(entrie.link)
 
                 try:  # arreglar problema codificacion de algunas series
                     self._logger.info(title_serie)
@@ -293,9 +288,9 @@ class DescargaAutomaticaCli:
                         # creo un string para solo mandar una notificacion
                         self.listaNotificaciones += f'{title_serie}\n'
                     else:
-                        self.extra_action(f'{i.name} {i.cap}')
+                        self.extra_action(f'{entrie.name} {entrie.chapter}')
                         # creo un string para solo mandar una notificacion
-                        self.listaNotificaciones += f'{i.name} {i.cap}\n'
+                        self.listaNotificaciones += f'{entrie.name} {entrie.chapter}\n'
 
                     self._logger.critical(f'++{torrents}')
                     for torrent in torrents:
@@ -304,11 +299,11 @@ class DescargaAutomaticaCli:
                         # donde voy regex para coger el capitulo unicamente
                     self.actualizaDia += f'''\nUPDATE series SET Dia="{funciones.calculate_day_week()}" 
                                             WHERE Nombre LIKE "{serie.title}";'''
-                    self.capDescargado[serie.title] = i.epi
+                    self.capDescargado[serie.title] = entrie.epi
 
                 self._logger.info(f'DESCARGANDO: {serie.title}')
 
-        return funciones.remove_tildes(d.entries[0].title)
+        return funciones.remove_tildes(feed.entries[0].title)
 
     def extra_action(self, serie: str) -> NoReturn:
         """
