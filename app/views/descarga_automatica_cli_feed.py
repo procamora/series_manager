@@ -35,7 +35,7 @@ class DescargaAutomaticaCli:
             self.notificaciones = self.show_notificacions()  # variable publica
 
             self.query = """SELECT Nombre, Temporada, Capitulo, VOSE FROM Series WHERE Siguiendo = "Si"
-                          ORDER BY Nombre ASC"""
+                          ORDER BY Nombre"""
             self.series = conection_sqlite(self.db, self.query, True)
 
             self.listaNotificaciones = str()

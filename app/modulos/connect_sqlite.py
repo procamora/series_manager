@@ -3,25 +3,28 @@
 
 import os
 import sqlite3
-from typing import Dict, List, Tuple, Optional
+from typing import Dict, List, Tuple, Optional, Union
 
 
-def conection_sqlite(db: str, query: str, is_dict: bool = False, to_class: object = None) -> List:
-    if os.path.exists(db):
-        conn = sqlite3.connect(db)
-        if is_dict:
-            conn.row_factory = dict_factory
-        cursor = conn.cursor()
-        cursor.execute(query)
+# fixme cambiar de orden database y query
+def conection_sqlite(database: str, query_str: str, is_dict: bool = False, to_class: object = None) -> \
+        Union[List[List], List[object], List[Dict[str, object]],]:
+    try:
+        if os.path.exists(database):
+            conn = sqlite3.connect(database)
+            if is_dict:
+                conn.row_factory = dict_factory
+            cursor = conn.cursor()
+            cursor.execute(query_str)
 
-        if query.upper().startswith('SELECT'):
-            data = cursor.fetchall()  # Traer los resultados de un select
-        else:
-            conn.commit()  # Hacer efectiva la escritura de datos
-            data = None
+            if query_str.upper().startswith('SELECT'):
+                data = cursor.fetchall()  # Traer los resultados de un select
+            else:
+                conn.commit()  # Hacer efectiva la escritura de datos
+                data = None
 
-        cursor.close()
-        conn.close()
+            cursor.close()
+            conn.close()
 
         response = list()
         if to_class is not None:
@@ -30,19 +33,21 @@ def conection_sqlite(db: str, query: str, is_dict: bool = False, to_class: objec
                 # fixme usar introspeccion para confirmar que tiene el metodo load
                 response.append(a.load(i))
             return response
-
         return data
+    except sqlite3.OperationalError:
+        print(f'LOCK {query_str}, sorry...')
+        return None
 
 
-def dict_factory(cursor: sqlite3.Cursor, row: Tuple[str]) -> Dict:
+def dict_factory(cursor: sqlite3.Cursor, row: Tuple[str]) -> Dict[str, str]:
     d = dict()
     for idx, col in enumerate(cursor.description):
         d[col[0]] = row[idx]
     return d
 
 
-def execute_script_sqlite(db: str, script: str) -> None:
-    conn = sqlite3.connect(db)
+def execute_script_sqlite(database: str, script: str) -> None:
+    conn = sqlite3.connect(database)
     cursor = conn.cursor()
     cursor.executescript(script)
     conn.commit()

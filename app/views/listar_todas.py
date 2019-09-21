@@ -2,13 +2,15 @@
 # -*- coding: utf-8 -*-
 
 import sys
-from typing import NoReturn
+from typing import NoReturn, List
 
 from PyQt5 import QtWidgets
 from app.views.ui.listar_todas_ui import Ui_Dialog
 
+import app.controller.Controller as Controller
 from app import logger
-from app.modulos.connect_sqlite import conection_sqlite, execute_script_sqlite
+from app.models.model_query import Query
+from app.models.model_serie import Serie
 from app.modulos.settings import ruta_db
 
 
@@ -23,13 +25,13 @@ class ListarTodas(QtWidgets.QDialog):
         self.db = database
 
         # lista de consultas que se ejecutaran al final
-        self.queryCompleta = str()
+        self.queryCompleta: str = str()
 
         self.setWindowTitle('Modificaciones en masa')
         # esto permite selecionar multiples
         self.ui.listWidget.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
 
-        self.seriesTest = list(dict())
+        self.series: List[Serie] = list()
         self.get_all_series()
 
         self.ui.radioButtonAct.clicked.connect(self.series_actuals)
@@ -41,15 +43,16 @@ class ListarTodas(QtWidgets.QDialog):
         self.ui.pushButtonAnadir.clicked.connect(self.print_current_items)
 
         self.ui.pushButtonAplicar.clicked.connect(self.apply_data)
-        self.ui.pushButtonCerrar.clicked.connect(self.cancela)
+        self.ui.pushButtonCerrar.clicked.connect(self.cancel)
         self.ui.pushButtonAceptar.clicked.connect(self.accept_data)
 
     def get_all_series(self) -> NoReturn:
         """
         Saca todas las series de la bd y las mete en una lista de diccionarios accesible en todo el objeto
         """
-        query = 'SELECT * FROM Series ORDER BY Nombre'
-        self.seriesTest = conection_sqlite(self.db, query, True)
+        response_query: Query = Controller.get_series_all(self.db, 'ORDER BY Nombre')
+        self.series = response_query.response
+
         self.ui.radioButtonAct.setChecked(True)
         # lo ejecuto al principio ya que es el activado por defecto
         self.series_actuals()
@@ -60,10 +63,10 @@ class ListarTodas(QtWidgets.QDialog):
         """
 
         self.ui.listWidget.clear()
-        for i in self.seriesTest:
-            if i['Siguiendo'] == 'Si' and i['Capitulo'] != 0 and i['Estado'] == 'Activa':
+        for serie in self.series:
+            if serie.following and serie.chapter != 0 and serie.state == 'Activa':
                 item = QtWidgets.QListWidgetItem()
-                item.setText(i['Nombre'])
+                item.setText(serie.title)
                 self.ui.listWidget.addItem(item)
 
     def series_finished_season(self) -> NoReturn:
@@ -72,10 +75,10 @@ class ListarTodas(QtWidgets.QDialog):
         """
 
         self.ui.listWidget.clear()
-        for i in self.seriesTest:
-            if i['Capitulo'] == 0:
+        for serie in self.series:
+            if serie.chapter == 0:
                 item = QtWidgets.QListWidgetItem()
-                item.setText(i['Nombre'])
+                item.setText(serie.title)
                 self.ui.listWidget.addItem(item)
 
     def series_stopped(self) -> NoReturn:
@@ -84,10 +87,10 @@ class ListarTodas(QtWidgets.QDialog):
         """
 
         self.ui.listWidget.clear()
-        for i in self.seriesTest:
-            if i['Estado'] == 'Pausada':
+        for serie in self.series:
+            if serie.state == 'Pausada':
                 item = QtWidgets.QListWidgetItem()
-                item.setText(i['Nombre'])
+                item.setText(serie.title)
                 self.ui.listWidget.addItem(item)
 
     def series_all(self) -> NoReturn:
@@ -96,52 +99,30 @@ class ListarTodas(QtWidgets.QDialog):
         """
 
         self.ui.listWidget.clear()
-        for i in self.seriesTest:
+        for serie in self.series:
             item = QtWidgets.QListWidgetItem()
-            item.setText(i['Nombre'])
+            item.setText(serie.title)
             self.ui.listWidget.addItem(item)
 
     def print_current_items(self) -> NoReturn:
         """
         Coge todas las series seleccionadas y las mete en una lista con su respectiva consulta para despues ejecutarlas
         """
-
-        for i in self.ui.listWidget.selectedItems():
-            if self.ui.radioButtonAcabaT.isChecked():
-                query = """UPDATE series SET Temporada=Temporada+1, Capitulo="00", Estado="En Espera" WHERE Nombre
-                    LIKE "{}";\n""".format(i.text())
-                self.queryCompleta += query
-
-            elif self.ui.radioButtonEmpieza.isChecked():
-                query = 'UPDATE series SET Capitulo="01", Estado="Activa" WHERE Nombre LIKE "{}";\n'.format(
-                    i.text())
-                self.queryCompleta += query
-
-            elif self.ui.radioButtonEspera.isChecked():
-                query = 'UPDATE series SET Estado="Pausada" WHERE Nombre LIKE "{}";\n'.format(
-                    i.text())
-                self.queryCompleta += query
-
-            elif self.ui.radioButtonFinalizada.isChecked():
-                query = 'UPDATE series SET Estado="Finalizada", Acabada="Si" WHERE Nombre LIKE "{}";\n'.format(
-                    i.text())
-                self.queryCompleta += query
-
-        logger.debug(self.queryCompleta)
+        test = [title.text() for title in self.ui.listWidget.selectedItems()]
+        self.queryCompleta += Controller.update_list_series(test, self.ui.radioButtonAcabaT.isChecked(),
+                                                            self.ui.radioButtonEmpieza.isChecked(),
+                                                            self.ui.radioButtonEspera.isChecked(),
+                                                            self.ui.radioButtonFinalizada.isChecked())
 
     def apply_data(self) -> bool:
         """
         Ejecuta todas las consultas que hay en la lista
         """
-
-        logger.debug(self.queryCompleta)
-
-        execute_script_sqlite(self.db, self.queryCompleta)
-
+        Controller.execute_query_script_sqlite(self.db, self.queryCompleta)
         self.queryCompleta = str()
         return True
 
-    def cancela(self) -> NoReturn:
+    def cancel(self) -> NoReturn:
         """
         Establece el estado actual en cancelado para retornar None y ejecuta reject
         """

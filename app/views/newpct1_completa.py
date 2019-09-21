@@ -14,6 +14,7 @@ from app.views.ui.descarga_completa_ui import Ui_Dialog
 from app import logger
 from app.modulos import funciones
 from app.modulos.telegram2 import Telegram
+import app.controller.Controller as Controller
 
 
 # https://gist.github.com/kaotika/e8ca5c340ec94f599fb2

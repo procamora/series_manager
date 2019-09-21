@@ -6,8 +6,9 @@ from typing import NoReturn
 from PyQt5 import QtWidgets
 from app.views.ui.buscar_series_ui import Ui_Dialog
 
+import app.controller.Controller as Controller
 from app import logger
-from app.modulos.connect_sqlite import conection_sqlite
+from app.models.model_query import Query
 from app.modulos.settings import ruta_db
 from app.views.actualizar_insertar import ActualizarInsertar
 
@@ -36,20 +37,17 @@ class BuscarSeries(QtWidgets.QDialog):
         """
 
         self.ui.listWidget.clear()
+        response_query: Query = Controller.get_series_name(self.ui.lineEdit.text(), self.db)
 
-        query = 'SELECT Nombre FROM Series WHERE Nombre LIKE "%%{}%%"'.format(
-            self.ui.lineEdit.text())
-        response_query = conection_sqlite(self.db, query, True)
-
-        if len(response_query) == 0:
+        if response_query.is_empty():
             item = QtWidgets.QListWidgetItem()
             item.setText('Serie no encontrada')
             self.ui.listWidget.addItem(item)
 
         else:
-            for i in response_query:
+            for i in response_query.response:
                 item = QtWidgets.QListWidgetItem()
-                item.setText(i['Nombre'])
+                item.setText(i.title)
                 self.ui.listWidget.addItem(item)
 
     def update_serie(self) -> NoReturn:
@@ -61,12 +59,8 @@ class BuscarSeries(QtWidgets.QDialog):
         for i in self.ui.listWidget.selectedItems():
             logger.debug((i.text()))
 
-            query = 'SELECT * FROM Series WHERE Nombre LIKE "{}"'.format(
-                i.text())
-            response_query = conection_sqlite(self.db, query, True)[0]
-
-            ActualizarInsertar.get_data(
-                data_serie=response_query, database=self.db)
+            response_query: Query = Controller.get_series_name(i.text(), self.db)
+            ActualizarInsertar.get_data(data_serie=response_query.response[0], database=self.db)
 
     def cancel(self) -> NoReturn:
         """

@@ -10,6 +10,7 @@ from app.views.ui.asistente_inicial_ui import Ui_Dialog
 
 from app import logger
 from app.modulos.settings import sync_sqlite, sync_gdrive
+import app.controller.Controller as Controller
 
 
 class AsistenteInicial(QtWidgets.QDialog):

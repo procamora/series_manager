@@ -2,19 +2,29 @@
 # -*- coding: utf-8 -*-
 
 import json
+import sys
 
 import requests
+
+# Esto hace que no salga la advertencia por fallo al verificar el certificado
+requests.packages.urllib3.disable_warnings()
 
 try:  # Ejecucion desde Series.py
     from .settings import modo_debug, ruta_db, directorio_local, sync_sqlite
     from .connect_sqlite import conection_sqlite, execute_script_sqlite
-except Exception:  # Ejecucion local
+    from app import logger
+except ModuleNotFoundError as e:  # Ejecucion local
+    new_path = '../../'
+    if new_path not in sys.path:
+        sys.path.append(new_path)
+    from app import logger
+
     from app.modulos.settings import modo_debug, ruta_db, directorio_local, sync_sqlite
     from app.modulos.connect_sqlite import conection_sqlite, execute_script_sqlite
 
 from app import logger
 
-from typing import NoReturn, Dict, Union, Any, Optional
+from typing import NoReturn, Dict, Optional
 
 
 class Telegram:
@@ -27,12 +37,10 @@ class Telegram:
 
         self.url = 'https://api.telegram.org/bot{0}/{1}'
         self.chat_id = chat_id
-        # Esto hace que no salga la advertencia por fallo al verificar el certificado
-        requests.packages.urllib3.disable_warnings()
 
     @staticmethod
     def initial_data() -> Optional[Dict[str, str]]:
-        with open(r'{}/{}'.format(directorio_local, sync_sqlite), 'r') as f:
+        with open(sync_sqlite, 'r') as f:
             id_fich = f.readline().replace('/n', '')
 
         query = 'SELECT * FROM Credenciales'.format(id_fich)
@@ -41,7 +49,7 @@ class Telegram:
             return consulta[0]
         return None
 
-    def make_request(self, method_name, method='post', params=None, files=None) -> Dict:
+    def make_request(self, method_name, method='post', params=None, files=None) -> Dict[str, str]:
         """
         Makes a request to the Telegram API.
         :param method_name: Name of the API method to be called. (E.g. 'getUpdates')
@@ -85,7 +93,7 @@ class Telegram:
         # logger.debug(dic[data_type])
         return dic[data_type]
 
-    def send_tg(self, texto: str = 'ola k ase') -> Union[Dict, Any]:  # funciona en python 3
+    def send_tg(self, texto: str = 'ola k ase') -> Dict[str, str]:  # funciona en python 3
         payload = {'chat_id': self.chat_id,
                    'text': texto}
 
@@ -93,7 +101,7 @@ class Telegram:
 
         return self.make_request(method_url, params=payload, method='post')
 
-    def send_file(self, url_file) -> Union[Dict, Any]:
+    def send_file(self, url_file: str) -> Dict[str, str]:
 
         payload = {'chat_id': self.chat_id}
         # files = None
@@ -121,6 +129,6 @@ class Telegram:
 
 if __name__ == '__main__':
     a = Telegram('33063767')
-    logger.info(a.send_tg('Test desde modulo de python'))
+    a.send_tg('Test desde modulo de python')
     # logger.info(a.sendFile('connect_sqlite.py'))
     # a.recibeTg()

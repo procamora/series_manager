@@ -12,7 +12,7 @@ from app.models import Model
 
 @dataclass
 class Serie(Model):
-    name: str = str()
+    title: str = str()
     season: int = -1
     chapter: int = -1
     following: bool = bool()
@@ -42,17 +42,17 @@ class Serie(Model):
         s = Serie()
         for i in dictionaty:
             if i == 'Nombre':
-                s.name = dictionaty[i]
+                s.title = dictionaty[i]
             elif i == 'Temporada':
                 s.season = int(dictionaty[i])
             elif i == 'Capitulo':
                 s.chapter = int(dictionaty[i])
             elif i == 'Siguiendo':
-                s.following = bool(dictionaty[i])
+                s.following = Model.str_to_bool(dictionaty[i])
             elif i == 'VOSE':
-                s.vose = dictionaty[i]
+                s.vose = Model.str_to_bool(dictionaty[i])
             elif i == 'Acabada':
-                s.finished = bool(dictionaty[i])
+                s.finished = Model.str_to_bool(dictionaty[i])
             elif i == 'Dia':
                 s.day = dictionaty[i]
             elif i == 'Estado':
@@ -66,7 +66,13 @@ class Serie(Model):
             elif i == 'imdb_Finaliza':
                 s.imdb_finished = dictionaty[i]
             elif i == 'imdb_seguir':
-                s.imdb_following = bool(dictionaty[i])
+                s.imdb_following = Model.str_to_bool(dictionaty[i])
             elif i == 'Capitulo_Descargado':
                 s._chapter_downloaded = dictionaty[i]
         return s
+
+    def __eq__(self, other):
+        """Overrides the default implementation"""
+        if isinstance(other, Serie):
+            return self.title == other.title
+        return False

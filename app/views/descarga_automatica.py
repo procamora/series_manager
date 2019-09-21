@@ -5,13 +5,15 @@
 
 """
 import sys
-from typing import NoReturn
+from typing import NoReturn, List
 
 from PyQt5 import QtWidgets, QtCore
 from app.views.ui.descarga_automatica_ui import Ui_Dialog
 
+import app.controller.Controller as Controller
+from app.models.model_query import Query
+from app.models.model_serie import Serie
 from app.modulos import funciones
-from app.modulos.connect_sqlite import conection_sqlite
 from app.modulos.settings import ruta_db
 from app.views.descarga_automatica_cli import DescargaAutomaticaCli
 from app.views.msgbox import MsgBox
@@ -24,13 +26,9 @@ class Mythread(QtCore.QThread, DescargaAutomaticaCli):
     total = QtCore.pyqtSignal(object)
     update = QtCore.pyqtSignal()
 
-    def __init__(self, parent: QtWidgets.QProgressBar, obj_vistas: QtWidgets.QTextEdit,
-                 obj_descargas: QtWidgets.QTextEdit, database: str = None, query: str = None) -> NoReturn:
+    def __init__(self, parent: QtWidgets.QProgressBar, obj_descargas: QtWidgets.QTextEdit) -> NoReturn:
         super(Mythread, self).__init__(parent)
-        self.objVistas = obj_vistas
         self.objDescargas = obj_descargas
-        self.db = database
-        self.query = query
 
     def run(self) -> NoReturn:
         # para saber cuantas series tiene en la barra de progreso (ajustarla y que marque bien los porcentajes)
@@ -42,10 +40,8 @@ class Mythread(QtCore.QThread, DescargaAutomaticaCli):
 
     def parser_feed(self, serie: str, tem: str, cap: str, vose: str) -> str:
         """Solo funciona con series de 2 digitos por la expresion regular"""
-
         self.update.emit()
         serie = DescargaAutomaticaCli.parser_feed(self, serie, tem, cap, vose)
-
         return serie
 
 
@@ -56,28 +52,27 @@ class DescargaAutomatica(QtWidgets.QDialog):
         self.ui.setupUi(self)
         self.otra = 'otra'  # campo otra del formulario
         self.estadoI = 'Ok'  # estado inicial
-        self.n = 0
+        self.n: int = 0
         self.db = database
         self.setWindowTitle('Descarga automatica de newpct1')
         self.ui.progressBar.setValue(self.n)
 
         # variable de acceso compartido, no se como hacerlo de otra forma
         DescargaAutomatica.notificaciones = DescargaAutomaticaCli.show_notifications()
-
-        query = """SELECT Nombre, Temporada, Capitulo, VOSE FROM Series WHERE Siguiendo = "Si" ORDER BY Nombre ASC"""
-        self.series = conection_sqlite(self.db, query, True)
+        response_query: Query = Controller.get_series_follow(self.db)
+        self.series: List[Serie] = response_query.response
 
         # si le doy a ok cierro la ventana
         self.ui.pushButtonCerrar.clicked.connect(self.close)
 
-        self.thread = Mythread(self.ui.progressBar, self.ui.textEditVistas, self.ui.textEditDescargadas, self.db, query)
+        self.thread = Mythread(self.ui.progressBar, self.ui.textEditDescargadas)
         self.thread.total.connect(self.ui.progressBar.setMaximum)
         self.thread.update.connect(self.update)
         self.thread.finished.connect(self.close)
         self.thread.start()
 
     def update(self) -> NoReturn:
-        self.ui.textEditVistas.append(str(self.series[self.n]['Nombre']))
+        self.ui.textEditVistas.append(self.series[self.n].title)
         self.n += 1
         self.ui.progressBar.setValue(self.n)
 

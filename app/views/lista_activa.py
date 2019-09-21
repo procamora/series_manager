@@ -9,6 +9,7 @@ from app.views.ui.lista_activa_ui import Ui_Dialog
 
 from app import logger
 from app.modulos.settings import ruta_db
+import app.controller.Controller as Controller
 
 
 class ListaActiva(QtWidgets.QDialog):

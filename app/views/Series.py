@@ -13,7 +13,7 @@ from PyQt5 import QtGui, QtWidgets, QtCore
 from app.views.ui.series_ui import Ui_MainWindow
 
 # PROPIAS
-import app.controller.Controller as controller
+import app.controller.Controller as Controller
 from app import logger
 from app.models.model_serie import Serie
 from app.modulos import funciones
@@ -58,7 +58,7 @@ class Series(QtWidgets.QMainWindow):
     def init_active_list(self) -> NoReturn:
 
         self.ui.gridLayoutGobal = QtWidgets.QGridLayout(self.ui.scrollAreaWidgetContents)
-        response_query = controller.get_all_series(self.db)
+        response_query = Controller.get_series_follow_active(self.db)
 
         # todo esto es para ordenar las series por fecha de proximidad de proximo capitulo
         fecha2 = funciones.calculate_day_week()
@@ -108,7 +108,7 @@ class Series(QtWidgets.QMainWindow):
         self.ui.gridLayoutGobal.addWidget(widget_botones, n, 3, 1, 1, QtCore.Qt.AlignLeft)
 
         label_emision.setText(serie.day)
-        label_nombre.setText(serie.name)
+        label_nombre.setText(serie.title)
         # hago esto para que quede bonito los numeros de los capitulos
         line_episodio.setText(f'{serie.get_season_chapter()}')
         button_sumar.setText("+1")
@@ -231,7 +231,7 @@ class Series(QtWidgets.QMainWindow):
         """
 
         logger.debug(self.queryCompleta)
-        controller.execute_query_script_sqlite(self.db, self.queryCompleta)
+        Controller.execute_query_script_sqlite(self.db, self.queryCompleta)
 
         self.queryCompleta = str()  # por si vuelvo a darle al boton aplicar
         return True
@@ -438,7 +438,7 @@ class Series(QtWidgets.QMainWindow):
         with open(r'{}/id.conf'.format(directorio_local), 'r') as f:
             id_fich = f.readline().replace('/n', '')
 
-        consultas_log = controller.get_credentials(id_fich, self.db)
+        consultas_log = Controller.get_credentials_fileconf(id_fich, self.db)
 
         if not consultas_log.is_empty():
             if num == 'newpct1':

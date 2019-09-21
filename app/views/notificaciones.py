@@ -2,13 +2,14 @@
 # -*- coding: utf-8 -*-
 
 import sys
-from typing import NoReturn
+from typing import NoReturn, List
 
 from PyQt5 import QtWidgets
 from app.views.ui.notificaciones_ui import Ui_Dialog
 
-from app import logger
-from app.modulos.connect_sqlite import conection_sqlite, execute_script_sqlite
+import app.controller.Controller as Controller
+from app.models.model_notifications import Notifications
+from app.models.model_query import Query
 from app.modulos.settings import ruta_db
 
 
@@ -24,7 +25,7 @@ class Notificaciones(QtWidgets.QDialog):
         self.db = database
         self.setWindowTitle('Notificaciones de la aplicacion')
 
-        self.data_db = list(dict())
+        self.notifications: List[Notifications] = list()
         self.initial_operations()
 
         self.ui.checkBox_Telegram.clicked.connect(
@@ -48,105 +49,101 @@ class Notificaciones(QtWidgets.QDialog):
         """
         Compruueba se hay un check en el campo a y si lo hay desabilita el campo de texto b
         """
-
-        if a:
-            b.setDisabled(False)
-        else:
-            b.setDisabled(True)
+        b.setDisabled(False) if a else b.setDisabled(True)
+        # if a:
+        #    b.setDisabled(False)
+        # else:
+        #    b.setDisabled(True)
 
     def initial_operations(self) -> NoReturn:
         """
         Ejecuta las 2 funciones necesarias para que funcione el programa,
         sacar los datos e introducirlos a la views
         """
-        self.get_notifications()
+        response_query: Query = Controller.get_notifications(self.db)
+        print(response_query.response)
+        self.notifications = response_query.response
+        print(self.notifications)
         self.get_configuration()
-
-    def get_notifications(self) -> NoReturn:
-        """
-        Ejecuta la consulta
-        """
-
-        query = 'SELECT * FROM Notificaciones'
-        self.data_db = conection_sqlite(self.db, query, True)
 
     def get_configuration(self) -> NoReturn:
         """
         Con la lista de la bd pone los datos en la views
         """
-
-        for i in self.data_db:
-            logger.debug(i)
-
-            if len(str(i['API'])) != 'None':
-                api = str(i['API'])
+        for notification in self.notifications:
+            print(notification)
+            if notification.api != 'None':
+                api = notification.api
             else:
                 api = ''
 
-            if i['Nombre'] == 'Telegram':
+            if notification.name == 'Telegram':
                 self.ui.lineEdit_Telegram.setText(api)
-                if i['Activo'] == 'True':
+                if notification.active:
                     self.ui.checkBox_Telegram.setChecked(True)
                 else:
                     self.ui.lineEdit_Telegram.setDisabled(True)
 
-            elif i['Nombre'] == 'Pushbullet':
+            elif notification.name == 'Pushbullet':
                 self.ui.lineEdit_PushBullet.setText(api)
-                if i['Activo'] == 'True':
+                if notification.active:
                     self.ui.checkBox_PushBullet.setChecked(True)
                     # self.lineEdit_PushBullet.setDisabled(False)
                 else:
                     # self.checkBox_PushBullet.setChecked(False)
                     self.ui.lineEdit_PushBullet.setDisabled(True)
 
-            elif i['Nombre'] == 'Email':
+            elif notification.name == 'Email':
                 self.ui.lineEdit_Email.setText(api)
-                if i['Activo'] == 'True':
+                if notification.active:
                     self.ui.checkBox_Email.setChecked(True)
                 else:
                     self.ui.lineEdit_Email.setDisabled(True)
 
-            elif i['Nombre'] == 'Hangouts':
+            elif notification.name == 'Hangouts':
                 self.ui.lineEdit_Hangouts.setText(api)
-                if i['Activo'] == 'True':
+                if notification.active:
                     self.ui.checkBox_Hangouts.setChecked(True)
                 else:
                     self.ui.lineEdit_Hangouts.setDisabled(True)
 
     def apply_data(self) -> bool:
         """
-        Creo un diccionario con todos los datos y voy ejecutando los updates,
-        si el campo de la api es None o NULL hago que ponfga el campo NULL en la bd
+        Creo una lista con todos los datos y voy ejecutando los updates,
+        si el campo de la api es None o NULL hago que ponga el campo NULL en la bd
         """
+        list_notifications: List[Notifications] = list()
+        notifications: Notifications = Notifications()
+        notifications.name = 'Telegram'
+        notifications.api = self.ui.lineEdit_Telegram.text()
+        notifications.active = str(self.ui.checkBox_Telegram.isChecked())
+        list_notifications.append(notifications)
 
-        datos = [
-            {'Nombre': 'Telegram', 'API': str(self.ui.lineEdit_Telegram.text()),
-             'Activo': str(self.ui.checkBox_Telegram.isChecked())},
-            {'Nombre': 'Pushbullet', 'API': str(self.ui.lineEdit_PushBullet.text()),
-             'Activo': str(self.ui.checkBox_PushBullet.isChecked())},
-            {'Nombre': 'Email', 'API': str(self.ui.lineEdit_Email.text()),
-             'Activo': str(self.ui.checkBox_Email.isChecked())},
-            {'Nombre': 'Hangouts', 'API': str(self.ui.lineEdit_Hangouts.text()),
-             'Activo': str(self.ui.checkBox_Hangouts.isChecked())}
-        ]
-        query_str = str()
-        for i in datos:
-            if i['API'] == 'NULL' or i['API'] == 'None':
-                query_str += """\nUPDATE Notificaciones SET API=NULL, Activo="{}" WHERE Nombre LIKE "{}";""".format(
-                    i['Activo'], i['Nombre'])
-            else:
-                query_str += """\nUPDATE Notificaciones SET API="{}", Activo="{}" WHERE Nombre LIKE "{}";""".format(
-                    i['API'], i['Activo'], i['Nombre'])
+        notifications: Notifications = Notifications()
+        notifications.name = 'Pushbullet'
+        notifications.api = self.ui.lineEdit_PushBullet.text()
+        notifications.active = str(self.ui.checkBox_PushBullet.isChecked())
+        list_notifications.append(notifications)
 
-        logger.debug(query_str)
-        execute_script_sqlite(self.db, query_str)
+        notifications: Notifications = Notifications()
+        notifications.name = 'Email'
+        notifications.api = self.ui.lineEdit_Email.text()
+        notifications.active = str(self.ui.checkBox_Email.isChecked())
+        list_notifications.append(notifications)
+
+        notifications: Notifications = Notifications()
+        notifications.name = 'Hangouts'
+        notifications.api = self.ui.lineEdit_Hangouts.text()
+        notifications.active = str(self.ui.checkBox_Hangouts.isChecked())
+        list_notifications.append(notifications)
+
+        Controller.update_notifications(list_notifications, self.db)
         return True
 
     def cancel(self) -> NoReturn:
         """
         Establece el estado actual en cancelado para retornar None y ejecuta reject
         """
-
         self.state_current = self.state_cancel
         self.reject()
 
@@ -154,7 +151,6 @@ class Notificaciones(QtWidgets.QDialog):
         """
         Boton Aceptar, primero aplicas los datos, si retorna True, cierra la ventana
         """
-
         if self.apply_data():
             self.accept()
 

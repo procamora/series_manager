@@ -2,14 +2,16 @@
 # -*- coding: utf-8 -*-
 
 import sys
-from typing import NoReturn
+from typing import NoReturn, List
 
 from PyQt5 import QtWidgets
 from app.views.ui.preferencias_ui import Ui_Dialog
 
+import app.controller.Controller as Controller
 from app import logger
+from app.models.model_preferences import Preferences
+from app.models.model_query import Query
 from app.modulos import funciones
-from app.modulos.connect_sqlite import conection_sqlite
 from app.modulos.settings import directorio_local, ruta_db
 
 
@@ -28,15 +30,15 @@ class Preferencias(QtWidgets.QDialog):
         self.setWindowTitle('Preferencias de configuracion')
         self.ui.tabWidget.setCurrentIndex(0)
 
-        self.configuraciones = list(dict())
-        self.data_db = dict()
+        self.configuraciones: List[Preferences] = list()
+        self.preferences_actual: Preferences = Preferences()
         self.initials_operations()
 
         # recogo todos los dias de la caja y le paso el indice del dia en el
         # que sale
         all_items = [self.ui.BoxId.itemText(i) for i in range(self.ui.BoxId.count())]
-
         logger.info(all_items)
+
         with open(r'{}/id.conf'.format(self.ruta), 'r') as f:
             id_fich = f.readline().replace('/n', '')
 
@@ -67,11 +69,11 @@ class Preferencias(QtWidgets.QDialog):
         Se encarga de coger la ruta en la que vamos a guardar el fichero, en este caso solo buscamos directorios,
         y establecemos que la ruta raiz sea el escrotorio, que se establece en el init
         """
-
         # filenames = QtGui.QFileDialog.getOpenFileName()
-        filenames = QtWidgets.QFileDialog.getExistingDirectory(self, "Open Directory", str(self.ui.lineRuta.text()),
-                                                               QtWidgets.QFileDialog.ShowDirsOnly |
-                                                               QtWidgets.QFileDialog.DontResolveSymlinks)
+        # noinspection PyArgumentList
+        filenames: str = QtWidgets.QFileDialog.getExistingDirectory(
+            parent=self, caption="Select Directory", directory=self.ui.lineRuta.text(),
+            QFileDialog_Options=QtWidgets.QFileDialog.ShowDirsOnly | QtWidgets.QFileDialog.DontResolveSymlinks)
 
         if filenames is not None:
             # if not (filenames.isNull()): en python 3 filenames ya no es un
@@ -82,21 +84,21 @@ class Preferencias(QtWidgets.QDialog):
         """
 
         """
-
-        query = 'SELECT * FROM Configuraciones'
-        self.configuraciones = conection_sqlite(self.db, query, True)
-        if len(self.configuraciones) > 0:
-            self.data_db = self.configuraciones[0]
+        response_query: Query = Controller.get_preferences(self.db)
+        self.configuraciones = response_query.response
+        # self.configuraciones = conection_sqlite(self.db, query, True)
+        if not response_query.is_empty():
+            self.preferences_actual = self.configuraciones[0]
+        else:
+            logger.info('Information not obtained')
 
     def list_id(self) -> NoReturn:
         """
 
         """
-
-        lista = list()
-        for i in self.configuraciones:
-            lista.append(str(i['id']))
-
+        lista: list = [str(i.id) for i in self.configuraciones]
+        # for i in self.configuraciones:
+        #    lista.append(str(i.id))
         self.ui.BoxId.clear()
         self.ui.BoxId.addItems(lista)
         self.ui.BoxId.addItem(self.other)
@@ -105,55 +107,35 @@ class Preferencias(QtWidgets.QDialog):
         """
 
         """
-
         for i in self.configuraciones:
-            if str(self.ui.BoxId.currentText()) == str(i['id']):
-                logger.debug(self.ui.BoxId.currentText())
-                logger.debug(i)
-                self.data_db = i
+            if str(self.ui.BoxId.currentText()) == str(i.id):
+                self.preferences_actual = i
         if self.ui.BoxId.currentText() == self.other:
-            self.data_db = {'UrlFeedShowrss': '',
-                            'RutaDescargas': '',
-                            'UrlFeedNewpct': '',
-                            'id': ''}
+            self.preferences_actual = Preferences()
 
     def common_processes(self) -> NoReturn:
         """
 
         """
-
         self.get_configuration()
         self.insert_serie()
 
     def apply_data(self) -> bool:
-        datos = {
-            'ID': str(self.ui.BoxId.currentText()),
-            'Newpct': str(self.ui.lineNewpct.text()),
-            'showrss': str(self.ui.lineShowrss.text()),
-            'Ruta': funciones.change_bars(str(self.ui.lineRuta.text()))
-        }
+        preferences: Preferences = Preferences()
+        preferences.id = self.ui.BoxId.currentText()
+        preferences.url_feed = self.ui.lineNewpct.text()
+        preferences.url_feed_vose = self.ui.lineShowrss.text()
+        preferences.path_download = funciones.change_bars(str(self.ui.lineRuta.text()))
 
-        if datos['ID'] == self.other:
+        if preferences.id == self.other:
             logger.info('insert')
-            query = """INSERT INTO Configuraciones(UrlFeedNewpct, UrlFeedShowrss, RutaDescargas) VALUES ("{}", "{}", 
-            "{}")""".format(datos['Newpct'], datos['showrss'], datos['Ruta'])
-
-            logger.debug('update')
-            logger.debug(query)
-
-            conection_sqlite(self.db, query)
+            Controller.insert_preferences(preferences, self.db)
             self.initials_operations()
         else:
-            query = """UPDATE Configuraciones SET UrlFeedNewpct="{}", UrlFeedShowrss="{}", RutaDescargas="{}"
-            WHERE ID LIKE {}""".format(datos['Newpct'], datos['showrss'], datos['Ruta'], datos['ID'])
-
-            logger.debug('update')
-            logger.debug(query)
-
-            conection_sqlite(self.db, query)
+            Controller.update_preferences(preferences, self.db)
 
         with open(r'{}/id.conf'.format(self.ruta), 'w') as f:
-            f.write(datos['ID'])
+            f.write(preferences.id)
 
         return True
 
@@ -161,10 +143,9 @@ class Preferencias(QtWidgets.QDialog):
         """
 
         """
-
-        self.ui.lineNewpct.setText(self.data_db['UrlFeedNewpct'])
-        self.ui.lineShowrss.setText(self.data_db['UrlFeedShowrss'])
-        self.ui.lineRuta.setText(str(self.data_db['RutaDescargas']))
+        self.ui.lineNewpct.setText(self.preferences_actual.url_feed)
+        self.ui.lineShowrss.setText(self.preferences_actual.url_feed_vose)
+        self.ui.lineRuta.setText(str(self.preferences_actual.path_download))
 
     def cancel(self) -> NoReturn:
         """

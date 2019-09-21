@@ -21,17 +21,24 @@ import urllib3
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 from bs4 import BeautifulSoup
+from typing import List, NoReturn, Dict
+from dataclasses import dataclass
+
+new_path = '../../'
+if new_path not in sys.path:
+    sys.path.append(new_path)
 
 from app.modulos import funciones
-from app.modulos.connect_sqlite import conection_sqlite, execute_script_sqlite
+from app.modulos.connect_sqlite import execute_script_sqlite
 from app.modulos.mail2 import ML2
 from app.modulos.pushbullet2 import PB2
 from app.modulos.settings import directorio_trabajo, ruta_db
 from app.modulos.telegram2 import Telegram
 from app import logger
-
-from typing import List, NoReturn, Dict
-from dataclasses import dataclass
+import app.controller.Controller as Controller
+from app.models.model_query import Query
+from app.models.model_notifications import Notifications
+from app.models.model_serie import Serie
 
 SERIE_DEBUG = "SEAL Team"
 
@@ -104,8 +111,7 @@ class FeedparserPropio:
                         f.add(serie.text, capitulo.text, url)
 
         for i in f.entries:
-            logger.debug('-> {}'.format(i.toString()))
-
+            logger.debug(f'-> {i}')
         return f
 
 
@@ -120,11 +126,7 @@ class DescargaAutomaticaCli:
             else:
                 self.db = database
 
-            self.notificaciones = self.show_notifications()  # variable publica
-
-            self.query = 'SELECT Nombre, Temporada, Capitulo, VOSE FROM Series WHERE Siguiendo = "Si" ' \
-                         'ORDER BY Nombre ASC'
-            self.series = conection_sqlite(self.db, self.query, True)
+            self.notificaciones: List[Notifications] = self.show_notifications()  # variable publica
 
             self.listaNotificaciones = str()
             self.actualizaDia = str()
@@ -154,7 +156,8 @@ class DescargaAutomaticaCli:
             except TypeError:  # Para el fallo en fedora
                 self.feedShow = funciones.feed_parser(url_show)
 
-            self.consultaSeries = conection_sqlite(self.db, self.query, True)
+            response_query: Query = Controller.get_series_follow(self.db)
+            self.consultaSeries: List[Serie] = response_query.response
 
     def run(self) -> NoReturn:
         serie_actual_new = str()
@@ -180,34 +183,34 @@ class DescargaAutomaticaCli:
         with open('{}/{}'.format(self.rutlog, fich_showrss), 'r') as f:
             self.ultimaSerieShow = f.readline()
 
-        for i in self.consultaSeries:
+        for serie in self.consultaSeries:
             try:
-                self._logger.info(('Revisa: {}'.format(funciones.remove_tildes(i['Nombre']))))
-                serie_actual_temp = self.parser_feed(i['Nombre'], i['Temporada'], i['Capitulo'], i['VOSE'])
-                if i['VOSE'] == 'Si':
+                self._logger.info(('Revisa: {}'.format(funciones.remove_tildes(serie.title))))
+                serie_actual_temp = self.parser_feed(serie)
+                if serie.vose:
                     serie_actual_show = serie_actual_temp
                 else:
                     serie_actual_new = serie_actual_temp
             except Exception as e:
-                self._logger.error('################ {} FALLO {}'.format(i['Nombre'], e))
+                self._logger.error('################ {} FALLO {}'.format(serie['Nombre'], e))
 
         if len(self.ultimaSerieNew) != 0:  # or len(self.ultimaSerieShow) != 0:
             # self._logger.info(self.actualizaDia)
             # actualiza los dias en los que sale el capitulo
             execute_script_sqlite(self.db, self.actualizaDia)
 
-            for notif in self.notificaciones:
-                if notif['Activo'] == 'True':
-                    if notif['Nombre'] == 'Telegram':
+            for notification in self.notificaciones:
+                if notification.active:
+                    if notification.name == 'Telegram':
                         self._logger.critical("TEST A")
                         tg3.send_tg(self.listaNotificaciones)
                         self._logger.critical("TEST B")
-                    elif notif['Nombre'] == 'Pushbullet':
+                    elif notification.name == 'Pushbullet':
                         pb3.send_text_pb('Gestor series', self.listaNotificaciones)
 
         # capitulos que descargo
-        for i in self.capDescargado.items():
-            query = 'UPDATE Series SET Capitulo_Descargado={} WHERE Nombre LIKE "{}";\n'.format(str(i[1]), i[0])
+        for serie in self.capDescargado.items():
+            query = 'UPDATE Series SET Capitulo_Descargado={} WHERE Nombre LIKE "{}";\n'.format(str(serie[1]), serie[0])
             self.consultaUpdate += query
 
         self._logger.info(self.consultaUpdate)
@@ -224,11 +227,11 @@ class DescargaAutomaticaCli:
         else:
             self._logger.error('PROBLEMA CON if SerieActualShow is not None and SerieActualNew is not None:')
 
-    def parser_feed(self, serie: str, tem: str, cap: str, vose: str) -> str:
+    def parser_feed(self, serie: Serie) -> str:
         """Solo funciona con series de 2 digitos por la expresion regular"""
         cap = str(cap)
         ruta = str(self.conf['RutaDescargas'])  # es unicode
-        if vose == 'Si':
+        if serie.vose:
             last_serie = self.ultimaSerieShow
             d = self.feedShow
         else:
@@ -250,27 +253,27 @@ class DescargaAutomaticaCli:
                 pass
                 # return funciones.eliminaTildes(d.entries[0].title)  # FIXME DESCOMENTAR
 
-            regex_vose = r'{} ({}|{}|{}).*'.format(funciones.scapes_parenthesis(serie.lower()), tem, tem + 1, tem + 2)
+            regex_vose = rf'{funciones.scapes_parenthesis(serie.title.lower())} (\d+).*'
             # regex_cast = r'(?i){}.*Temporada( )?({}|{}|{}).*Capitulo( )?\d+.*'.format(
             #    funciones.escapaParentesis(serie.lower()), tem, tem + 1, tem + 2)
-            regex_cast = r'{}'.format(funciones.scapes_parenthesis(serie.lower()))
+            regex_cast = rf'{funciones.scapes_parenthesis(serie.title.lower())}'
 
-            if serie.lower() == SERIE_DEBUG.lower():
-                self._logger.info("{} - {}".format(regex_cast, self.titleSerie))
+            if serie.title.lower() == SERIE_DEBUG.lower():
+                self._logger.info(f"{regex_cast} - {self.titleSerie}")
                 self._logger.info(i.link)
 
             estado = False
-            if vose == 'Si':
+            if serie.vose:
                 if re.search(regex_vose, self.titleSerie, re.IGNORECASE):
                     estado = True
             else:
                 if re.search(regex_cast, self.titleSerie, re.IGNORECASE):
-                    self._logger.debug('DESCARGA: {}'.format(i.toString()))
+                    self._logger.debug(f'DESCARGA: {i}')
                     estado = True
 
             if estado:
                 title_serie = self.titleSerie  # conversion necesaria para usar como str
-                if vose == 'Si':
+                if serie.vose:
                     torrents = list(i.link)
                 else:
                     torrents = funciones.get_url_torrent_dontorrent(i.link)
@@ -280,37 +283,36 @@ class DescargaAutomaticaCli:
                 except Exception:
                     title_serie = title_serie.replace(u"\uFFFD", "?")
 
-                if not os.path.exists(u'{}{}.torrent'.format(ruta, title_serie)):
+                if not os.path.exists(f'{ruta}{title_serie}.torrent'):  # fixme revisar si funciona antes habia u'...'
                     fichero_descargas = self.conf['FicheroDescargas']
-                    with open('{}/{}'.format(self.rutlog, fichero_descargas), 'a') as f:
-                        f.write('{} {}\n'.format(time.strftime('%Y%m%d'), title_serie))
+                    with open(f'{self.rutlog}/{fichero_descargas}', 'a') as f:
+                        f.write(f'{time.strftime("%Y%m%d")} {title_serie}\n')
 
-                    if vose == 'Si':
+                    if serie.vose:
                         self.extra_action(title_serie)
                         # creo un string para solo mandar una notificacion
-                        self.listaNotificaciones += '{}\n'.format(title_serie)
+                        self.listaNotificaciones += f'{title_serie}\n'
                     else:
-                        self.extra_action('{} {}'.format(i.name, i.cap))
+                        self.extra_action(f'{i.name} {i.cap}')
                         # creo un string para solo mandar una notificacion
-                        self.listaNotificaciones += '{} {}\n'.format(i.name, i.cap)
+                        self.listaNotificaciones += f'{i.name} {i.cap}\n'
 
-                    self._logger.critical('++{}'.format(torrents))
+                    self._logger.critical(f'++{torrents}')
                     for torrent in torrents:
-                        funciones.download_file(torrent, r'{}/{}.torrent'.format(ruta, torrent.split('/')[-1]))
+                        funciones.download_file(torrent, rf'{ruta}/{torrent.split("/")[-1]}.torrent')
                         # Diccionario con todos los capitulos descargados, para actualizar la bd con los capitulos por
                         # donde voy regex para coger el capitulo unicamente
-                    self.actualizaDia += """\nUPDATE series SET Dia="{}" WHERE Nombre LIKE "{}";""".format(
-                        funciones.calculate_day_week(), serie)
-                    self.capDescargado[serie] = i.epi
+                    self.actualizaDia += f'''\nUPDATE series SET Dia="{funciones.calculate_day_week()}" 
+                                            WHERE Nombre LIKE "{serie.title}";'''
+                    self.capDescargado[serie.title] = i.epi
 
-                self._logger.info(('DESCARGANDO: {}'.format(serie)))
+                self._logger.info(f'DESCARGANDO: {serie.title}')
 
         return funciones.remove_tildes(d.entries[0].title)
 
     def extra_action(self, serie: str) -> NoReturn:
         """
-        Metodo que no hace nada en esta clase pero que en herencia es
-        usado para usar el entorno ggrafico que QT
+        Metodo que no hace nada en esta clase pero que en herencia es usado para usar el entorno ggrafico que QT
         :return:
         """
         pass
@@ -322,28 +324,26 @@ class DescargaAutomaticaCli:
         return self.titleSerie
 
     @staticmethod
-    def show_notifications() -> List:
+    def show_notifications() -> List[Notifications]:
         """
         poner las api de la base de datos
         """
-        query_n = 'SELECT * FROM notificaciones'
-        datos = conection_sqlite(ruta_db, query_n, True)
-
+        response_query: Query = Controller.get_notifications(ruta_db)
+        notifications: List[Notifications] = response_query.response
         global tg3, pb3, ml3, api_ml3
-        logger.info(datos)
-        for i in datos:
-            if i['Activo'] == 'True':
-                if i['Nombre'] == 'Telegram':
-                    tg3 = Telegram(i['API'])
+        logger.info(notifications)
+        for i in notifications:
+            if i.active:
+                if i.name == 'Telegram':
+                    tg3 = Telegram(i.api)
 
-                elif i['Nombre'] == 'Pushbullet':
-                    pb3 = PB2(i['API'])
+                elif i.name == 'Pushbullet':
+                    pb3 = PB2(i.api)
 
-                elif i['Nombre'] == 'Email':
+                elif i.name == 'Email':
                     ml3 = ML2('test1notificaciones@gmail.com', 'i(!f!Boz_A&YLY]q')
                     api_ml3 = api_ml3
-
-        return datos
+        return notifications
 
 
 def main():

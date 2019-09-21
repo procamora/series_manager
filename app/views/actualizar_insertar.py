@@ -1,21 +1,23 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import sys
-from typing import Dict, NoReturn
+from typing import NoReturn
 
 from PyQt5 import QtWidgets
 from app.views.ui.actualizar_insertar_ui import Ui_Dialog
 
+import app.controller.Controller as Controller
 from app import logger
+from app.models.model_query import Query
+from app.models.model_serie import Serie
 from app.modulos import funciones
 from app.modulos.actualiza_imdb import UpdateImdb
-from app.modulos.connect_sqlite import conection_sqlite
 from app.modulos.settings import ruta_db
 from app.views.msgbox import MsgBox
 
 
 class ActualizarInsertar(QtWidgets.QDialog):
-    def __init__(self, parent=None, database: str = None, data_serie: Dict = None) -> NoReturn:
+    def __init__(self, parent=None, database: str = None, data_serie: Serie = None) -> NoReturn:
         QtWidgets.QWidget.__init__(self, parent)
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
@@ -24,7 +26,7 @@ class ActualizarInsertar(QtWidgets.QDialog):
         self.state_cancel = 'Cancelado'  # final
         self.state_current = self.state_ok  # actual
         self.db = database
-        self.datSerie = data_serie
+        self.serie = data_serie
 
         # para todos establezco esto que el estado es Activa, si actualizo lo
         # modifico en la funcion creaConf
@@ -34,11 +36,11 @@ class ActualizarInsertar(QtWidgets.QDialog):
         if len(all_items) > 0:
             self.ui.BoxEstado.setCurrentIndex(all_items.index('Activa'))
 
-        if self.datSerie is not None:  # Actualizar
-            self.setWindowTitle('Actualizar serie: {}'.format(self.datSerie['Nombre']))
+        if self.serie is not None:  # Actualizar
+            self.setWindowTitle('Actualizar serie: {}'.format(self.serie.title))
 
             # para poder modifical el nombre en el update
-            self.name_original = str(self.datSerie['Nombre'])
+            self.name_original = str(self.serie.title)
 
             self.ui.pushButtonAplicar.setText('Actualizar')
             self.create_configuration()
@@ -136,28 +138,27 @@ class ActualizarInsertar(QtWidgets.QDialog):
         Crea el comboBox de los estados, primero lo vacia y
         luego lo crea con los rangos que le indico
         """
-        estados = 'SELECT * FROM ID_Estados'
-        query_estados = conection_sqlite(self.db, estados, True)
-        list_est = list()
-        for i in query_estados:
-            list_est.append(i['Estados'])
+        response_query: Query = Controller.get_states(self.db)
+        list_estates: list = [states.state for states in response_query.response]
+        # for i in response_query.response:
+        #    list_estates.append(i.state)
 
         self.ui.BoxEstado.clear()
-        self.ui.BoxEstado.addItems(list_est)
+        self.ui.BoxEstado.addItems(list_estates)
 
     def create_configuration(self) -> NoReturn:
         """
         Establece los valores por defecto que se le indican en caso de que se indiquen
         """
-        logger.debug(self.datSerie)
+        logger.debug(self.serie)
 
-        self.ui.lineTitulo.setText(self.datSerie['Nombre'])
+        self.ui.lineTitulo.setText(self.serie.title)
 
         # Generar checkbox
-        self.list_seasons(self.datSerie['Temporada'], self.datSerie['Temporada'] + 2)
-        self.list_chapters(self.datSerie['Capitulo'], self.datSerie['Capitulo'] + 8)
+        self.list_seasons(self.serie.season, self.serie.season + 2)
+        self.list_chapters(self.serie.chapter, self.serie.chapter + 8)
 
-        if self.datSerie['Siguiendo'] == 'Si':
+        if self.serie.following == 'Si':
             self.ui.radioSeguirSi.click()
         else:
             self.ui.radioSeguirNo.click()
@@ -165,24 +166,26 @@ class ActualizarInsertar(QtWidgets.QDialog):
         # recogo todos los dias de la caja y le paso el indice del dia en el que sale
         all_items = [self.ui.BoxEmision.itemText(i) for i in range(self.ui.BoxEmision.count())]
         if len(all_items) > 0:
-            self.ui.BoxEmision.setCurrentIndex(all_items.index(self.datSerie['Dia']))
+            print(all_items)
+            print(self.serie.day)
+            self.ui.BoxEmision.setCurrentIndex(all_items.index(self.serie.day))
 
-        if self.datSerie['VOSE'] == 'Si':
+        if self.serie.vose == 'Si':
             self.ui.radioVOSE_Si.click()
         else:
             self.ui.radioVOSE_No.click()
 
-        if self.datSerie['Acabada'] == 'Si':
+        if self.serie.finished == 'Si':
             self.ui.radioAcabadaSi.click()
         else:
             self.ui.radioAcabadaNo.click()
 
         all_items = [self.ui.BoxEstado.itemText(i) for i in range(self.ui.BoxEstado.count())]
         if len(all_items) > 0:
-            self.ui.BoxEstado.setCurrentIndex(all_items.index(self.datSerie['Estado']))
+            self.ui.BoxEstado.setCurrentIndex(all_items.index(self.serie.state))
 
-        if self.datSerie['imdb_id'] is not None:
-            self.ui.lineImdb.setText(self.datSerie['imdb_id'])
+        if self.serie.imdb_id is not None:
+            self.ui.lineImdb.setText(self.serie.imdb_id)
 
         self.ui.radioImdbNo.click()
 
@@ -190,104 +193,82 @@ class ActualizarInsertar(QtWidgets.QDialog):
         """
         Recoge todos los valores que necesita, crea el update y lo ejecuta
         """
-
         self.ui.label_Info.setText('')
+
+        serie: Serie = Serie()
+        serie.title = str(self.ui.lineTitulo.text()).lstrip().rstrip()
+        serie.season = str(self.ui.lineTemp.text())
+        serie.chapter = str(self.ui.lineCapitulo.text())
+        serie.day = str(self.ui.BoxEmision.currentText())
+        serie.state = str(self.ui.BoxEstado.currentText())
+
         if self.ui.radioVOSE_Si.isChecked():
-            vose = 'Si'
+            serie.vose = 'Si'
         else:
-            vose = 'No'
+            serie.vose = 'No'
 
         if self.ui.radioAcabadaSi.isChecked():
-            acabada = 'Si'
+            serie.finished = 'Si'
         else:
-            acabada = 'No'
+            serie.finished = 'No'
 
         if self.ui.radioImdbSi.isChecked():
-            imdb = 'Si'
+            serie.imdb_following = 'Si'
         else:
-            imdb = 'No'
+            serie.imdb_following = 'No'
+
+        if len(self.ui.lineImdb.text()) == 0:  # añadido de insertar
+            serie.imdb_id = 'NULL'
+        else:
+            # Ponemos las comillas del string usado por la query, ya que si es NULL buscamos que este sin comillas
+            # para que no se añada a la BD
+            serie.imdb_id = f'"{self.ui.lineImdb.text()}"'
 
         if self.ui.radioSeguirSi.isChecked():
-            seguir = 'Si'
+            update_imdb: bool = True
         else:
-            seguir = 'No'
-
-        if len(str(self.ui.lineImdb.text())) == 0:  # añadido de insertar
-            str_imdb = 'NULL'
-        else:
-            str_imdb = str(self.ui.lineImdb.text())
-
-        datos = {
-            'Titulo': str(self.ui.lineTitulo.text()).lstrip().rstrip(),
-            'Temporada': str(self.ui.lineTemp.text()),
-            'Capitulo': str(self.ui.lineCapitulo.text()),
-            'Seguir': seguir,
-            'Emision': str(self.ui.BoxEmision.currentText()),
-            'VOSE': vose,
-            'Acabada': acabada,
-            'Estado': str(self.ui.BoxEstado.currentText()),
-            'idImdb': str_imdb,
-            'ImdbLanzar': imdb
-        }
+            update_imdb: bool = False
 
         # Nombre vacia produce errores al descargar series
         if len(str(self.ui.lineTitulo.text())) != 0:
             # HAGO ESTO PARA QUE EL UPDATE SE HAGA CON NONE EN CASO DE QUE NO LO PONGA
-            if len(str(self.ui.lineImdb.text())) == 0:
-                if self.datSerie is not None:
-                    query = '''UPDATE series SET Nombre="{}", Temporada={}, Capitulo={}, Siguiendo="{}", Dia="{}", 
-                    VOSE="{}", Acabada="{}", Estado="{}",imdb_id={} WHERE Nombre="{}"'''.format(
-                        datos['Titulo'], datos['Temporada'], datos['Capitulo'], datos['Seguir'], datos['Emision'],
-                        datos['VOSE'], datos['Acabada'], datos['Estado'], datos['idImdb'], self.name_original)
-                else:
-                    query = '''INSERT INTO series(Nombre, Temporada, Capitulo, Siguiendo, Dia, VOSE, Acabada, Estado, 
-                    imdb_id) VALUES ("{}", {}, {}, "{}", "{}", "{}", "{}", "{}", {})'''.format(
-                        datos['Titulo'], datos['Temporada'], datos['Capitulo'], datos['Seguir'], datos['Emision'],
-                        datos['VOSE'], datos['Acabada'], datos['Estado'], datos['idImdb'])
+            if self.serie is not None:
+                query_str = Controller.get_query_update_serie(serie)
             else:
-                if self.datSerie is not None:
-                    query = '''UPDATE series SET Nombre="{}", Temporada={}, Capitulo={}, Siguiendo="{}", Dia="{}", 
-                    VOSE="{}", Acabada="{}", Estado="{}",imdb_id="{}" WHERE Nombre="{}"'''.format(
-                        datos['Titulo'], datos['Temporada'], datos['Capitulo'], datos['Seguir'], datos['Emision'],
-                        datos['VOSE'], datos['Acabada'], datos['Estado'], datos['idImdb'], self.name_original)
-                else:
-                    query = '''INSERT INTO series(Nombre, Temporada, Capitulo, Siguiendo, Dia, VOSE, Acabada, Estado, 
-                  imdb_id) VALUES ("{}", {}, {}, "{}", "{}", "{}", "{}", "{}", "{}")'''.format(
-                        datos['Titulo'], datos['Temporada'], datos['Capitulo'], datos['Seguir'], datos['Emision'],
-                        datos['VOSE'], datos['Acabada'], datos['Estado'], datos['idImdb'])
-            try:
-                logger.debug(query)
-                if datos['ImdbLanzar'] == 'Si':
-                    imbd_test = UpdateImdb()
+                query_str = Controller.get_query_insert_serie(serie)
 
-                    if imbd_test.check_title(datos['idImdb']):
-                        self.execute_imdb()
-                        conection_sqlite(self.db, query)
-                        # Si es una inserccion despues de insertar vacio el
-                        # titulo para poder hacer mas
-                        if self.datSerie is None:
-                            funciones.show_message(self.ui.label_Info, 'Insertado con imdb', True)
-                            self.ui.lineTitulo.setText('')
-                        else:
-                            funciones.show_message(self.ui.label_Info, 'Actualizado con imdb', True)
-                    else:  # Si da error no quiero que borre el nombre
-                        funciones.show_message(self.ui.label_Info, 'fallo en imdb', False)
-                else:
-                    conection_sqlite(self.db, query)
-                    # Si es una inserccion despues de insertar vacio el titulo
-                    # para poder hacer mas
-                    if self.datSerie is None:
-                        funciones.show_message(self.ui.label_Info, 'Insertado', True)
+            #try:
+            logger.debug(query_str)
+            if update_imdb:
+                imbd_test = UpdateImdb()
+
+                if imbd_test.check_title(serie.imdb_id):
+                    self.execute_imdb()
+                    Controller.execute_query(query_str, self.db)
+                    # Si es una inserccion despues de insertar vacio el titulo para poder hacer mas
+                    if self.serie is None:
+                        funciones.show_message(self.ui.label_Info, 'Insertado con imdb', True)
                         self.ui.lineTitulo.setText('')
                     else:
-                        funciones.show_message(self.ui.label_Info, 'Actualizado', True)
-                return True
+                        funciones.show_message(self.ui.label_Info, 'Actualizado con imdb', True)
+                else:  # Si da error no quiero que borre el nombre
+                    funciones.show_message(self.ui.label_Info, 'fallo en imdb', False)
+            else:
+                Controller.execute_query(query_str, self.db)
+                # Si es una inserccion despues de insertar vacio el titulo para poder hacer mas
+                if self.serie is None:
+                    funciones.show_message(self.ui.label_Info, 'Insertado', True)
+                    self.ui.lineTitulo.setText('')
+                else:
+                    funciones.show_message(self.ui.label_Info, 'Actualizado', True)
+            return True
 
-            except Exception as e:
-                logger.error(e)
-                dat = {'title': 'Error en bd', 'text': str(e)}
-                MsgBox.get_data(datos=dat)
-                return False
+            #except Exception as e:
+            #    logger.error(e)
+            #    logger.error(e)
+            #    dat = {'title': 'Error en bd', 'text': str(e)}
+            #    MsgBox.get_data(datos=dat)
+            #    return False
         else:
             funciones.show_message(self.ui.label_Info, 'Titulo vacio', False)
             return False
@@ -296,12 +277,11 @@ class ActualizarInsertar(QtWidgets.QDialog):
         """
         Actualiza los datos de la serie de imdb siempre que el id no este vacio
         """
-
-        a = UpdateImdb()
+        update_imdb = UpdateImdb()
         id_imdb = str(self.ui.lineImdb.text())
         if len(id_imdb) > 0:
             logger.debug('actualiza imdb')
-            a.update_series(id_imdb)
+            update_imdb.update_series(id_imdb)
 
     def accept_data(self) -> NoReturn:
         """
@@ -320,7 +300,7 @@ class ActualizarInsertar(QtWidgets.QDialog):
         self.reject()
 
     @staticmethod
-    def get_data(parent: object = None, data_serie: Dict = None, database: str = None) -> NoReturn:
+    def get_data(parent: object = None, data_serie: Serie = None, database: str = None) -> NoReturn:
         dialog = ActualizarInsertar(parent, database, data_serie)
         dialog.exec_()
 

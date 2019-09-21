@@ -6,13 +6,19 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
-from typing import Dict, List
+from typing import Dict, List, Union
+
+from app.models.model_notifications import Notifications
+from app.models.model_preferences import Preferences
+from app.models.model_serie import Serie
+from app.models.model_states import States
+from app.models.model_credentials import Credentials
 
 
 @dataclass
 class Query(object):
     query: str
-    response: List[Dict]
+    response: List[Union[Dict, States, Preferences, Notifications, Serie, Credentials]]
 
     def is_empty(self) -> bool:
         if len(self.response) == 0:
@@ -22,7 +28,7 @@ class Query(object):
     def size(self) -> int:
         return len(self.response)
 
-    def __str__(self):
+    def __str__(self) -> str:
         response_str = ', '.join(map(str, self.response))
         query_str = re.sub('\n', '', self.query.strip())
         query_str = re.sub(' +', ' ', query_str)
