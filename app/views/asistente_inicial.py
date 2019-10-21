@@ -9,7 +9,7 @@ from PyQt5 import QtWidgets
 from app.views.ui.asistente_inicial_ui import Ui_Dialog
 
 from app import logger
-from app.modulos.settings import sync_sqlite, sync_gdrive
+from app.modulos.settings import SYNC_SQLITE, SYNC_GDRIVE
 import app.controller.Controller as Controller
 
 
@@ -54,7 +54,7 @@ class AsistenteInicial(QtWidgets.QDialog):
         if platform.system() == "Windows":
             directorio_trabajo = '{}/{}'.format((os.environ['LOCALAPPDATA']).replace('\\', '/'), 'Gestor-Series')
         elif platform.system() == "Linux":
-            directorio_trabajo = '{}/.{}'.format(os.environ['HOME'], 'Gestor-Series')
+            directorio_trabajo = f'{os.environ["HOME"]}/.{"Gestor-Series"}'
         return directorio_trabajo
 
     def search_directory(self) -> NoReturn:
@@ -92,13 +92,13 @@ class AsistenteInicial(QtWidgets.QDialog):
     def apply_data(self) -> bool:
         if self.ui.checkBoxValido.isChecked():
             if self.ui.checkBoxSync.isChecked():
-                with open(sync_gdrive, 'w') as f:
+                with open(SYNC_GDRIVE, 'w') as f:
                     f.write('1\n')
                     f.write(self.change_bars(self.ui.lineRuta.text()))
             else:
-                with open(sync_gdrive, 'w') as f:
+                with open(SYNC_GDRIVE, 'w') as f:
                     f.write('0')
-            with open(sync_sqlite, 'w') as f:
+            with open(SYNC_SQLITE, 'w') as f:
                 f.write('1\n')
             self.show_message(self.ui.label, 'Exito', True)
             return True
@@ -175,18 +175,18 @@ class AsistenteInicial(QtWidgets.QDialog):
         """
 
         # Si no existe uno de los ficheros necesarios asistente inicial
-        logger.debug('Analized exists: {}'.format(sync_sqlite))
-        logger.debug('Analized exists: {}'.format(sync_gdrive))
-        if not os.path.exists(sync_sqlite) or not os.path.exists(sync_gdrive):
+        logger.debug(f'Analized exists: {SYNC_SQLITE}')
+        logger.debug(f'Analized exists: {SYNC_GDRIVE}')
+        if not os.path.exists(SYNC_SQLITE) or not os.path.exists(SYNC_GDRIVE):
             main()  # main de la funcion
             return False
         else:
             # comprobamos que es correcto el fichero sync_sqlite
-            with open(sync_sqlite, 'r') as f:
+            with open(SYNC_SQLITE, 'r') as f:
                 response_sqlite = AsistenteInicial.check_integrity_sqlite(f.readline())
 
             # comprobamos que es correcto el fichero sync_gdrive
-            with open(sync_gdrive, 'r') as f:
+            with open(SYNC_GDRIVE, 'r') as f:
                 response_gdrive = AsistenteInicial.check_integrity_gdrive(f.readlines()[0])  # linea 1 es un 1 o un 0
 
             if not response_gdrive or not response_sqlite:

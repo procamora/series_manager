@@ -5,7 +5,7 @@ import glob
 import os
 import re
 import time
-from typing import List, NoReturn, Dict
+from typing import List, NoReturn
 
 import feedparser
 import requests
@@ -14,8 +14,8 @@ import urllib3
 from bs4 import BeautifulSoup
 
 from app import logger
-from app.modulos.connect_sqlite import conection_sqlite, execute_script_sqlite, dump_database
-from app.modulos.settings import directorio_trabajo, directorio_local, nombre_db, ruta_db, sync_sqlite
+from app.modulos.connect_sqlite import execute_script_sqlite, dump_database
+from app.modulos.settings import DIRECTORY_WORKING, DIRECTORY_LOCAL, NAME_DATABASE, PATH_DATABASE, SYNC_SQLITE
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -28,16 +28,16 @@ def create_directory_work() -> NoReturn:
     Si el directorio existe comprueba que exista la base de datos y que no este vacia
     """
 
-    if not os.path.exists(directorio_trabajo):
+    if not os.path.exists(DIRECTORY_WORKING):
         logger.debug("NO EXISTE DIRECTORIO TRABAJO, CREANDOLO")
-        os.mkdir(directorio_trabajo)
+        os.mkdir(DIRECTORY_WORKING)
         template_database()
         template_file_conf()
     else:
-        if not os.path.exists(ruta_db) or os.stat(ruta_db).st_size == 0:
+        if not os.path.exists(PATH_DATABASE) or os.stat(PATH_DATABASE).st_size == 0:
             logger.info(1)
             template_database()
-        if not os.path.exists(sync_sqlite) or os.stat(sync_sqlite).st_size == 0:
+        if not os.path.exists(SYNC_SQLITE) or os.stat(SYNC_SQLITE).st_size == 0:
             logger.info(2)
             template_file_conf()
 
@@ -51,25 +51,6 @@ def change_bars(texto) -> str:
     return texto.replace('\\', '/')
 
 
-def db_configuarion() -> List[Dict[str, str]]:
-    """
-    Funcion que obtiene los valores de la configuracion de un programa, devuelve el diciconario con los datos
-
-    :return dict: Nos devuelve un diccionario con los datos
-    """
-
-    try:
-        with open(sync_sqlite, 'r') as f:
-            id_db = f.readline()
-    except Exception:
-        logger.warning('fallo en dbConfiguarion')
-        id_db = 1
-
-    query = 'SELECT * FROM Configuraciones WHERE id IS {}'.format(id_db)
-    consulta = conection_sqlite('{}/{}'.format(directorio_trabajo, nombre_db), query, True)[0]
-    return consulta
-
-
 def template_file_conf() -> NoReturn:
     """
     Si hay una configuracion en la la carpeta del programa la mueve a la carpeta
@@ -77,10 +58,10 @@ def template_file_conf() -> NoReturn:
     vacio o no existe lo pone a 1
     """
 
-    fichero_conf = '{}/{}'.format(directorio_local, sync_sqlite.split('/')[-1])
-    if os.path.exists(sync_sqlite):
-        logger.debug('{} & {}'.format(sync_sqlite, fichero_conf))
-        os.rename(sync_sqlite, fichero_conf)
+    fichero_conf = f'{DIRECTORY_LOCAL}/{SYNC_SQLITE.split("/")[-1]}'
+    if os.path.exists(SYNC_SQLITE):
+        logger.debug(f'{SYNC_SQLITE} & {fichero_conf}')
+        os.rename(SYNC_SQLITE, fichero_conf)
     else:
         if os.path.exists(fichero_conf):
             if os.stat(fichero_conf).st_size == 0:
@@ -97,8 +78,8 @@ def template_database() -> NoReturn:
     cargo la estructura basica
     """
 
-    ficheros_sql = glob.glob('{}/SQL/*estructura.sql'.format(directorio_local))
-    fichero_db = '{}/{}'.format(directorio_trabajo, nombre_db)
+    ficheros_sql = glob.glob(f'{DIRECTORY_LOCAL}/SQL/*estructura.sql')
+    fichero_db = f'{DIRECTORY_WORKING}/{NAME_DATABASE}'
 
     if not os.path.exists(fichero_db) or not os.stat(fichero_db).st_size > 50000:  # estructura pesa 72Kb
         logger.debug("creando db")
@@ -112,15 +93,15 @@ def create_full_backup_db() -> NoReturn:
     Funcion encargada de generar backup de la base de datos y guardarlo 
     """
 
-    data = dump_database(ruta_db)
+    data = dump_database(PATH_DATABASE)
     if data is None:
-        logger.error(f'database {ruta_db} not exists')
+        logger.error(f'database {PATH_DATABASE} not exists')
         return
     try:
-        with open('{}/SQL/{}.sql'.format(directorio_local, time.strftime("%Y%m%d")), 'w') as f:
+        with open(f'{DIRECTORY_LOCAL}/SQL/{time.strftime("%Y%m%d")}.sql', "w") as f:
             f.write(data)
     except Exception as e:
-        logger.error('error al hacer backup: {}'.format(e))
+        logger.error(f'error al hacer backup: {e}')
 
 
 def calculate_day_week() -> str:
@@ -191,7 +172,7 @@ def download_file(url, destino, libreria='requests'):
 
     if libreria == 'requests':
         r = requests.get(url, verify=False)
-        logger.debug('Descargo el fichero: {}'.format(destino))
+        logger.debug(f'Descargo el fichero: {destino}')
         with open(destino, "wb") as code:
             code.write(r.content)
 
@@ -381,7 +362,7 @@ def get_url_torrent_dontorrent(direcc, bot=None, message=None):
 
         new_urls = list()
         for i in urls:
-            new_urls.append('https://dontorrent.com{}'.format(i[0]))
+            new_urls.append(f'https://dontorrent.com{i[0]}')
 
         return new_urls
 
@@ -411,7 +392,7 @@ def get_url_torrent_dontorrent_direct(direcc, bot=None, message=None):
         print(mtable)
         print(mtable['href'])
 
-        return 'https://dontorrent.com{}'.format(mtable['href'])
+        return f'https://dontorrent.com{mtable["href"]}'
 
 
 def feed_parser(url):

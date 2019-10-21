@@ -25,6 +25,8 @@ README
 + [ ] Al actualizar/insertar relacionar los campos estado y siguiendo, (si le doy a finalizar que el estado sea finalizar)
 + [ ] url descarga torrent usa ahora javascript para obtener la url, modificar código descarga, ahora esta solucionado de forma provisional
 + [ ] showrss ha modificado método obtención de url torrent, modificar código
++ [ ] Modelos son serializables y tienen metodo toSql
++ [ ] actualizar metodo actualizar series con imdb y usar api tviso
 
 
 ## Requerimientos

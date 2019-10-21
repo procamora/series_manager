@@ -13,8 +13,8 @@ import rarfile
 import requests
 from bs4 import BeautifulSoup
 
-from app.modulos.telegram2 import Telegram
 from app import logger
+from app.modulos.telegram2 import Telegram
 
 
 def search_pass(url):
@@ -38,9 +38,9 @@ def unzip(fichero):
     if rar.needs_password():
         # busco la url para descargar la pass
         # con glob no me lista los ficheros
-        for i in os.listdir('{}'.format(directory)):
+        for i in os.listdir(directory):
             if i == 'CONTRASEÑA PARA DESCOMPRIMIR.txt':
-                with open('{}{}'.format(directory, i), 'r', encoding="ISO-8859-1") as f:
+                with open(f'{directory}{i}', 'r', encoding="ISO-8859-1") as f:
                     texto = f.read()
                 url = re.findall(r"((https?://)?(\w+\.)+\w{2,3}/?.*/)", texto)
 
@@ -57,15 +57,13 @@ def main(ruta):
     for i in glob.glob(ruta):
         logger.info(i)
         try:
-            a.send_tg(
-                'Empieza proceos descomprimir: {}'.format(i.split('/')[-1]))
+            a.send_tg(f'Empieza proceos descomprimir: {i.split("/")[-1]}')
             unzip(i)
-            a.send_tg(
-                'Termina proceos descomprimir: {}'.format(i.split('/')[-1]))
+            a.send_tg(f'Termina proceos descomprimir: {i.split("/")[-1]}')
         except Exception as e:
             if str(e) != "Need to start from first volume":
-                a.send_tg('Fallo al descomprimir: {} por: {}'.format(i.split('/')[-1], e))
-            logger.info("|{}|".format(e))
+                a.send_tg(f'Fallo al descomprimir: {i.split("/")[-1]} por: {e}')
+            logger.info(f"|{e}|")
 
             with open('/tmp/unrar.log', 'a', encoding="UTF-8") as f:
                 f.write(str(sys.exc_info()[0]))

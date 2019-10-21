@@ -27,7 +27,7 @@ class Mythread(QtCore.QThread):
                  text_edit: QtWidgets.QTextEdit, send_tg: bool) -> NoReturn:
         super(Mythread, self).__init__(parent)
 
-        self.conf = funciones.db_configuarion()
+        self.conf = Controller.get_database_configuration()
         self.serie = serie.replace(' ', '-')  # ruta correcta
         self.cap = capitulo
         self.temp = temporada
@@ -50,18 +50,18 @@ class Mythread(QtCore.QThread):
             i = str(i)
             time.sleep(0.2)
             try:
-                fichero = '{}/{}_{}x{}.torrent'.format(ruta, self.serie, self.temp, i)
+                fichero = f'{ruta}/{self.serie}_{self.temp}x{i}.torrent'
                 # al ser un or si la primera retorna true no comprueba la segunda
                 if self.try_get_url(self.url, i, fichero) or self.try_get_url(self.url2, i, fichero):
                     if self.sendTg:
                         self.telegram.send_file(fichero)
                         # fichero = '{}/{}x{}.torrent'.format(ruta, self.serie, i)
-                    self.textEdit.append('{} {}x{}'.format(self.serie, self.temp, i))
+                    self.textEdit.append(f'{self.serie} {self.temp}x{i}')
                 else:
-                    self.textEdit.append('No encontrada: {} {}x{}'.format(self.serie, self.temp, i))
+                    self.textEdit.append(f'No encontrada: {self.serie} {self.temp}x{i}')
             except Exception as e:
                 logger.error('FALLO DESCONOCIDO!!', e)
-                self.textEdit.append("Error:{}".format(str(e)))
+                self.textEdit.append(f"Error:{str(e)}")
                 raise
 
         logger.info("fin")

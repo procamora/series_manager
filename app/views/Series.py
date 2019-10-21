@@ -17,8 +17,7 @@ import app.controller.Controller as Controller
 from app import logger
 from app.models.model_serie import Serie
 from app.modulos import funciones
-# from app.modulos.connect_sqlite import conection_sqlite, execute_script_sqlite
-from app.modulos.settings import directorio_trabajo, sistema, nombre_db, directorio_local
+from app.modulos.settings import DIRECTORY_WORKING, SYSTEM, NAME_DATABASE, DIRECTORY_LOCAL
 from app.views import acerca_de
 from app.views import actualizar_insertar
 from app.views import asistente_inicial
@@ -31,7 +30,7 @@ from app.views import msgbox
 from app.views import newpct1_completa
 from app.views import notificaciones
 from app.views import preferencias
-
+from app.models.model_query import Query
 
 class Series(QtWidgets.QMainWindow):
     def __init__(self, parent: object = None) -> NoReturn:
@@ -39,7 +38,7 @@ class Series(QtWidgets.QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
-        self.database: str = '{}/{}'.format(directorio_trabajo, nombre_db)
+        self.database: str = f'{DIRECTORY_WORKING}/{NAME_DATABASE}'
 
         self.other: str = 'otra'  # campo otra del formulario
         self.state_ok: str = 'Ok'  # estado inicial
@@ -67,7 +66,7 @@ class Series(QtWidgets.QMainWindow):
 
         for texto, i in zip(listado_final, list(range(0, len(listado_final)))):  # el encabezado lo tengo encima
             self.create_list_serie(i, texto)
-            logger.debug('{}-> {}'.format(i, texto))
+            logger.debug(f'{i}-> {texto}')
 
         self.ui.pushButtonAceptar.setVisible(False)
         self.ui.pushButtonAplicar.setText("Guardar")
@@ -204,7 +203,7 @@ class Series(QtWidgets.QMainWindow):
         qline_edit.setText(serie.get_season_chapter())
 
         # fixme meter en controller
-        query = 'UPDATE series SET Capitulo=Capitulo-1 WHERE Nombre LIKE "{}";'.format(serie.title)
+        query = f'UPDATE series SET Capitulo=Capitulo-1 WHERE Nombre LIKE "{serie.title}";'
         self.queryCompleta += '\n' + query
         logger.debug(query)
 
@@ -373,30 +372,30 @@ class Series(QtWidgets.QMainWindow):
         a.update_completed()
 
     def menu_download_automatic(self) -> NoReturn:
-        conf = funciones.db_configuarion()
+        conf: Query = Controller.get_database_configuration(self.db)
         ruta_desc = str(conf['RutaDescargas'])  # es unicode
 
         if not os.path.exists(ruta_desc):
-            dat = {'title': 'No existe el directorio', 'text': 'El directorio {} no existe'.format(ruta_desc)}
+            dat = {'title': 'No existe el directorio', 'text': f'El directorio {ruta_desc} no existe'}
             msgbox.MsgBox.get_data(datos=dat)
         else:
             descarga_automatica.DescargaAutomatica.get_data(database=self.database)
 
-    @staticmethod
-    def menu_download_automatic_complete() -> NoReturn:
-        conf = funciones.db_configuarion()
-        ruta_desc = str(conf['RutaDescargas'])  # es unicode
+    def menu_download_automatic_complete(self) -> NoReturn:
+        preferences: Query = Controller.get_database_configuration(self.database)
+        #ruta_desc = str(preferences.response[0].path_download)  # es unicode
 
-        if not os.path.exists(ruta_desc):
-            dat = {'title': 'No existe el directorio', 'text': 'El directorio {} no existe'.format(ruta_desc)}
+        if not os.path.exists(preferences.response[0].path_download):
+            dat = {'title': 'No existe el directorio',
+                   'text': f'El directorio {preferences.response[0].path_download} no existe'}
             msgbox.MsgBox.get_data(datos=dat)
         else:
-            newpct1_completa.Newpct1Completa.get_data()
+            newpct1_completa.TorrentlocuraCompleta.get_data()
 
     @staticmethod
     def open_directory_data() -> NoReturn:
-        if sistema == 'Windows':
-            comando = 'explorer "{}"'.format(directorio_trabajo.replace('/', '\\'))
+        if SYSTEM == 'Windows':
+            comando = 'explorer "{}"'.format(DIRECTORY_WORKING.replace('/', '\\'))
         else:
             entorno_grafico = str()
             for command in ["dolphin", "caja", "nautilus"]:
@@ -408,7 +407,7 @@ class Series(QtWidgets.QMainWindow):
                     break
 
             if entorno_grafico is not None:
-                comando = '{} "{}"'.format(entorno_grafico, directorio_trabajo)  # no esta revisado
+                comando = f'{entorno_grafico} "{DIRECTORY_WORKING}"'  # no esta revisado
                 logger.info(entorno_grafico)
 
         ejecucion = subprocess.Popen(comando, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -428,24 +427,22 @@ class Series(QtWidgets.QMainWindow):
 
         lista_log = list()
 
-        with open(r'{}/id.conf'.format(directorio_local), 'r') as f:
+        with open(rf'{DIRECTORY_LOCAL}/id.conf', 'r') as f:
             id_fich = f.readline().replace('/n', '')
 
         consultas_log = Controller.get_credentials_fileconf(id_fich, self.db)
 
         if not consultas_log.is_empty():
             if num == 'newpct1':
-                lista_log.append('{}/log/{}'.format(directorio_trabajo, consultas_log.response[0]['FicheroFeedNewpct']))
+                lista_log.append(f'{DIRECTORY_WORKING}/log/{consultas_log.response[0]["FicheroFeedNewpct"]}')
             elif num == 'showrss':
-                lista_log.append(
-                    '{}/log/{}'.format(directorio_trabajo, consultas_log.response[0]['FicheroFeedShowrss']))
+                lista_log.append(f'{DIRECTORY_WORKING}/log/{consultas_log.response[0]["FicheroFeedShowrss"]}')
             elif num == 'Descargas':
-                lista_log.append('{}/log/{}'.format(directorio_trabajo, consultas_log.response[0]['FicheroDescargas']))
+                lista_log.append(f'{DIRECTORY_WORKING}/log/{consultas_log.response[0]["FicheroDescargas"]}')
             elif num == 'Todos':
-                lista_log.append('{}/log/{}'.format(directorio_trabajo, consultas_log.response[0]['FicheroFeedNewpct']))
-                lista_log.append(
-                    '{}/log/{}'.format(directorio_trabajo, consultas_log.response[0]['FicheroFeedShowrss']))
-                lista_log.append('{}/log/{}'.format(directorio_trabajo, consultas_log.response[0]['FicheroDescargas']))
+                lista_log.append(f'{DIRECTORY_WORKING}/log/{consultas_log.response[0]["FicheroFeedNewpct"]}')
+                lista_log.append(f'{DIRECTORY_WORKING}/log/{consultas_log.response[0]["FicheroFeedShowrss"]}')
+                lista_log.append(f'{DIRECTORY_WORKING}/log/{consultas_log.response[0]["FicheroDescargas"]}')
 
         # print self.listaLog
         self.menu_empty_log(lista_log)
@@ -463,7 +460,7 @@ class Series(QtWidgets.QMainWindow):
 
     @staticmethod
     def menu_initial_assistant() -> NoReturn:
-        asistente_inicial.AsistenteInicial.get_data(ruta=directorio_trabajo)
+        asistente_inicial.AsistenteInicial.get_data(ruta=DIRECTORY_WORKING)
 
     @staticmethod
     def menu_about() -> NoReturn:
@@ -475,7 +472,7 @@ def main():
     contador = 0
     while not asistente_inicial.AsistenteInicial.check_integrity_files():
         contador += 1
-        logger.info("Intento {} de 3".format(contador))
+        logger.info(f"Intento {contador} de 3")
         if contador == 3:
             return
 

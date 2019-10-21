@@ -10,7 +10,7 @@ import colorlog  # https://medium.com/@galea/python-logging-example-with-color-f
 __all__ = [os.path.basename(
     f)[:-3] for f in glob.glob(os.path.dirname(__file__) + "/*.py")]
 
-from app.modulos.settings import modo_debug
+from app.modulos.settings import MODE_DEBUG
 
 
 def get_logger(verbose, name='Series'):
@@ -18,7 +18,7 @@ def get_logger(verbose, name='Series'):
     # for _ in ("boto", "elasticsearch", "urllib3"):
     #    logging.getLogger(_).setLevel(logging.CRITICAL)
 
-    log_format = '%(levelname)s - %(module)s - %(message)s'
+    log_format = '%(levelname)s - %(module)s - %(funcName)s - %(message)s'
 
     bold_seq = '\033[1m'
     colorlog_format = (
@@ -39,4 +39,4 @@ def get_logger(verbose, name='Series'):
     return log
 
 
-logger = get_logger(modo_debug, 'series')
+logger = get_logger(MODE_DEBUG, 'series')

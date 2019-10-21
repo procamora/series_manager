@@ -10,7 +10,7 @@ import requests
 requests.packages.urllib3.disable_warnings()
 
 try:  # Ejecucion desde Series.py
-    from .settings import modo_debug, ruta_db, directorio_local, sync_sqlite
+    from .settings import MODE_DEBUG, PATH_DATABASE, DIRECTORY_LOCAL, SYNC_SQLITE
     from .connect_sqlite import conection_sqlite, execute_script_sqlite
     from app import logger
 except ModuleNotFoundError as e:  # Ejecucion local
@@ -19,7 +19,7 @@ except ModuleNotFoundError as e:  # Ejecucion local
         sys.path.append(new_path)
     from app import logger
 
-    from app.modulos.settings import modo_debug, ruta_db, directorio_local, sync_sqlite
+    from app.modulos.settings import MODE_DEBUG, PATH_DATABASE, DIRECTORY_LOCAL, SYNC_SQLITE
     from app.modulos.connect_sqlite import conection_sqlite, execute_script_sqlite
 
 from app import logger
@@ -40,11 +40,11 @@ class Telegram:
 
     @staticmethod
     def initial_data() -> Optional[Dict[str, str]]:
-        with open(sync_sqlite, 'r') as f:
+        with open(SYNC_SQLITE, 'r') as f:
             id_fich = f.readline().replace('/n', '')
 
         query = 'SELECT * FROM Credenciales'.format(id_fich)
-        consulta = conection_sqlite(ruta_db, query, True)
+        consulta = conection_sqlite(PATH_DATABASE, query, True)
         if len(consulta) > 0:
             return consulta[0]
         return None
@@ -114,7 +114,7 @@ class Telegram:
             return self.make_request(method_url, params=payload, files=files, method='post')
 
     def receives_tg(self) -> NoReturn:  # no funciona de momento por la codificacion
-        url = 'https://api.telegram.org/bot{}/getUpdates'.format(self.api)
+        url = f'https://api.telegram.org/bot{self.api}/getUpdates'
         req_headers = {'Content-Type': 'application/x-www-form-urlencoded'}
 
         session = requests.session()

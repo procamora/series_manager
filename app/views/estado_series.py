@@ -12,7 +12,7 @@ from app import logger
 from app.models.model_query import Query
 from app.models.model_serie import Serie
 from app.modulos.connect_sqlite import execute_script_sqlite
-from app.modulos.settings import ruta_db
+from app.modulos.settings import PATH_DATABASE
 from app.modulos.tviso import conect_tviso
 
 
@@ -161,19 +161,17 @@ class EstadoSeries(QtWidgets.QDialog):
 
         for i in self.ui.listWidget.selectedItems():
             if self.ui.radioButtonAcabaT.isChecked():
-                query = """UPDATE series SET Temporada=Temporada+1, Capitulo="00", Estado="En Espera" 
-                WHERE Nombre Like "{}";""".format(
-                    i.text())
+                query = f"""UPDATE series SET Temporada=Temporada+1, Capitulo="00", Estado="En Espera" 
+                WHERE Nombre Like "{i.text()}";"""
                 self.query_complete_str += '\n' + query
 
             elif self.ui.radioButtonEmpieza.isChecked():
-                query = """UPDATE series SET Capitulo="01", Estado="Activa" WHERE Nombre Like "{}";""".format(i.text())
+                query = f"""UPDATE series SET Capitulo="01", Estado="Activa" WHERE Nombre Like "{i.text()}";"""
                 self.query_complete_str += '\n' + query
 
             elif self.ui.radioButtonFinalizada.isChecked():
-                query = """UPDATE series SET Estado="Finalizada", Acabada="Si", Siguiendo="No" 
-                WHERE Nombre Like "{}";""".format(
-                    i.text())
+                query = f"""UPDATE series SET Estado="Finalizada", Acabada="Si", Siguiendo="No" 
+                WHERE Nombre Like "{i.text()}";"""
                 self.query_complete_str += '\n' + query
 
         logger.debug(self.query_complete_str)
@@ -190,7 +188,7 @@ class EstadoSeries(QtWidgets.QDialog):
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
-    EstadoSeries.get_data(database=ruta_db)
+    EstadoSeries.get_data(database=PATH_DATABASE)
     return app
 
 

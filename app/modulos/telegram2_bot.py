@@ -18,21 +18,21 @@ from telebot import types  # Y los tipos especiales de esta
 from app import logger
 
 try:  # Ejecucion desde Series.py
-    from .settings import modo_debug, ruta_db, directorio_local, directorio_trabajo
+    from .settings import MODE_DEBUG, PATH_DATABASE, DIRECTORY_LOCAL, DIRECTORY_WORKING
     from .connect_sqlite import conection_sqlite, execute_script_sqlite
 except Exception:  # Ejecucion local
-    from app.modulos.settings import modo_debug, ruta_db, directorio_local, directorio_trabajo
+    from app.modulos.settings import MODE_DEBUG, PATH_DATABASE, DIRECTORY_LOCAL, DIRECTORY_WORKING
     from app.modulos.connect_sqlite import conection_sqlite, execute_script_sqlite
 
 import app.modulos.funciones as funciones
 
 
 def initial_data():
-    with open(rf'{directorio_local}/id.conf', 'r') as f:
+    with open(rf'{DIRECTORY_LOCAL}/id.conf', 'r') as f:
         id_fich = f.readline().replace('/n', '')
 
     query = f'SELECT * FROM Configuraciones, Credenciales WHERE ID LIKE {id_fich} LIMIT 1'
-    return conection_sqlite(ruta_db, query, True)[0]
+    return conection_sqlite(PATH_DATABASE, query, True)[0]
 
 
 credentials = initial_data()
@@ -126,7 +126,7 @@ def send_cgs(message) -> Union[NoReturn, None]:
 
 @bot.message_handler(func=lambda message: message.chat.id == administrador, commands=['/empty_log'])
 def send_log(message) -> NoReturn:
-    fichero = f'{directorio_trabajo}/log/{credentials["FicheroFeedNewpct"]}'
+    fichero = f'{DIRECTORY_WORKING}/log/{credentials["FicheroFeedNewpct"]}'
 
     with open(fichero, 'w'):
         pass

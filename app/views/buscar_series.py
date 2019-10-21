@@ -9,7 +9,7 @@ from app.views.ui.buscar_series_ui import Ui_Dialog
 import app.controller.Controller as Controller
 from app import logger
 from app.models.model_query import Query
-from app.modulos.settings import ruta_db
+from app.modulos.settings import PATH_DATABASE
 from app.views.actualizar_insertar import ActualizarInsertar
 
 
@@ -78,7 +78,7 @@ class BuscarSeries(QtWidgets.QDialog):
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
-    BuscarSeries.get_data(database=ruta_db)
+    BuscarSeries.get_data(database=PATH_DATABASE)
     return app
 
 

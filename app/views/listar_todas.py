@@ -11,7 +11,7 @@ import app.controller.Controller as Controller
 from app import logger
 from app.models.model_query import Query
 from app.models.model_serie import Serie
-from app.modulos.settings import ruta_db
+from app.modulos.settings import PATH_DATABASE
 
 
 class ListarTodas(QtWidgets.QDialog):
@@ -142,7 +142,7 @@ class ListarTodas(QtWidgets.QDialog):
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
-    ListarTodas.get_data(database=ruta_db)
+    ListarTodas.get_data(database=PATH_DATABASE)
     return app
 
 

@@ -6,9 +6,9 @@ import re
 import requests
 
 try:  # Ejecucion desde Series.py
-    from .settings import modo_debug
+    from .settings import MODE_DEBUG
 except Exception:  # Ejecucion local
-    from app.modulos.settings import modo_debug
+    from app.modulos.settings import MODE_DEBUG
 
 from app import logger
 

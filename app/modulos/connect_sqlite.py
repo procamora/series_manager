@@ -3,13 +3,14 @@
 
 import os
 import sqlite3
-from typing import Dict, List, Tuple, Optional, Union
+from typing import Dict, List, Tuple, Optional, Union, NoReturn
 
 
 # fixme cambiar de orden database y query
 def conection_sqlite(database: str, query_str: str, is_dict: bool = False, to_class: object = None) -> \
-        Union[List[List], List[object], List[Dict[str, object]],]:
+        Union[List[List], List[object], List[Dict[str, object]], NoReturn]:
     try:
+        data = None
         if os.path.exists(database):
             conn = sqlite3.connect(database)
             if is_dict:
@@ -21,7 +22,6 @@ def conection_sqlite(database: str, query_str: str, is_dict: bool = False, to_cl
                 data = cursor.fetchall()  # Traer los resultados de un select
             else:
                 conn.commit()  # Hacer efectiva la escritura de datos
-                data = None
 
             cursor.close()
             conn.close()
@@ -34,8 +34,9 @@ def conection_sqlite(database: str, query_str: str, is_dict: bool = False, to_cl
                 response.append(a.load(i))
             return response
         return data
-    except sqlite3.OperationalError:
-        print(f'LOCK {query_str}, sorry...')
+    except sqlite3.OperationalError as e:
+        print(f'LOCK "{query_str}", sorry...')
+        print(e)
         return None
 
 

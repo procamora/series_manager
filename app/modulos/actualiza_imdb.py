@@ -9,7 +9,7 @@ from imdbpie import Imdb
 
 try:  # Ejecucion desde Series.py
     from .connect_sqlite import conection_sqlite, execute_script_sqlite
-    from .settings import modo_debug, ruta_db
+    from .settings import MODE_DEBUG, PATH_DATABASE
     from app import logger
 except ModuleNotFoundError as e:  # Ejecucion local
     new_path = '../../'
@@ -19,16 +19,16 @@ except ModuleNotFoundError as e:  # Ejecucion local
 
     logger.debug(e)
     from app.modulos.connect_sqlite import conection_sqlite, execute_script_sqlite
-    from app.modulos.settings import modo_debug, ruta_db
+    from app.modulos.settings import MODE_DEBUG, PATH_DATABASE
 
-from app.modulos.funciones import db_configuarion
+from Controller import get_database_configuration
 
 
 class UpdateImdb:
     def __init__(self):
         self.imdb = Imdb()
-        self.conf = db_configuarion()
-        self.nombre_db = ruta_db
+        self.nombre_db = PATH_DATABASE
+        self.preferences = get_database_configuration(self.nombre_db)
         # self.imdb = Imdb(cache=True, cache_dir='/tmp/imdbpie-cache-here', anonymize=False)
 
     @staticmethod
@@ -50,21 +50,21 @@ class UpdateImdb:
     def search_chapter(id_imdb):
         # Para buscar el capitulo en vez de coger el la primera temporada, coger la ultima
         # problema de que la ultima temporada no este completa
-        url = 'http://www.imdb.com/title/{}/episodes?season=1'.format(id_imdb)
+        url = f'http://www.imdb.com/title/{id_imdb}/episodes?season=1'
         session = requests.session()
         html = session.get(url, verify=True).text
         a = re.findall('S1, Ep[0-9]+', html)
         return re.findall('[0-9]+', a[-1])[-1]
 
     def _update_serie(self, data):
-        query = 'UPDATE series SET imdb_Temporada="{}", imdb_Finaliza="{}", imdb_Capitulos="{}" WHERE imdb_id Like ' \
-                '"{}"'.format(data['Temp'], data['year'], data['Cap'], data['id_imdb'])
+        query = f'''UPDATE series SET imdb_Temporada="{data['Temp']}", imdb_Finaliza="{data['year']}", 
+        imdb_Capitulos="{data['Cap']}" WHERE imdb_id Like "{data['id_imdb']}"'''
         conection_sqlite(self.nombre_db, query)
         logger.info(query)
 
     def _update_serie_partial(self, data):
-        query = 'UPDATE series SET imdb_Temporada="{}", imdb_Finaliza="{}" WHERE imdb_id Like "{}"'.format(
-            data['Temp'], data['year'], data['id_imdb'])
+        query = f'''UPDATE series SET imdb_Temporada="{data['Temp']}", imdb_Finaliza="{data['year']}" 
+                    WHERE imdb_id Like "{data['id_imdb']}"'''
         conection_sqlite(self.nombre_db, query)
         logger.info(query)
 
@@ -93,7 +93,7 @@ class UpdateImdb:
                     self._update_serie_partial(data_imdb)
 
             except Exception as e:
-                logger.error('FALLO: {}'.format(i['Nombre']))
+                logger.error(f'FALLO: {i["Nombre"]}')
                 logger.error(e)
 
     """
@@ -126,7 +126,7 @@ class UpdateImdb:
                     self._update_serie(data_imdb)
 
             except Exception as e:
-                logger.error('FALLO: {}'.format(i['Nombre']))
+                logger.error(f'FALLO: {i["Nombre"]}')
                 logger.error(e)
 
     def update_series(self, imdb_id):
@@ -147,7 +147,7 @@ class UpdateImdb:
             self._update_serie(datos_imdb)
 
         except Exception as e:
-            logger.error('FALLO: {}'.format(title.data['title']))
+            logger.error(f'FALLO: {title.data["title"]}')
             logger.error(e)
 
     def check_title(self, imdb_id):
@@ -171,7 +171,7 @@ class UpdateImdb:
         query_all = str()
 
         for i in series:
-            query = 'UPDATE series SET imdb_seguir="No" WHERE Nombre LIKE "{}";'.format(i["Nombre"])
+            query = f'UPDATE series SET imdb_seguir="No" WHERE Nombre LIKE "{i["Nombre"]}";'
             query_all += '\n' + query
 
         # logger.info(queryCompleta)

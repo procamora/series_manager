@@ -12,7 +12,7 @@ from app import logger
 from app.models.model_preferences import Preferences
 from app.models.model_query import Query
 from app.modulos import funciones
-from app.modulos.settings import directorio_local, ruta_db
+from app.modulos.settings import DIRECTORY_LOCAL, PATH_DATABASE
 
 
 class Preferencias(QtWidgets.QDialog):
@@ -25,7 +25,7 @@ class Preferencias(QtWidgets.QDialog):
         self.state_cancel = 'Cancelado'  # final
         self.state_current = self.state_ok  # actual
         self.db = database
-        self.ruta = directorio_local
+        self.ruta = DIRECTORY_LOCAL
 
         self.setWindowTitle('Preferencias de configuracion')
         self.ui.tabWidget.setCurrentIndex(0)
@@ -39,7 +39,7 @@ class Preferencias(QtWidgets.QDialog):
         all_items = [self.ui.BoxId.itemText(i) for i in range(self.ui.BoxId.count())]
         logger.info(all_items)
 
-        with open(r'{}/id.conf'.format(self.ruta), 'r') as f:
+        with open(rf'{self.ruta}/id.conf', 'r') as f:
             id_fich = f.readline().replace('/n', '')
 
         try:
@@ -134,7 +134,7 @@ class Preferencias(QtWidgets.QDialog):
         else:
             Controller.update_preferences(preferences, self.db)
 
-        with open(r'{}/id.conf'.format(self.ruta), 'w') as f:
+        with open(rf'{self.ruta}/id.conf', 'w') as f:
             f.write(preferences.id)
 
         return True
@@ -171,7 +171,7 @@ class Preferencias(QtWidgets.QDialog):
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
-    Preferencias.get_data(database=ruta_db)
+    Preferencias.get_data(database=PATH_DATABASE)
     return app
 
 

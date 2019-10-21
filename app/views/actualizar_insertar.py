@@ -12,7 +12,7 @@ from app.models.model_query import Query
 from app.models.model_serie import Serie
 from app.modulos import funciones
 from app.modulos.actualiza_imdb import UpdateImdb
-from app.modulos.settings import ruta_db
+from app.modulos.settings import PATH_DATABASE
 from app.views.msgbox import MsgBox
 
 
@@ -37,7 +37,7 @@ class ActualizarInsertar(QtWidgets.QDialog):
             self.ui.BoxEstado.setCurrentIndex(all_items.index('Activa'))
 
         if self.serie is not None:  # Actualizar
-            self.setWindowTitle('Actualizar serie: {}'.format(self.serie.title))
+            self.setWindowTitle(f'Actualizar serie: {self.serie.title}')
 
             # para poder modifical el nombre en el update
             self.name_original = str(self.serie.title)
@@ -307,11 +307,11 @@ class ActualizarInsertar(QtWidgets.QDialog):
 
 def main():
     # query = 'SELECT * FROM Series WHERE Nombre LIKE "Silicon Valley"'
-    # configuracion = conectionSQLite('{}/{}'.format(directorio_trabajo, nombre_db), query, True)[0]
+    # configuracion = conectionSQLite('{}/{}'.directorio_trabajo, nombre_db), query, True)[0]
     ser = None
     app = QtWidgets.QApplication(sys.argv)
     # hay que poner la base de datos como parametro
-    ActualizarInsertar.get_data(database=ruta_db, data_serie=ser)
+    ActualizarInsertar.get_data(database=PATH_DATABASE, data_serie=ser)
     return app
 
 

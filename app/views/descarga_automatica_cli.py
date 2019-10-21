@@ -32,13 +32,14 @@ from app.modulos import funciones
 from app.modulos.connect_sqlite import execute_script_sqlite
 from app.modulos.mail2 import ML2
 from app.modulos.pushbullet2 import PB2
-from app.modulos.settings import directorio_trabajo, ruta_db
+from app.modulos.settings import DIRECTORY_WORKING, PATH_DATABASE, FILE_LOG_FEED, FILE_LOG_FEED_VOSE, FILE_LOG_DOWNLOADS
 from app.modulos.telegram2 import Telegram
 from app import logger
 import app.controller.Controller as Controller
 from app.models.model_query import Query
 from app.models.model_notifications import Notifications
 from app.models.model_serie import Serie
+from app.models.model_preferences import Preferences
 
 SERIE_DEBUG = "SEAL Team"
 
@@ -90,7 +91,7 @@ class FeedparserPropio:
         login = session.get(url, headers=req_headers, verify=False)
 
         if login.status_code != 200:
-            logger.critical("Status code get({}) is: {}".format(login, login.status_code))
+            logger.critical(f"Status code get({login}) is: {login.status_code}")
             sys.exit(1)
 
         sopa = BeautifulSoup(login.text, 'html.parser')
@@ -107,7 +108,7 @@ class FeedparserPropio:
                         # logger.debug(serie.contents)
                         # logger.debug(serie['href'])
                         # logger.debug(capitulo.text)
-                        url = '{}{}'.format('https://dontorrent.com', serie['href'])
+                        url = f'https://dontorrent.com{serie["href"]}'
                         # obtenemos todos los episodios y mandamos unicammente el ultimo
                         chapters = re.findall('\d+', str(capitulo.text))
                         f.add(serie.text, int(chapters[-1]), url)
@@ -123,7 +124,7 @@ class DescargaAutomaticaCli:
             self._logger.debug('Start')
 
             if database is None:  # en herencia no mando ruta
-                self.db = ruta_db
+                self.db = PATH_DATABASE
             else:
                 self.db = database
 
@@ -131,10 +132,10 @@ class DescargaAutomaticaCli:
 
             self.listaNotificaciones = str()
             self.actualizaDia = str()
-            self.conf = funciones.db_configuarion()
-
+            preferences: Query = Controller.get_database_configuration(self.db)
+            self.preferences: Preferences = preferences.response[0]
             # urlNew = self.conf['UrlFeedNewpct']
-            url_show = self.conf['UrlFeedShowrss']
+            url_show = self.preferences.url_feed_vose
 
             # Diccionario con las series y capitulos para actualizar la bd el capitulo descargado
             self.capDescargado: Dict[str, str] = dict()
@@ -159,35 +160,33 @@ class DescargaAutomaticaCli:
         serie_actual_show = str()
         # SerieActualTemp = str()
 
-        fich_newpct = self.conf['FicheroFeedNewpct']
-        fich_showrss = self.conf['FicheroFeedShowrss']
-        self.rutlog = r'{}/log'.format(directorio_trabajo)
+        self.rutlog = rf'{DIRECTORY_WORKING}/log'
 
         if not os.path.exists(self.rutlog):
             os.mkdir(self.rutlog)
 
-        if not os.path.exists('{}/{}'.format(self.rutlog, fich_newpct)):
-            funciones.create_file('{}/{}'.format(self.rutlog, fich_newpct))
+        if not os.path.exists(f'{self.rutlog}/{FILE_LOG_FEED}'):
+            funciones.create_file(f'{self.rutlog}/{FILE_LOG_FEED}')
 
-        if not os.path.exists('{}/{}'.format(self.rutlog, fich_showrss)):
-            funciones.create_file('{}/{}'.format(self.rutlog, fich_showrss))
+        if not os.path.exists(f'{self.rutlog}/{FILE_LOG_FEED_VOSE}'):
+            funciones.create_file(f'{self.rutlog}/{FILE_LOG_FEED_VOSE}')
 
-        with open('{}/{}'.format(self.rutlog, fich_newpct), 'r') as f:
+        with open(f'{self.rutlog}/{FILE_LOG_FEED}', 'r') as f:
             self.ultimaSerieNew = f.readline()
 
-        with open('{}/{}'.format(self.rutlog, fich_showrss), 'r') as f:
+        with open(f'{self.rutlog}/{FILE_LOG_FEED_VOSE}', 'r') as f:
             self.ultimaSerieShow = f.readline()
 
         for serie in self.consultaSeries:
             try:
-                self._logger.info(('Revisa: {}'.format(funciones.remove_tildes(serie.title))))
+                self._logger.info(f'Revisa: {funciones.remove_tildes(serie.title)}')
                 serie_actual_temp = self.parser_feed(serie)
                 if serie.vose:
                     serie_actual_show = serie_actual_temp
                 else:
                     serie_actual_new = serie_actual_temp
             except Exception as e:
-                self._logger.error('################ {} FALLO {}'.format(serie.title, e))
+                self._logger.error(f'################ {serie.title} FALLO {e}')
 
         if len(self.ultimaSerieNew) != 0:  # or len(self.ultimaSerieShow) != 0:
             # self._logger.info(self.actualizaDia)
@@ -205,7 +204,7 @@ class DescargaAutomaticaCli:
 
         # capitulos que descargo
         for serie in self.capDescargado.items():
-            query = 'UPDATE Series SET Capitulo_Descargado={} WHERE Nombre LIKE "{}";\n'.format(str(serie[1]), serie[0])
+            query = f'UPDATE Series SET Capitulo_Descargado={str(serie[1])} WHERE Nombre LIKE "{serie[0]}";\n'
             self.consultaUpdate += query
 
         self._logger.info(self.consultaUpdate)
@@ -215,9 +214,9 @@ class DescargaAutomaticaCli:
 
         # Guardar ultima serie del feed
         if serie_actual_show is not None and serie_actual_new is not None:
-            with open('{}/{}'.format(self.rutlog, fich_newpct), 'w') as f:
+            with open(f'{self.rutlog}/{FILE_LOG_FEED}', 'w') as f:
                 f.write(funciones.remove_tildes(serie_actual_new))
-            with open('{}/{}'.format(self.rutlog, fich_showrss), 'w') as f:
+            with open(f'{self.rutlog}/{FILE_LOG_FEED_VOSE}', 'w') as f:
                 f.write(funciones.remove_tildes(serie_actual_show))
         else:
             self._logger.error('PROBLEMA CON if SerieActualShow is not None and SerieActualNew is not None:')
@@ -225,7 +224,6 @@ class DescargaAutomaticaCli:
     def parser_feed(self, serie: Serie) -> str:
         """Solo funciona con series de 2 digitos por la expresion regular"""
         cap = str(serie.chapter)
-        ruta = str(self.conf['RutaDescargas'])  # es unicode
         if serie.vose:
             last_serie = self.ultimaSerieShow
             feed = self.feedShow
@@ -233,8 +231,8 @@ class DescargaAutomaticaCli:
             last_serie = self.ultimaSerieNew
             feed = self.feedNew
 
-        if not os.path.exists(ruta):
-            os.mkdir(ruta)
+        if not os.path.exists(self.preferences.path_download):
+            os.mkdir(self.preferences.path_download)
 
         if len(str(cap)) == 1:
             cap = '0' + str(cap)
@@ -278,9 +276,9 @@ class DescargaAutomaticaCli:
                 except Exception:
                     title_serie = title_serie.replace(u"\uFFFD", "?")
 
-                if not os.path.exists(f'{ruta}{title_serie}.torrent'):  # fixme revisar si funciona antes habia u'...'
-                    fichero_descargas = self.conf['FicheroDescargas']
-                    with open(f'{self.rutlog}/{fichero_descargas}', 'a') as f:
+                # fixme revisar si funciona antes habia u'...'
+                if not os.path.exists(f'{self.preferences.path_download}{title_serie}.torrent'):
+                    with open(f'{self.rutlog}/{FILE_LOG_DOWNLOADS}', 'a') as f:
                         f.write(f'{time.strftime("%Y%m%d")} {title_serie}\n')
 
                     if serie.vose:
@@ -294,7 +292,7 @@ class DescargaAutomaticaCli:
 
                     self._logger.critical(f'++{torrents}')
                     for torrent in torrents:
-                        funciones.download_file(torrent, rf'{ruta}/{torrent.split("/")[-1]}.torrent')
+                        funciones.download_file(torrent, rf'{self.preferences.path_download}/{torrent.split("/")[-1]}.torrent')
                         # Diccionario con todos los capitulos descargados, para actualizar la bd con los capitulos por
                         # donde voy regex para coger el capitulo unicamente
                     self.actualizaDia += f'''\nUPDATE series SET Dia="{funciones.calculate_day_week()}" 
@@ -323,7 +321,7 @@ class DescargaAutomaticaCli:
         """
         poner las api de la base de datos
         """
-        response_query: Query = Controller.get_notifications(ruta_db)
+        response_query: Query = Controller.get_notifications(PATH_DATABASE)
         notifications: List[Notifications] = response_query.response
         global tg3, pb3, ml3, api_ml3
         logger.info(notifications)
@@ -342,7 +340,7 @@ class DescargaAutomaticaCli:
 
 
 def main():
-    d = DescargaAutomaticaCli(database=ruta_db)
+    d = DescargaAutomaticaCli(database=PATH_DATABASE)
     d.run()
     # feedparserPropio.parse()
 

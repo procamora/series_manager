@@ -11,6 +11,7 @@ from app.models.model_query import Query
 from app.models.model_serie import Serie
 from app.models.model_states import States
 from app.modulos.connect_sqlite import conection_sqlite, execute_script_sqlite
+from app.modulos.settings import SYNC_SQLITE
 
 
 def execute_query_select(sql_query: str, database: str, to_class: object = None) -> Query:
@@ -43,6 +44,7 @@ def get_series_follow_active(database: str) -> Query:
 def get_series_follow(database: str) -> Query:
     query_str = '''SELECT * FROM Series WHERE Siguiendo = "Si" ORDER BY Nombre'''
     return execute_query_select(query_str, database, Serie())
+
 
 def get_series_start_season(database: str) -> Query:
     query_str = '''SELECT Nombre FROM Series WHERE Estado LIKE "En Espera" AND Capitulo LIKE 0'''
@@ -89,6 +91,11 @@ def get_credentials(database: str) -> Query:
 
 def get_preferences(database: str) -> Query:
     query_str = 'SELECT * FROM Configuraciones'
+    return execute_query_select(query_str, database, Preferences())
+
+
+def get_preferences_id(database: str, id_db: int) -> Query:
+    query_str = f'SELECT * FROM Configuraciones WHERE id IS {id_db}'
     return execute_query_select(query_str, database, Preferences())
 
 
@@ -154,3 +161,22 @@ def update_notifications(notifications: List[Notifications], database: str) -> N
             query_str += f'''\nUPDATE Notificaciones SET API="{notification.api}", Activo="{notification.active}" 
             WHERE Nombre LIKE "{notification.name}";'''
     execute_query_script_sqlite(query_str, database)
+
+
+def get_database_configuration(database: str) -> Query:
+    """
+    Funcion que obtiene los valores de la configuracion de un programa, devuelve el diciconario con los datos
+
+    :return dict: Nos devuelve un diccionario con los datos
+    """
+
+    try:
+        with open(SYNC_SQLITE, 'r') as f:
+            id_db = f.readline()
+    except Exception:
+        logger.warning('fallo en dbConfiguarion')
+        id_db = 1
+
+    response_query: Query = get_preferences_id(database, id_db)
+    # response_query: Query = get_preferences_id(f'{directorio_trabajo}/{nombre_db}', id_db)
+    return response_query
