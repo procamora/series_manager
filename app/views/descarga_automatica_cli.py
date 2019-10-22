@@ -13,27 +13,27 @@ import logging
 import os
 import re
 import sys
+from pathlib import Path, PurePath  # nueva forma de trabajar con rutas
+
 import time
+from dataclasses import dataclass
+from typing import List, NoReturn, Dict
 
 import feedparser
 import requests
 import urllib3
-
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 from bs4 import BeautifulSoup
-from typing import List, NoReturn, Dict
-from dataclasses import dataclass
 
-new_path = '../../'
+new_path: str = '../../'
 if new_path not in sys.path:
     sys.path.append(new_path)
 
-from app.modulos import funciones
-from app.modulos.connect_sqlite import execute_script_sqlite
-from app.modulos.mail2 import ML2
-from app.modulos.pushbullet2 import PB2
-from app.modulos.settings import DIRECTORY_WORKING, PATH_DATABASE, FILE_LOG_FEED, FILE_LOG_FEED_VOSE, FILE_LOG_DOWNLOADS
-from app.modulos.telegram2 import Telegram
+from app.utils import funciones
+from app.utils.connect_sqlite import execute_script_sqlite
+from app.utils.mail2 import ML2
+from app.utils.pushbullet2 import PB2
+from app.utils.settings import DIRECTORY_WORKING, PATH_DATABASE, FILE_LOG_FEED, FILE_LOG_FEED_VOSE, FILE_LOG_DOWNLOADS
+from app.utils.telegram2 import Telegram
 from app import logger
 import app.controller.Controller as Controller
 from app.models.model_query import Query
@@ -41,6 +41,7 @@ from app.models.model_notifications import Notifications
 from app.models.model_serie import Serie
 from app.models.model_preferences import Preferences
 
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 SERIE_DEBUG = "SEAL Team"
 
 
@@ -118,15 +119,10 @@ class FeedparserPropio:
 
 
 class DescargaAutomaticaCli:
-    def __init__(self, database: str = None) -> NoReturn:
+    def __init__(self, ) -> NoReturn:
         if funciones.internet_on():
             self._logger = logger
             self._logger.debug('Start')
-
-            if database is None:  # en herencia no mando ruta
-                self.db = PATH_DATABASE
-            else:
-                self.db = database
 
             self.notificaciones: List[Notifications] = self.show_notifications()  # variable publica
 
@@ -160,10 +156,10 @@ class DescargaAutomaticaCli:
         serie_actual_show = str()
         # SerieActualTemp = str()
 
-        self.rutlog = rf'{DIRECTORY_WORKING}/log'
+        self.rutlog :Path = Path(rf'{DIRECTORY_WORKING}/log')
 
-        if not os.path.exists(self.rutlog):
-            os.mkdir(self.rutlog)
+        if not self.rutlog.exists():
+            Path.mkdir(self.rutlog)
 
         if not os.path.exists(f'{self.rutlog}/{FILE_LOG_FEED}'):
             funciones.create_file(f'{self.rutlog}/{FILE_LOG_FEED}')
@@ -223,7 +219,7 @@ class DescargaAutomaticaCli:
 
     def parser_feed(self, serie: Serie) -> str:
         """Solo funciona con series de 2 digitos por la expresion regular"""
-        cap = str(serie.chapter)
+        #cap = str(serie.chapter)
         if serie.vose:
             last_serie = self.ultimaSerieShow
             feed = self.feedShow
@@ -234,8 +230,8 @@ class DescargaAutomaticaCli:
         if not os.path.exists(self.preferences.path_download):
             os.mkdir(self.preferences.path_download)
 
-        if len(str(cap)) == 1:
-            cap = '0' + str(cap)
+        #if len(str(cap)) == 1:
+        #    cap = '0' + str(cap)
 
         for entrie in feed.entries:
             self.titleSerie = funciones.remove_tildes(entrie.title)
@@ -273,7 +269,8 @@ class DescargaAutomaticaCli:
 
                 try:  # arreglar problema codificacion de algunas series
                     self._logger.info(title_serie)
-                except Exception:
+                except Exception as e:
+                    print(e)
                     title_serie = title_serie.replace(u"\uFFFD", "?")
 
                 # fixme revisar si funciona antes habia u'...'
@@ -292,7 +289,8 @@ class DescargaAutomaticaCli:
 
                     self._logger.critical(f'++{torrents}')
                     for torrent in torrents:
-                        funciones.download_file(torrent, rf'{self.preferences.path_download}/{torrent.split("/")[-1]}.torrent')
+                        funciones.download_file(torrent,
+                                                rf'{self.preferences.path_download}/{torrent.split("/")[-1]}.torrent')
                         # Diccionario con todos los capitulos descargados, para actualizar la bd con los capitulos por
                         # donde voy regex para coger el capitulo unicamente
                     self.actualizaDia += f'''\nUPDATE series SET Dia="{funciones.calculate_day_week()}" 

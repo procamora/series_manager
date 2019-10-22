@@ -10,7 +10,7 @@ import colorlog  # https://medium.com/@galea/python-logging-example-with-color-f
 __all__ = [os.path.basename(
     f)[:-3] for f in glob.glob(os.path.dirname(__file__) + "/*.py")]
 
-from app.modulos.settings import MODE_DEBUG
+from app.utils.settings import MODE_DEBUG
 
 
 def get_logger(verbose, name='Series'):

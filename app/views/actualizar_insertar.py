@@ -10,10 +10,9 @@ import app.controller.Controller as Controller
 from app import logger
 from app.models.model_query import Query
 from app.models.model_serie import Serie
-from app.modulos import funciones
-from app.modulos.actualiza_imdb import UpdateImdb
-from app.modulos.settings import PATH_DATABASE
-from app.views.msgbox import MsgBox
+from app.utils import funciones
+from app.utils.settings import PATH_DATABASE
+from app.utils.actualiza_imdb import UpdateImdb
 
 
 class ActualizarInsertar(QtWidgets.QDialog):
@@ -233,11 +232,11 @@ class ActualizarInsertar(QtWidgets.QDialog):
         if len(str(self.ui.lineTitulo.text())) != 0:
             # HAGO ESTO PARA QUE EL UPDATE SE HAGA CON NONE EN CASO DE QUE NO LO PONGA
             if self.serie is not None:
-                query_str = Controller.get_query_update_serie(serie)
+                query_str = Controller.get_query_update_serie(serie, self.name_original)
             else:
                 query_str = Controller.get_query_insert_serie(serie)
 
-            #try:
+            # try:
             logger.debug(query_str)
             if update_imdb:
                 imbd_test = UpdateImdb()
@@ -263,7 +262,7 @@ class ActualizarInsertar(QtWidgets.QDialog):
                     funciones.show_message(self.ui.label_Info, 'Actualizado', True)
             return True
 
-            #except Exception as e:
+            # except Exception as e:
             #    logger.error(e)
             #    logger.error(e)
             #    dat = {'title': 'Error en bd', 'text': str(e)}

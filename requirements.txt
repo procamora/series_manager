@@ -1,3 +1,6 @@
+mechanize
+cx_Freeze
+wget
 PyQt5
 beautifulsoup4
 feedparser

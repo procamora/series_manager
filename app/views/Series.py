@@ -15,9 +15,10 @@ from app.views.ui.series_ui import Ui_MainWindow
 # PROPIAS
 import app.controller.Controller as Controller
 from app import logger
+from app.models.model_query import Query
 from app.models.model_serie import Serie
-from app.modulos import funciones
-from app.modulos.settings import DIRECTORY_WORKING, SYSTEM, NAME_DATABASE, DIRECTORY_LOCAL
+from app.utils import funciones
+from app.utils.settings import DIRECTORY_WORKING, SYSTEM, DATABASE_ID, PATH_DATABASE
 from app.views import acerca_de
 from app.views import actualizar_insertar
 from app.views import asistente_inicial
@@ -30,7 +31,8 @@ from app.views import msgbox
 from app.views import newpct1_completa
 from app.views import notificaciones
 from app.views import preferencias
-from app.models.model_query import Query
+from pathlib import Path  # nueva forma de trabajar con rutas
+
 
 class Series(QtWidgets.QMainWindow):
     def __init__(self, parent: object = None) -> NoReturn:
@@ -38,7 +40,7 @@ class Series(QtWidgets.QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
-        self.database: str = f'{DIRECTORY_WORKING}/{NAME_DATABASE}'
+        self.database: Path = PATH_DATABASE
 
         self.other: str = 'otra'  # campo otra del formulario
         self.state_ok: str = 'Ok'  # estado inicial
@@ -366,24 +368,24 @@ class Series(QtWidgets.QMainWindow):
 
     @staticmethod
     def menu_imdb_update() -> NoReturn:
-        import app.modulos.actualiza_imdb as actualiza_imdb
+        import app.utils.actualiza_imdb as actualiza_imdb
         a = actualiza_imdb.UpdateImdb()
         logger.info('actulizaCompleto')
         a.update_completed()
 
     def menu_download_automatic(self) -> NoReturn:
-        conf: Query = Controller.get_database_configuration(self.db)
-        ruta_desc = str(conf['RutaDescargas'])  # es unicode
+        preferences: Query = Controller.get_database_configuration(self.database)
 
-        if not os.path.exists(ruta_desc):
-            dat = {'title': 'No existe el directorio', 'text': f'El directorio {ruta_desc} no existe'}
+        if not os.path.exists(preferences.response[0].path_download):
+            dat = {'title': 'No existe el directorio',
+                   'text': f'El directorio {preferences.response[0].path_download} no existe'}
             msgbox.MsgBox.get_data(datos=dat)
         else:
             descarga_automatica.DescargaAutomatica.get_data(database=self.database)
 
     def menu_download_automatic_complete(self) -> NoReturn:
         preferences: Query = Controller.get_database_configuration(self.database)
-        #ruta_desc = str(preferences.response[0].path_download)  # es unicode
+        # ruta_desc = str(preferences.response[0].path_download)  # es unicode
 
         if not os.path.exists(preferences.response[0].path_download):
             dat = {'title': 'No existe el directorio',
@@ -395,23 +397,23 @@ class Series(QtWidgets.QMainWindow):
     @staticmethod
     def open_directory_data() -> NoReturn:
         if SYSTEM == 'Windows':
-            comando = 'explorer "{}"'.format(DIRECTORY_WORKING.replace('/', '\\'))
+            command = 'explorer "{}"'.format(DIRECTORY_WORKING.replace('/', '\\'))
+            Controller.execute_command(command)
         else:
-            entorno_grafico = str()
+            entorno_grafico:str = None
+            # buscarmos que entorno grafico esta instalado con el -h
             for command in ["dolphin", "caja", "nautilus"]:
                 cmd = f"{command} -h"
-                ejecucion = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                ejecucion.communicate()
-                if ejecucion.returncode == 0:
+                execute = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                execute.communicate()
+                if execute.returncode == 0:
                     entorno_grafico = command
                     break
 
             if entorno_grafico is not None:
-                comando = f'{entorno_grafico} "{DIRECTORY_WORKING}"'  # no esta revisado
+                command = f'{entorno_grafico} "{DIRECTORY_WORKING}"'  # no esta revisado
                 logger.info(entorno_grafico)
-
-        ejecucion = subprocess.Popen(comando, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        ejecucion.communicate()  # no se lanza un hilo, hasta que no se cierre la ventana no sepuede seguir usando
+                Controller.execute_command(command)
 
     # PREFERENCIAS
     def menu_preferences(self) -> NoReturn:
@@ -427,10 +429,7 @@ class Series(QtWidgets.QMainWindow):
 
         lista_log = list()
 
-        with open(rf'{DIRECTORY_LOCAL}/id.conf', 'r') as f:
-            id_fich = f.readline().replace('/n', '')
-
-        consultas_log = Controller.get_credentials_fileconf(id_fich, self.db)
+        consultas_log = Controller.get_credentials_fileconf(DATABASE_ID, self.db)
 
         if not consultas_log.is_empty():
             if num == 'newpct1':
@@ -485,9 +484,3 @@ def main():
     myapp.show()
     app.exec_()
 
-
-if __name__ == "__main__":
-    if len(sys.argv) != 1:
-        descarga_automatica.main()
-    else:
-        main()

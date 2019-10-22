@@ -11,8 +11,8 @@ import app.controller.Controller as Controller
 from app import logger
 from app.models.model_preferences import Preferences
 from app.models.model_query import Query
-from app.modulos import funciones
-from app.modulos.settings import DIRECTORY_LOCAL, PATH_DATABASE
+from app.utils import funciones
+from app.utils.settings import DIRECTORY_LOCAL, PATH_DATABASE
 
 
 class Preferencias(QtWidgets.QDialog):
@@ -135,7 +135,7 @@ class Preferencias(QtWidgets.QDialog):
             Controller.update_preferences(preferences, self.db)
 
         with open(rf'{self.ruta}/id.conf', 'w') as f:
-            f.write(preferences.id)
+            f.write(str(preferences.id))
 
         return True
 

@@ -13,8 +13,8 @@ from app.views.ui.descarga_automatica_ui import Ui_Dialog
 import app.controller.Controller as Controller
 from app.models.model_query import Query
 from app.models.model_serie import Serie
-from app.modulos import funciones
-from app.modulos.settings import PATH_DATABASE
+from app.utils import funciones
+from app.utils.settings import PATH_DATABASE
 from app.views.descarga_automatica_cli import DescargaAutomaticaCli
 from app.views.msgbox import MsgBox
 

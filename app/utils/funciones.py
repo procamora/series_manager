@@ -5,6 +5,7 @@ import glob
 import os
 import re
 import time
+from pathlib import Path  # nueva forma de trabajar con rutas
 from typing import List, NoReturn
 
 import feedparser
@@ -14,8 +15,8 @@ import urllib3
 from bs4 import BeautifulSoup
 
 from app import logger
-from app.modulos.connect_sqlite import execute_script_sqlite, dump_database
-from app.modulos.settings import DIRECTORY_WORKING, DIRECTORY_LOCAL, NAME_DATABASE, PATH_DATABASE, SYNC_SQLITE
+from app.utils.connect_sqlite import execute_script_sqlite, dump_database
+from app.utils.settings import DIRECTORY_WORKING, DIRECTORY_LOCAL, PATH_DATABASE
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -28,18 +29,18 @@ def create_directory_work() -> NoReturn:
     Si el directorio existe comprueba que exista la base de datos y que no este vacia
     """
 
-    if not os.path.exists(DIRECTORY_WORKING):
-        logger.debug("NO EXISTE DIRECTORIO TRABAJO, CREANDOLO")
-        os.mkdir(DIRECTORY_WORKING)
-        template_database()
-        template_file_conf()
+    if not DIRECTORY_WORKING.exists():
+        logger.debug(f"NO EXISTE DIRECTORIO TRABAJO, CREANDOLO: {DIRECTORY_WORKING}")
+        Path.mkdir(DIRECTORY_WORKING)
+        template_database()  # crea db con la estructura adecuada
+        # template_file_conf()
     else:
-        if not os.path.exists(PATH_DATABASE) or os.stat(PATH_DATABASE).st_size == 0:
+        if not PATH_DATABASE.exists() or Path.stat(PATH_DATABASE).st_size == 0:
             logger.info(1)
-            template_database()
-        if not os.path.exists(SYNC_SQLITE) or os.stat(SYNC_SQLITE).st_size == 0:
-            logger.info(2)
-            template_file_conf()
+            template_database()  # crea db con la estructura adecuada
+        # if not os.path.exists(SYNC_SQLITE) or os.stat(SYNC_SQLITE).st_size == 0:
+        #    logger.info(2)
+        #    template_file_conf()
 
 
 def create_file(fichero) -> NoReturn:
@@ -51,6 +52,7 @@ def change_bars(texto) -> str:
     return texto.replace('\\', '/')
 
 
+'''
 def template_file_conf() -> NoReturn:
     """
     Si hay una configuracion en la la carpeta del programa la mueve a la carpeta
@@ -70,6 +72,7 @@ def template_file_conf() -> NoReturn:
         else:
             with open(fichero_conf, 'w') as f:
                 f.write("1")
+'''
 
 
 def template_database() -> NoReturn:
@@ -79,13 +82,14 @@ def template_database() -> NoReturn:
     """
 
     ficheros_sql = glob.glob(f'{DIRECTORY_LOCAL}/SQL/*estructura.sql')
-    fichero_db = f'{DIRECTORY_WORKING}/{NAME_DATABASE}'
+    print(DIRECTORY_LOCAL)
+    print(ficheros_sql)
 
-    if not os.path.exists(fichero_db) or not os.stat(fichero_db).st_size > 50000:  # estructura pesa 72Kb
+    if not PATH_DATABASE.exists() or not Path.stat(PATH_DATABASE).st_size > 50000:  # estructura pesa 72Kb
         logger.debug("creando db")
         with open(change_bars(ficheros_sql[-1]), 'r') as f:
             plantilla = f.read()
-        execute_script_sqlite(fichero_db, plantilla)
+        execute_script_sqlite(PATH_DATABASE, plantilla)
 
 
 def create_full_backup_db() -> NoReturn:
@@ -159,10 +163,6 @@ def remove_tildes(cadena):
 
 
 def download_file(url, destino, libreria='requests'):
-    if libreria == 'urllib':
-        import urllib
-        urllib.urlretrieve(url, destino)
-
     if libreria == 'urllib2':
         import urllib2
         f = urllib2.urlopen(url)
@@ -170,13 +170,13 @@ def download_file(url, destino, libreria='requests'):
         with open(destino, "wb") as code:
             code.write(data)
 
-    if libreria == 'requests':
+    elif libreria == 'requests':
         r = requests.get(url, verify=False)
         logger.debug(f'Descargo el fichero: {destino}')
         with open(destino, "wb") as code:
             code.write(r.content)
 
-    if libreria == 'wget':
+    elif libreria == 'wget':
         import wget
         wget.download(url, destino)
 
@@ -246,7 +246,8 @@ def _descarga_url_torrent_aux(page):
             javascript = re.findall(r'window\.location\.href = \".*\";', page)
             return javascript[0].replace("window.location.href = \"", "").replace("\";", "")
             # return sopa.find('div', {"id": "tab1"}).a['href']
-    except Exception:
+    except Exception as e:
+        print(e)
         return None
 
 

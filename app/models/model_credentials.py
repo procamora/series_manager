@@ -11,7 +11,7 @@ from app.models import Model
 
 @dataclass
 class Credentials(Model):
-    #id: int = int()
+    # id: int = int()
     pass_transmission: str = str()
     user_tviso: str = str()
     pass_tviso: str = str()

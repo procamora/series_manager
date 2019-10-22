@@ -11,9 +11,9 @@ import app.controller.Controller as Controller
 from app import logger
 from app.models.model_query import Query
 from app.models.model_serie import Serie
-from app.modulos.connect_sqlite import execute_script_sqlite
-from app.modulos.settings import PATH_DATABASE
-from app.modulos.tviso import conect_tviso
+from app.utils.connect_sqlite import execute_script_sqlite
+from app.utils.settings import PATH_DATABASE
+from app.utils.tviso import conect_tviso
 
 
 class EstadoSeries(QtWidgets.QDialog):

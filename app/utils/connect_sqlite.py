@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os
 import sqlite3
+from pathlib import Path  # nueva forma de trabajar con rutas
 from typing import Dict, List, Tuple, Optional, Union, NoReturn
 
 
 # fixme cambiar de orden database y query
-def conection_sqlite(database: str, query_str: str, is_dict: bool = False, to_class: object = None) -> \
+def conection_sqlite(database: Path, query_str: str, is_dict: bool = False, to_class: object = None) -> \
         Union[List[List], List[object], List[Dict[str, object]], NoReturn]:
     try:
         data = None
-        if os.path.exists(database):
-            conn = sqlite3.connect(database)
+        if database.exists():
+            conn = sqlite3.connect(str(database))
             if is_dict:
                 conn.row_factory = dict_factory
             cursor = conn.cursor()
@@ -47,8 +47,8 @@ def dict_factory(cursor: sqlite3.Cursor, row: Tuple[str]) -> Dict[str, str]:
     return d
 
 
-def execute_script_sqlite(database: str, script: str) -> None:
-    conn = sqlite3.connect(database)
+def execute_script_sqlite(database: Path, script: str) -> None:
+    conn = sqlite3.connect(str(database))
     cursor = conn.cursor()
     cursor.executescript(script)
     conn.commit()
@@ -56,13 +56,13 @@ def execute_script_sqlite(database: str, script: str) -> None:
     conn.close()
 
 
-def dump_database(db: str) -> Optional[str]:
+def dump_database(database: Path) -> Optional[str]:
     """
     Hace un dump de la base de datos y lo retorna
-    :param db: ruta de la base de datos
+    :param database: ruta de la base de datos
     :return dump: volcado de la base de datos 
     """
-    if os.path.exists(db):
-        con = sqlite3.connect(db)
+    if database.exists():
+        con = sqlite3.connect(str(database))
         return '\n'.join(con.iterdump())
     return None

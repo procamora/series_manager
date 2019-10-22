@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import configparser
 import os
-import platform
 import sys
 from typing import NoReturn
 
@@ -9,8 +9,7 @@ from PyQt5 import QtWidgets
 from app.views.ui.asistente_inicial_ui import Ui_Dialog
 
 from app import logger
-from app.modulos.settings import SYNC_SQLITE, SYNC_GDRIVE
-import app.controller.Controller as Controller
+from app.utils.settings import PATH_FILE_CONFIG, DIRECTORY_WORKING
 
 
 class AsistenteInicial(QtWidgets.QDialog):
@@ -21,15 +20,22 @@ class AsistenteInicial(QtWidgets.QDialog):
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
 
+        self.config = configparser.ConfigParser()
+        self.config.read(PATH_FILE_CONFIG)
+
         self.setWindowTitle('Asistente Inicial')
 
-        self.rutaSistemaDefecto = self.show_directory_temporary()
+        # self.rutaSistemaDefecto = self.show_directory_temporary()
         # Si paso una ruta la pongo por defecto
         if ruta is None:
-            self.ui.checkBoxSync.setChecked(False)
-            self.ui.lineRuta.setText(self.rutaSistemaDefecto)
+            self.ui.lineRuta.setText(str(DIRECTORY_WORKING))
         else:
-            self.ui.lineRuta.setText(ruta)
+            self.ui.lineRuta.setText(str(ruta))
+
+        print(self.config["CONFIGURABLE"].getboolean('WORKDIR_DEFAULT'))
+        if self.config["CONFIGURABLE"].getboolean('WORKDIR_DEFAULT'):
+            self.ui.checkBoxSync.setChecked(False)
+        else:
             self.ui.checkBoxSync.setChecked(True)
 
         self.ui.checkBoxValido.setChecked(True)
@@ -42,7 +48,7 @@ class AsistenteInicial(QtWidgets.QDialog):
         self.ui.pushButtonCerrar.clicked.connect(self.close)
         self.ui.pushButtonAceptar.clicked.connect(self.accept_data)
 
-    @staticmethod
+    ''''@staticmethod
     def show_directory_temporary() -> NoReturn:
         """
         IMPORTANTE
@@ -55,7 +61,7 @@ class AsistenteInicial(QtWidgets.QDialog):
             directorio_trabajo = '{}/{}'.format((os.environ['LOCALAPPDATA']).replace('\\', '/'), 'Gestor-Series')
         elif platform.system() == "Linux":
             directorio_trabajo = f'{os.environ["HOME"]}/.{"Gestor-Series"}'
-        return directorio_trabajo
+        return directorio_trabajo'''
 
     def search_directory(self) -> NoReturn:
         """
@@ -87,19 +93,18 @@ class AsistenteInicial(QtWidgets.QDialog):
             # self.__cambiaVisibilidad(False)
             self.ui.checkBoxValido.setChecked(True)
             self.show_message(self.ui.checkBoxValido, 'Valido', True)
-            self.ui.lineRuta.setText(self.rutaSistemaDefecto)
+            self.ui.lineRuta.setText(str(DIRECTORY_WORKING))
 
     def apply_data(self) -> bool:
         if self.ui.checkBoxValido.isChecked():
+            print(self.ui.checkBoxSync.isChecked())
+            self.config["CONFIGURABLE"]['WORKDIR_DEFAULT'] = str(not self.ui.checkBoxSync.isChecked())
             if self.ui.checkBoxSync.isChecked():
-                with open(SYNC_GDRIVE, 'w') as f:
-                    f.write('1\n')
-                    f.write(self.change_bars(self.ui.lineRuta.text()))
-            else:
-                with open(SYNC_GDRIVE, 'w') as f:
-                    f.write('0')
-            with open(SYNC_SQLITE, 'w') as f:
-                f.write('1\n')
+                self.config["CONFIGURABLE"]['WORKDIR'] = self.change_bars(self.ui.lineRuta.text())
+            with open(PATH_FILE_CONFIG, 'w') as configfile:
+                print("escribi datos")
+                self.config.write(configfile)
+
             self.show_message(self.ui.label, 'Exito', True)
             return True
         else:
@@ -175,25 +180,11 @@ class AsistenteInicial(QtWidgets.QDialog):
         """
 
         # Si no existe uno de los ficheros necesarios asistente inicial
-        logger.debug(f'Analized exists: {SYNC_SQLITE}')
-        logger.debug(f'Analized exists: {SYNC_GDRIVE}')
-        if not os.path.exists(SYNC_SQLITE) or not os.path.exists(SYNC_GDRIVE):
+        logger.debug(f'Analized exists: {PATH_FILE_CONFIG}')
+        if not PATH_FILE_CONFIG.exists():
             main()  # main de la funcion
             return False
-        else:
-            # comprobamos que es correcto el fichero sync_sqlite
-            with open(SYNC_SQLITE, 'r') as f:
-                response_sqlite = AsistenteInicial.check_integrity_sqlite(f.readline())
-
-            # comprobamos que es correcto el fichero sync_gdrive
-            with open(SYNC_GDRIVE, 'r') as f:
-                response_gdrive = AsistenteInicial.check_integrity_gdrive(f.readlines()[0])  # linea 1 es un 1 o un 0
-
-            if not response_gdrive or not response_sqlite:
-                main()  # main de la funcion
-                return False
-
-            return True
+        return True
 
     @staticmethod
     def get_data(parent: object = None, ruta: str = None) -> NoReturn:

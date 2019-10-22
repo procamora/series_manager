@@ -10,7 +10,7 @@ from app.views.ui.notificaciones_ui import Ui_Dialog
 import app.controller.Controller as Controller
 from app.models.model_notifications import Notifications
 from app.models.model_query import Query
-from app.modulos.settings import PATH_DATABASE
+from app.utils.settings import PATH_DATABASE
 
 
 class Notificaciones(QtWidgets.QDialog):

@@ -14,7 +14,7 @@ import requests
 from bs4 import BeautifulSoup
 
 from app import logger
-from app.modulos.telegram2 import Telegram
+from app.utils.telegram2 import Telegram
 
 
 def search_pass(url):

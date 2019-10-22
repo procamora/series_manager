@@ -11,10 +11,12 @@ from typing import NoReturn
 from PyQt5 import QtWidgets, QtCore
 from app.views.ui.descarga_completa_ui import Ui_Dialog
 
-from app import logger
-from app.modulos import funciones
-from app.modulos.telegram2 import Telegram
 import app.controller.Controller as Controller
+from app import logger
+from app.models.model_preferences import Preferences
+from app.models.model_query import Query
+from app.utils import funciones
+from app.utils.telegram2 import Telegram
 
 
 # https://gist.github.com/kaotika/e8ca5c340ec94f599fb2
@@ -27,7 +29,8 @@ class Mythread(QtCore.QThread):
                  text_edit: QtWidgets.QTextEdit, send_tg: bool) -> NoReturn:
         super(Mythread, self).__init__(parent)
 
-        self.conf = Controller.get_database_configuration()
+        preferences: Query = Controller.get_database_configuration(self.db)
+        self.preferences: Preferences = preferences.response[0]
         self.serie = serie.replace(' ', '-')  # ruta correcta
         self.cap = capitulo
         self.temp = temporada
@@ -40,7 +43,6 @@ class Mythread(QtCore.QThread):
         self.url2 = 'http://torrentlocura.com/serie/{}/capitulo-{}{}/hdtv-720p-ac3-5-1/'
 
     def run(self) -> NoReturn:
-        ruta = self.conf['RutaDescargas']
         self.total.emit(int(self.cap))
         for i in range(1, self.cap + 1):
             self.update.emit()
@@ -50,7 +52,7 @@ class Mythread(QtCore.QThread):
             i = str(i)
             time.sleep(0.2)
             try:
-                fichero = f'{ruta}/{self.serie}_{self.temp}x{i}.torrent'
+                fichero = f'{self.preferences.path_download}/{self.serie}_{self.temp}x{i}.torrent'
                 # al ser un or si la primera retorna true no comprueba la segunda
                 if self.try_get_url(self.url, i, fichero) or self.try_get_url(self.url2, i, fichero):
                     if self.sendTg:
@@ -70,7 +72,8 @@ class Mythread(QtCore.QThread):
         url_format = url.format(self.serie, self.temp, capitulo)
         logger.debug(url_format)
         try:
-            url_torrent = funciones.descarga_url_torrent(url_format)
+            # FIXME ARREGLAR Y PONER UNA FUNCION VALIDA
+            url_torrent = funciones.get_url_torrent_dontorrent(url_format)
             logger.debug(url_format)
             logger.debug(capitulo, "Bien: ", url_torrent)
 

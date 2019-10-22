@@ -1,22 +1,18 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import os
 import sys
 from typing import List, Dict
 
-try:  # Ejecucion desde Series.py
-    from .connect_sqlite import conection_sqlite, execute_script_sqlite
-    from .settings import MODE_DEBUG, PATH_DATABASE
-    from app import logger
-except ModuleNotFoundError as e:  # Ejecucion local
-    new_path = '../../'
-    if new_path not in sys.path:
-        sys.path.append(new_path)
-    from app import logger
+# Confirmamos que tenemos en el path la ruta de la aplicacion, para poder lanzarlo desde cualquier ruta
+new_path = '{}/../../'.format(os.path.dirname(os.path.realpath(__file__)))
+if new_path not in sys.path:
+    sys.path.append(new_path)
 
-    logger.debug(e)
-    from app.modulos.connect_sqlite import conection_sqlite, execute_script_sqlite
-    from app.modulos.settings import MODE_DEBUG, PATH_DATABASE
+from app import logger
+from app.utils.settings import PATH_DATABASE
+from app.utils.connect_sqlite import conection_sqlite, execute_script_sqlite
 
 
 def finished(write: bool = False) -> str:

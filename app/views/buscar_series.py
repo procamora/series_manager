@@ -9,7 +9,7 @@ from app.views.ui.buscar_series_ui import Ui_Dialog
 import app.controller.Controller as Controller
 from app import logger
 from app.models.model_query import Query
-from app.modulos.settings import PATH_DATABASE
+from app.utils.settings import PATH_DATABASE
 from app.views.actualizar_insertar import ActualizarInsertar
 
 

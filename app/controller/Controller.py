@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from typing import NoReturn, List
+import subprocess
+from typing import NoReturn, List, Optional, Tuple
 
 from app import logger
 from app.models.model_credentials import Credentials
@@ -9,9 +10,24 @@ from app.models.model_notifications import Notifications
 from app.models.model_preferences import Preferences
 from app.models.model_query import Query
 from app.models.model_serie import Serie
+from app.models.model_serie_imdb import SerieImdb
 from app.models.model_states import States
-from app.modulos.connect_sqlite import conection_sqlite, execute_script_sqlite
-from app.modulos.settings import SYNC_SQLITE
+from app.utils.connect_sqlite import conection_sqlite, execute_script_sqlite
+from app.utils.settings import DATABASE_ID
+
+
+def format_text(param_text: bytes) -> Optional[str]:
+    if param_text is not None:
+        text = param_text.decode('utf-8')
+        return str(text)
+        # return text.replace('\n', '')
+    return param_text
+
+
+def execute_command(command: str) -> Tuple[str, str, subprocess.Popen]:
+    execute = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = execute.communicate()
+    return format_text(stdout), format_text(stderr), execute
 
 
 def execute_query_select(sql_query: str, database: str, to_class: object = None) -> Query:
@@ -74,6 +90,22 @@ def get_series_name(name: str, database: str) -> Query:
     return execute_query_select(query_str, database, Serie())
 
 
+def get_series_finished_imdb(database: str) -> Query:
+    query_str = 'SELECT * FROM Series Where Estado LIKE "Finalizada" AND imdb_seguir LIKE "Si"'
+    return execute_query_select(query_str, database, Serie())
+
+
+def get_series_completed_imdb(database: str) -> Query:
+    query_str = 'SELECT * FROM Series WHERE imdb_seguir LIKE "Si" AND (imdb_id IS NULL OR imdb_Finaliza IS NULL) AND ' \
+                'NOT imdb_id IS NULL'  # para nuevas series con mod completa
+    return execute_query_select(query_str, database, Serie())
+
+
+def get_series_following_imdb(database: str) -> Query:
+    query_str = 'SELECT * FROM Series WHERE imdb_Finaliza LIKE "????" AND imdb_seguir LIKE "Si" ORDER BY Nombre'
+    return execute_query_select(query_str, database, Serie())
+
+
 def get_states(database: str) -> Query:
     query_str = 'SELECT * FROM ID_Estados'
     return execute_query_select(query_str, database, States())
@@ -85,7 +117,7 @@ def get_credentials_fileconf(id_fich: str, database: str) -> Query:
 
 
 def get_credentials(database: str) -> Query:
-    query_str = 'SELECT * FROM Credenciales'
+    query_str = 'SELECT * FROM Credenciales LIMIT 1'
     return execute_query_select(query_str, database, Credentials())
 
 
@@ -138,6 +170,36 @@ def update_series_finished(title: str, database: str) -> NoReturn:
     execute_query(query_str, database)
 
 
+def update_serie_imdb(database: str, imdb: SerieImdb):
+    query_str = f'UPDATE series SET imdb_Temporada="{imdb.season}", imdb_Finaliza="{imdb.year}", ' \
+                f'imdb_Capitulos="{imdb.chapter}" WHERE imdb_id Like "{imdb.id}"'
+    logger.info(query_str)
+    execute_query(query_str, database)
+
+
+def update_serie_partial_imdb(database: str, imdb: SerieImdb):
+    query_str = f'UPDATE series SET imdb_Temporada="{imdb.season}", imdb_Finaliza="{imdb.year}" ' \
+                f'WHERE imdb_id Like "{imdb.id}"'
+    logger.info(query_str)
+    execute_query(query_str, database)
+
+
+def update_series_finished_imdb(database: str) -> NoReturn:
+    """
+    busca las series finalizadas que tienen el imdb_seguir a si y lo actualiza a no para
+    hacer mas rapidas las futuras actualizaciones
+    """
+    response_query: Query = get_series_finished_imdb(database)
+    query_all: str = str()
+
+    for serie in response_query.response:
+        query = f'UPDATE series SET imdb_seguir="No" WHERE Nombre LIKE "{serie["Nombre"]}";'
+        query_all += '\n' + query
+
+    # logger.info(queryCompleta)
+    execute_script_sqlite(database, query_all)
+
+
 def update_preferences(preferences: Preferences, database: str) -> NoReturn:
     query_str = f'''UPDATE Configuraciones SET UrlFeedNewpct="{preferences.url_feed}", 
                 UrlFeedShowrss="{preferences.url_feed_vose}", RutaDescargas="{preferences.path_download}"
@@ -170,13 +232,9 @@ def get_database_configuration(database: str) -> Query:
     :return dict: Nos devuelve un diccionario con los datos
     """
 
-    try:
-        with open(SYNC_SQLITE, 'r') as f:
-            id_db = f.readline()
-    except Exception:
-        logger.warning('fallo en dbConfiguarion')
-        id_db = 1
-
-    response_query: Query = get_preferences_id(database, id_db)
+    response_query: Query = get_preferences_id(database, DATABASE_ID)
+    # Si falla al obtener datos para el id indicado obtenemos la primera fila
+    if response_query.is_empty():
+        return get_preferences_id(database, 1)
     # response_query: Query = get_preferences_id(f'{directorio_trabajo}/{nombre_db}', id_db)
     return response_query

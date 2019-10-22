@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import http.cookiejar
+import os
 import re
+import sys
 
 import requests
 
-try:  # Ejecucion desde Series.py
-    from .settings import MODE_DEBUG
-except Exception:  # Ejecucion local
-    from app.modulos.settings import MODE_DEBUG
+# Confirmamos que tenemos en el path la ruta de la aplicacion, para poder lanzarlo desde cualquier ruta
+new_path = '{}/../../'.format(os.path.dirname(os.path.realpath(__file__)))
+if new_path not in sys.path:
+    sys.path.append(new_path)
 
 from app import logger
 

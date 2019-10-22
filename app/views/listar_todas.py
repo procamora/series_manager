@@ -8,10 +8,9 @@ from PyQt5 import QtWidgets
 from app.views.ui.listar_todas_ui import Ui_Dialog
 
 import app.controller.Controller as Controller
-from app import logger
 from app.models.model_query import Query
 from app.models.model_serie import Serie
-from app.modulos.settings import PATH_DATABASE
+from app.utils.settings import PATH_DATABASE
 
 
 class ListarTodas(QtWidgets.QDialog):

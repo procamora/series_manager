@@ -2,52 +2,38 @@
 # -*- coding: utf-8 -*-
 
 import json
+import os
 import sys
 
 import requests
 
-# Esto hace que no salga la advertencia por fallo al verificar el certificado
-requests.packages.urllib3.disable_warnings()
-
-try:  # Ejecucion desde Series.py
-    from .settings import MODE_DEBUG, PATH_DATABASE, DIRECTORY_LOCAL, SYNC_SQLITE
-    from .connect_sqlite import conection_sqlite, execute_script_sqlite
-    from app import logger
-except ModuleNotFoundError as e:  # Ejecucion local
-    new_path = '../../'
-    if new_path not in sys.path:
-        sys.path.append(new_path)
-    from app import logger
-
-    from app.modulos.settings import MODE_DEBUG, PATH_DATABASE, DIRECTORY_LOCAL, SYNC_SQLITE
-    from app.modulos.connect_sqlite import conection_sqlite, execute_script_sqlite
+# Confirmamos que tenemos en el path la ruta de la aplicacion, para poder lanzarlo desde cualquier ruta
+new_path = '{}/../../'.format(os.path.dirname(os.path.realpath(__file__)))
+if new_path not in sys.path:
+    sys.path.append(new_path)
 
 from app import logger
+from app.utils.settings import PATH_DATABASE
+from app.models.model_query import Query
+import app.controller.Controller as Controller
 
-from typing import NoReturn, Dict, Optional
+from typing import NoReturn, Dict
+
+# Esto hace que no salga la advertencia por fallo al verificar el certificado
+requests.packages.urllib3.disable_warnings()
 
 
 class Telegram:
     def __init__(self, chat_id: str) -> NoReturn:
-        initial_data = self.initial_data()
-        if initial_data is not None:
-            self.api = initial_data['api_telegram']
+        response_query: Query = Controller.get_credentials(PATH_DATABASE)
+
+        if not response_query.is_empty():
+            self.api = response_query.response[0].api_telegram
         else:
             return
 
         self.url = 'https://api.telegram.org/bot{0}/{1}'
         self.chat_id = chat_id
-
-    @staticmethod
-    def initial_data() -> Optional[Dict[str, str]]:
-        with open(SYNC_SQLITE, 'r') as f:
-            id_fich = f.readline().replace('/n', '')
-
-        query = 'SELECT * FROM Credenciales'.format(id_fich)
-        consulta = conection_sqlite(PATH_DATABASE, query, True)
-        if len(consulta) > 0:
-            return consulta[0]
-        return None
 
     def make_request(self, method_name, method='post', params=None, files=None) -> Dict[str, str]:
         """
@@ -70,12 +56,9 @@ class Telegram:
             if 'connect-timeout' in params:
                 connect_timeout = params['connect-timeout'] + 10
 
-        result = requests.request(method, request_url, params=params, files=files, timeout=(
-            connect_timeout, read_timeout))
-
-        logger.debug(
-            requests.request(method, request_url, params=params, files=files, timeout=(connect_timeout, read_timeout)))
-
+        result = requests.request(method, request_url, params=params, files=files, timeout=(connect_timeout,
+                                                                                            read_timeout))
+        logger.debug(result)
         return json.loads(result.text)['ok']
 
     @staticmethod

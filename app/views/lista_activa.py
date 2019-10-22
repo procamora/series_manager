@@ -8,8 +8,7 @@ from PyQt5 import QtWidgets, QtSql
 from app.views.ui.lista_activa_ui import Ui_Dialog
 
 from app import logger
-from app.modulos.settings import PATH_DATABASE
-import app.controller.Controller as Controller
+from app.utils.settings import PATH_DATABASE
 
 
 class ListaActiva(QtWidgets.QDialog):
