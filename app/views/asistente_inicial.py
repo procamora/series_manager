@@ -10,10 +10,11 @@ from app.views.ui.asistente_inicial_ui import Ui_Dialog
 
 from app import logger
 from app.utils.settings import PATH_FILE_CONFIG, DIRECTORY_WORKING
+from pathlib import Path  # nueva forma de trabajar con rutas
 
 
 class AsistenteInicial(QtWidgets.QDialog):
-    def __init__(self, parent: object = None, ruta: str = None) -> NoReturn:
+    def __init__(self, parent: object = None, ruta: Path = None) -> NoReturn:
         # super(MiFormulario, self).__init__()
         # uic.loadUi('ui/AcercaDe.ui', self)
         QtWidgets.QWidget.__init__(self, parent)
@@ -187,7 +188,7 @@ class AsistenteInicial(QtWidgets.QDialog):
         return True
 
     @staticmethod
-    def get_data(parent: object = None, ruta: str = None) -> NoReturn:
+    def get_data(parent: object = None, ruta: Path = None) -> NoReturn:
         dialog = AsistenteInicial(parent, ruta)
         dialog.exec_()
 

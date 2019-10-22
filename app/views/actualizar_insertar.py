@@ -11,12 +11,11 @@ from app import logger
 from app.models.model_query import Query
 from app.models.model_serie import Serie
 from app.utils import funciones
-from app.utils.settings import PATH_DATABASE
 from app.utils.actualiza_imdb import UpdateImdb
 
 
 class ActualizarInsertar(QtWidgets.QDialog):
-    def __init__(self, parent=None, database: str = None, data_serie: Serie = None) -> NoReturn:
+    def __init__(self, parent=None, data_serie: Serie = None) -> NoReturn:
         QtWidgets.QWidget.__init__(self, parent)
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
@@ -24,7 +23,6 @@ class ActualizarInsertar(QtWidgets.QDialog):
         self.state_ok = 'Ok'  # estado inicial
         self.state_cancel = 'Cancelado'  # final
         self.state_current = self.state_ok  # actual
-        self.db = database
         self.serie = data_serie
 
         # para todos establezco esto que el estado es Activa, si actualizo lo
@@ -137,7 +135,7 @@ class ActualizarInsertar(QtWidgets.QDialog):
         Crea el comboBox de los estados, primero lo vacia y
         luego lo crea con los rangos que le indico
         """
-        response_query: Query = Controller.get_states(self.db)
+        response_query: Query = Controller.get_states()
         list_estates: list = [states.state for states in response_query.response]
         # for i in response_query.response:
         #    list_estates.append(i.state)
@@ -299,8 +297,8 @@ class ActualizarInsertar(QtWidgets.QDialog):
         self.reject()
 
     @staticmethod
-    def get_data(parent: object = None, data_serie: Serie = None, database: str = None) -> NoReturn:
-        dialog = ActualizarInsertar(parent, database, data_serie)
+    def get_data(parent: object = None, data_serie: Serie = None) -> NoReturn:
+        dialog = ActualizarInsertar(parent, data_serie)
         dialog.exec_()
 
 
@@ -310,7 +308,7 @@ def main():
     ser = None
     app = QtWidgets.QApplication(sys.argv)
     # hay que poner la base de datos como parametro
-    ActualizarInsertar.get_data(database=PATH_DATABASE, data_serie=ser)
+    ActualizarInsertar.get_data(data_serie=ser)
     return app
 
 

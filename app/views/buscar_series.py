@@ -9,19 +9,17 @@ from app.views.ui.buscar_series_ui import Ui_Dialog
 import app.controller.Controller as Controller
 from app import logger
 from app.models.model_query import Query
-from app.utils.settings import PATH_DATABASE
 from app.views.actualizar_insertar import ActualizarInsertar
 
 
 class BuscarSeries(QtWidgets.QDialog):
-    def __init__(self, parent: object = None, database: str = None) -> NoReturn:
+    def __init__(self, parent: object = None) -> NoReturn:
         QtWidgets.QWidget.__init__(self, parent)
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
         self.state_ok = 'Ok'  # estado inicial
         self.state_cancel = 'Cancelado'  # final
         self.state_current = self.state_ok  # actual
-        self.db = database
 
         self.setWindowTitle('Buscador de series')
 
@@ -37,7 +35,7 @@ class BuscarSeries(QtWidgets.QDialog):
         """
 
         self.ui.listWidget.clear()
-        response_query: Query = Controller.get_series_name(self.ui.lineEdit.text(), self.db)
+        response_query: Query = Controller.get_series_name(self.ui.lineEdit.text())
 
         if response_query.is_empty():
             item = QtWidgets.QListWidgetItem()
@@ -59,8 +57,8 @@ class BuscarSeries(QtWidgets.QDialog):
         for i in self.ui.listWidget.selectedItems():
             logger.debug((i.text()))
 
-            response_query: Query = Controller.get_series_name(i.text(), self.db)
-            ActualizarInsertar.get_data(data_serie=response_query.response[0], database=self.db)
+            response_query: Query = Controller.get_series_name(i.text())
+            ActualizarInsertar.get_data(data_serie=response_query.response[0])
 
     def cancel(self) -> NoReturn:
         """
@@ -71,14 +69,14 @@ class BuscarSeries(QtWidgets.QDialog):
         self.reject()
 
     @staticmethod
-    def get_data(parent: object = None, database: str = None) -> NoReturn:
-        dialog = BuscarSeries(parent, database)
+    def get_data(parent: object = None) -> NoReturn:
+        dialog = BuscarSeries(parent)
         dialog.exec_()
 
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
-    BuscarSeries.get_data(database=PATH_DATABASE)
+    BuscarSeries.get_data()
     return app
 
 

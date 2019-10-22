@@ -29,7 +29,7 @@ class Mythread(QtCore.QThread):
                  text_edit: QtWidgets.QTextEdit, send_tg: bool) -> NoReturn:
         super(Mythread, self).__init__(parent)
 
-        preferences: Query = Controller.get_database_configuration(self.db)
+        preferences: Query = Controller.get_database_configuration()
         self.preferences: Preferences = preferences.response[0]
         self.serie = serie.replace(' ', '-')  # ruta correcta
         self.cap = capitulo

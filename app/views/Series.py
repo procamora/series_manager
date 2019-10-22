@@ -18,7 +18,7 @@ from app import logger
 from app.models.model_query import Query
 from app.models.model_serie import Serie
 from app.utils import funciones
-from app.utils.settings import DIRECTORY_WORKING, SYSTEM, DATABASE_ID, PATH_DATABASE
+from app.utils.settings import DIRECTORY_WORKING, SYSTEM, DATABASE_ID
 from app.views import acerca_de
 from app.views import actualizar_insertar
 from app.views import asistente_inicial
@@ -31,7 +31,6 @@ from app.views import msgbox
 from app.views import newpct1_completa
 from app.views import notificaciones
 from app.views import preferencias
-from pathlib import Path  # nueva forma de trabajar con rutas
 
 
 class Series(QtWidgets.QMainWindow):
@@ -40,14 +39,11 @@ class Series(QtWidgets.QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
-        self.database: Path = PATH_DATABASE
-
         self.other: str = 'otra'  # campo otra del formulario
         self.state_ok: str = 'Ok'  # estado inicial
         self.state_cancel: str = 'Cancelado'  # final
         self.state_current: str = self.state_ok  # actual
         # CUIADO REVISAR ESTO Y UNIFICADO TODOS LOS NOMBRE DE LA DB
-        self.db: str = self.database
         self.queryCompleta: str = str()  # lista de consultas que se ejecutaran al final
 
         self.setWindowTitle('Gestor de Series by Pablo')
@@ -59,7 +55,7 @@ class Series(QtWidgets.QMainWindow):
     def init_active_list(self) -> NoReturn:
 
         self.ui.gridLayoutGobal = QtWidgets.QGridLayout(self.ui.scrollAreaWidgetContents)
-        response_query = Controller.get_series_follow_active(self.db)
+        response_query = Controller.get_series_follow_active()
 
         # todo esto es para ordenar las series por fecha de proximidad de proximo capitulo
         fecha2 = funciones.calculate_day_week()
@@ -225,7 +221,7 @@ class Series(QtWidgets.QMainWindow):
         """
 
         logger.debug(self.queryCompleta)
-        Controller.execute_query_script_sqlite(self.db, self.queryCompleta)
+        Controller.execute_query_script_sqlite(self.queryCompleta)
 
         self.queryCompleta = str()  # por si vuelvo a darle al boton aplicar
         return True
@@ -336,35 +332,35 @@ class Series(QtWidgets.QMainWindow):
         Muestra todas las series activas con un boton de sumar o restar capitulos
         """
 
-        lista_activa.ListaActiva.get_data(database=self.database)
+        lista_activa.ListaActiva.get_data()
 
     def menu_list(self) -> NoReturn:
         """
         Muestra las series para hacer modificaciones en masa
         """
 
-        listar_todas.ListarTodas.get_data(database=self.database)
+        listar_todas.ListarTodas.get_data()
 
     def menu_serie_update(self) -> NoReturn:
         """
         Busca una serie especifica en la bd y te abre la ventana de modificacion de la serie
         """
 
-        buscar_series.BuscarSeries.get_data(database=self.database)
+        buscar_series.BuscarSeries.get_data()
 
     def menu_insert(self) -> NoReturn:
         """
         Abre una ventana para meter una nueva serie en la bd
         """
 
-        actualizar_insertar.ActualizarInsertar.get_data(database=self.database)
+        actualizar_insertar.ActualizarInsertar.get_data()
 
     def check_series_states(self):
         """
         Revisa los estados de las series, si empiezan temporada, acaban temporadao acaban serie
         """
 
-        estado_series.EstadoSeries.get_data(database=self.database)
+        estado_series.EstadoSeries.get_data()
 
     @staticmethod
     def menu_imdb_update() -> NoReturn:
@@ -374,17 +370,17 @@ class Series(QtWidgets.QMainWindow):
         a.update_completed()
 
     def menu_download_automatic(self) -> NoReturn:
-        preferences: Query = Controller.get_database_configuration(self.database)
+        preferences: Query = Controller.get_database_configuration()
 
         if not os.path.exists(preferences.response[0].path_download):
             dat = {'title': 'No existe el directorio',
                    'text': f'El directorio {preferences.response[0].path_download} no existe'}
             msgbox.MsgBox.get_data(datos=dat)
         else:
-            descarga_automatica.DescargaAutomatica.get_data(database=self.database)
+            descarga_automatica.DescargaAutomatica.get_data()
 
     def menu_download_automatic_complete(self) -> NoReturn:
-        preferences: Query = Controller.get_database_configuration(self.database)
+        preferences: Query = Controller.get_database_configuration()
         # ruta_desc = str(preferences.response[0].path_download)  # es unicode
 
         if not os.path.exists(preferences.response[0].path_download):
@@ -400,7 +396,7 @@ class Series(QtWidgets.QMainWindow):
             command = 'explorer "{}"'.format(DIRECTORY_WORKING.replace('/', '\\'))
             Controller.execute_command(command)
         else:
-            entorno_grafico:str = None
+            entorno_grafico: str = None
             # buscarmos que entorno grafico esta instalado con el -h
             for command in ["dolphin", "caja", "nautilus"]:
                 cmd = f"{command} -h"
@@ -417,10 +413,10 @@ class Series(QtWidgets.QMainWindow):
 
     # PREFERENCIAS
     def menu_preferences(self) -> NoReturn:
-        preferencias.Preferencias.get_data(database=self.database)
+        preferencias.Preferencias.get_data()
 
     def menu_notifications(self) -> NoReturn:
-        notificaciones.Notificaciones.get_data(database=self.database)
+        notificaciones.Notificaciones.get_data()
 
     def menu_select_log(self, num: str) -> NoReturn:
         """
@@ -429,7 +425,7 @@ class Series(QtWidgets.QMainWindow):
 
         lista_log = list()
 
-        consultas_log = Controller.get_credentials_fileconf(DATABASE_ID, self.db)
+        consultas_log = Controller.get_credentials_fileconf(DATABASE_ID)
 
         if not consultas_log.is_empty():
             if num == 'newpct1':
@@ -483,4 +479,3 @@ def main():
     myapp = Series()
     myapp.show()
     app.exec_()
-

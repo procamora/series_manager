@@ -14,7 +14,6 @@ import app.controller.Controller as Controller
 from app.models.model_query import Query
 from app.models.model_serie import Serie
 from app.utils import funciones
-from app.utils.settings import PATH_DATABASE
 from app.views.descarga_automatica_cli import DescargaAutomaticaCli
 from app.views.msgbox import MsgBox
 
@@ -46,20 +45,19 @@ class Mythread(QtCore.QThread, DescargaAutomaticaCli):
 
 
 class DescargaAutomatica(QtWidgets.QDialog):
-    def __init__(self, parent: object = None, database: str = None) -> NoReturn:
+    def __init__(self, parent: object = None) -> NoReturn:
         QtWidgets.QWidget.__init__(self, parent)
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
         self.otra = 'otra'  # campo otra del formulario
         self.estadoI = 'Ok'  # estado inicial
         self.n: int = 0
-        self.db = database
         self.setWindowTitle('Descarga automatica de newpct1')
         self.ui.progressBar.setValue(self.n)
 
         # variable de acceso compartido, no se como hacerlo de otra forma
         DescargaAutomatica.notificaciones = DescargaAutomaticaCli.show_notifications()
-        response_query: Query = Controller.get_series_follow(self.db)
+        response_query: Query = Controller.get_series_follow()
         self.series: List[Serie] = response_query.response
 
         # si le doy a ok cierro la ventana
@@ -77,9 +75,9 @@ class DescargaAutomatica(QtWidgets.QDialog):
         self.ui.progressBar.setValue(self.n)
 
     @staticmethod
-    def get_data(parent: object = None, database: str = None) -> NoReturn:
+    def get_data(parent: object = None) -> NoReturn:
         if funciones.internet_on():
-            dialog = DescargaAutomatica(parent, database)
+            dialog = DescargaAutomatica(parent)
             dialog.exec_()
         else:
             dat = {'title': 'Error de internet', 'text': 'No hay internet'}
@@ -88,7 +86,7 @@ class DescargaAutomatica(QtWidgets.QDialog):
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
-    DescargaAutomatica.get_data(database=PATH_DATABASE)
+    DescargaAutomatica.get_data()
     return app
 
 

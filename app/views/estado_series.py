@@ -12,19 +12,17 @@ from app import logger
 from app.models.model_query import Query
 from app.models.model_serie import Serie
 from app.utils.connect_sqlite import execute_script_sqlite
-from app.utils.settings import PATH_DATABASE
 from app.utils.tviso import conect_tviso
 
 
 class EstadoSeries(QtWidgets.QDialog):
-    def __init__(self, parent: object = None, database: str = None) -> NoReturn:
+    def __init__(self, parent: object = None) -> NoReturn:
         QtWidgets.QWidget.__init__(self, parent)
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
         self.state_ok = 'Ok'  # estado inicial
         self.state_cancel = 'Cancelado'  # final
         self.state_current = self.state_ok  # actual
-        self.db = database
 
         # str de consultas que se ejecutaran al final
         self.query_complete_str = str()
@@ -59,23 +57,23 @@ class EstadoSeries(QtWidgets.QDialog):
         Saca todas las series de la bd y las mete en una lista de diccionarios
         accesible en _todo el objeto
         """
-        response_query: Query = Controller.get_series_start_season(self.db)
+        response_query: Query = Controller.get_series_start_season()
         self.DatSeriesEmpiezanTemporada = response_query.response
 
-        response_query: Query = Controller.get_series_finished(self.db)
+        response_query: Query = Controller.get_series_finished()
         self.DatSerieFinalizada = response_query.response
 
-        response_query: Query = Controller.get_series_finished_season(self.db)
+        response_query: Query = Controller.get_series_finished_season()
         self.DatTemporadaAcabada = response_query.response
 
-        response_query: Query = Controller.get_series_finished2(self.db)
+        response_query: Query = Controller.get_series_finished2()
         self.DatSeriesFinalizadas = response_query.response
 
         self.ui.radioButtonFinalizada.setChecked(True)
         # lo ejecuto al principio ya que es el activado por defecto
         self.serie_finished()
 
-        response_query_credentials: Query = Controller.get_credentials(self.db)
+        response_query_credentials: Query = Controller.get_credentials()
         if not response_query_credentials.is_empty():
             user_credentials = response_query_credentials.response[0]  # primer elemento
             self.list_series_tviso = conect_tviso(user_credentials.user_tviso, user_credentials.pass_tviso)
@@ -137,7 +135,7 @@ class EstadoSeries(QtWidgets.QDialog):
         # necesito
         self.button_next(self.DatSeriesFinalizadas)
         for serie in self.DatSeriesFinalizadas:
-            Controller.update_series_finished(serie.title, self.db)
+            Controller.update_series_finished(serie.title)
 
     def series_start_season(self) -> NoReturn:
         # cuidado, si lo ejecutas la misma semana que acabas la temporada se pondra en activa,
@@ -181,14 +179,14 @@ class EstadoSeries(QtWidgets.QDialog):
             self.accept()
 
     @staticmethod
-    def get_data(parent: object = None, database: str = None) -> NoReturn:
-        dialog = EstadoSeries(parent, database)
+    def get_data(parent: object = None) -> NoReturn:
+        dialog = EstadoSeries(parent)
         dialog.exec_()
 
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
-    EstadoSeries.get_data(database=PATH_DATABASE)
+    EstadoSeries.get_data()
     return app
 
 

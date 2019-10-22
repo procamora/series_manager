@@ -13,10 +13,9 @@ import logging
 import os
 import re
 import sys
-from pathlib import Path, PurePath  # nueva forma de trabajar con rutas
-
 import time
 from dataclasses import dataclass
+from pathlib import Path  # nueva forma de trabajar con rutas
 from typing import List, NoReturn, Dict
 
 import feedparser
@@ -32,7 +31,7 @@ from app.utils import funciones
 from app.utils.connect_sqlite import execute_script_sqlite
 from app.utils.mail2 import ML2
 from app.utils.pushbullet2 import PB2
-from app.utils.settings import DIRECTORY_WORKING, PATH_DATABASE, FILE_LOG_FEED, FILE_LOG_FEED_VOSE, FILE_LOG_DOWNLOADS
+from app.utils.settings import DIRECTORY_WORKING, FILE_LOG_FEED, FILE_LOG_FEED_VOSE, FILE_LOG_DOWNLOADS
 from app.utils.telegram2 import Telegram
 from app import logger
 import app.controller.Controller as Controller
@@ -119,7 +118,7 @@ class FeedparserPropio:
 
 
 class DescargaAutomaticaCli:
-    def __init__(self, ) -> NoReturn:
+    def __init__(self) -> NoReturn:
         if funciones.internet_on():
             self._logger = logger
             self._logger.debug('Start')
@@ -128,7 +127,7 @@ class DescargaAutomaticaCli:
 
             self.listaNotificaciones = str()
             self.actualizaDia = str()
-            preferences: Query = Controller.get_database_configuration(self.db)
+            preferences: Query = Controller.get_database_configuration()
             self.preferences: Preferences = preferences.response[0]
             # urlNew = self.conf['UrlFeedNewpct']
             url_show = self.preferences.url_feed_vose
@@ -148,7 +147,7 @@ class DescargaAutomaticaCli:
             except TypeError:  # Para el fallo en fedora
                 self.feedShow = funciones.feed_parser(url_show)
 
-            response_query: Query = Controller.get_series_follow(self.db)
+            response_query: Query = Controller.get_series_follow()
             self.consultaSeries: List[Serie] = response_query.response
 
     def run(self) -> NoReturn:
@@ -156,7 +155,7 @@ class DescargaAutomaticaCli:
         serie_actual_show = str()
         # SerieActualTemp = str()
 
-        self.rutlog :Path = Path(rf'{DIRECTORY_WORKING}/log')
+        self.rutlog: Path = Path(rf'{DIRECTORY_WORKING}/log')
 
         if not self.rutlog.exists():
             Path.mkdir(self.rutlog)
@@ -187,7 +186,7 @@ class DescargaAutomaticaCli:
         if len(self.ultimaSerieNew) != 0:  # or len(self.ultimaSerieShow) != 0:
             # self._logger.info(self.actualizaDia)
             # actualiza los dias en los que sale el capitulo
-            execute_script_sqlite(self.db, self.actualizaDia)
+            execute_script_sqlite(self.db, self.actualizaDia)  # fixme meter a controlador
 
             for notification in self.notificaciones:
                 if notification.active:
@@ -219,7 +218,7 @@ class DescargaAutomaticaCli:
 
     def parser_feed(self, serie: Serie) -> str:
         """Solo funciona con series de 2 digitos por la expresion regular"""
-        #cap = str(serie.chapter)
+        # cap = str(serie.chapter)
         if serie.vose:
             last_serie = self.ultimaSerieShow
             feed = self.feedShow
@@ -230,7 +229,7 @@ class DescargaAutomaticaCli:
         if not os.path.exists(self.preferences.path_download):
             os.mkdir(self.preferences.path_download)
 
-        #if len(str(cap)) == 1:
+        # if len(str(cap)) == 1:
         #    cap = '0' + str(cap)
 
         for entrie in feed.entries:
@@ -319,7 +318,7 @@ class DescargaAutomaticaCli:
         """
         poner las api de la base de datos
         """
-        response_query: Query = Controller.get_notifications(PATH_DATABASE)
+        response_query: Query = Controller.get_notifications()
         notifications: List[Notifications] = response_query.response
         global tg3, pb3, ml3, api_ml3
         logger.info(notifications)
@@ -338,7 +337,7 @@ class DescargaAutomaticaCli:
 
 
 def main():
-    d = DescargaAutomaticaCli(database=PATH_DATABASE)
+    d = DescargaAutomaticaCli()
     d.run()
     # feedparserPropio.parse()
 

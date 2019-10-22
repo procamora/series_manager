@@ -25,7 +25,7 @@ requests.packages.urllib3.disable_warnings()
 
 class Telegram:
     def __init__(self, chat_id: str) -> NoReturn:
-        response_query: Query = Controller.get_credentials(PATH_DATABASE)
+        response_query: Query = Controller.get_credentials()
 
         if not response_query.is_empty():
             self.api = response_query.response[0].api_telegram

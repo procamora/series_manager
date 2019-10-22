@@ -30,7 +30,7 @@ def get_id_fileconf() -> str:
         return f.readline().replace('/n', '')
 
 
-response_query: Query = Controller.get_credentials_fileconf(get_id_fileconf(), PATH_DATABASE)
+response_query: Query = Controller.get_credentials_fileconf(get_id_fileconf())
 credentials = response_query.response[0]
 administrador = 33063767
 users_permitted = [33063767, 40522670]

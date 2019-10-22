@@ -10,18 +10,16 @@ from app.views.ui.listar_todas_ui import Ui_Dialog
 import app.controller.Controller as Controller
 from app.models.model_query import Query
 from app.models.model_serie import Serie
-from app.utils.settings import PATH_DATABASE
 
 
 class ListarTodas(QtWidgets.QDialog):
-    def __init__(self, parent: object = None, database: str = None) -> NoReturn:
+    def __init__(self, parent: object = None) -> NoReturn:
         QtWidgets.QWidget.__init__(self, parent)
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
         self.state_ok = 'Ok'  # estado inicial
         self.state_cancel = 'Cancelado'  # final
         self.state_current = self.state_ok  # actual
-        self.db = database
 
         # lista de consultas que se ejecutaran al final
         self.queryCompleta: str = str()
@@ -49,7 +47,7 @@ class ListarTodas(QtWidgets.QDialog):
         """
         Saca todas las series de la bd y las mete en una lista de diccionarios accesible en todo el objeto
         """
-        response_query: Query = Controller.get_series_all(self.db, 'ORDER BY Nombre')
+        response_query: Query = Controller.get_series_all('ORDER BY Nombre')
         self.series = response_query.response
 
         self.ui.radioButtonAct.setChecked(True)
@@ -117,7 +115,7 @@ class ListarTodas(QtWidgets.QDialog):
         """
         Ejecuta todas las consultas que hay en la lista
         """
-        Controller.execute_query_script_sqlite(self.db, self.queryCompleta)
+        Controller.execute_query_script_sqlite(self.queryCompleta)
         self.queryCompleta = str()
         return True
 
@@ -134,14 +132,14 @@ class ListarTodas(QtWidgets.QDialog):
             self.accept()
 
     @staticmethod
-    def get_data(parent: object = None, database: str = None) -> NoReturn:
-        dialog = ListarTodas(parent, database)
+    def get_data(parent: object = None) -> NoReturn:
+        dialog = ListarTodas(parent)
         dialog.exec_()
 
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
-    ListarTodas.get_data(database=PATH_DATABASE)
+    ListarTodas.get_data()
     return app
 
 

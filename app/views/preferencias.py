@@ -12,11 +12,11 @@ from app import logger
 from app.models.model_preferences import Preferences
 from app.models.model_query import Query
 from app.utils import funciones
-from app.utils.settings import DIRECTORY_LOCAL, PATH_DATABASE
+from app.utils.settings import DIRECTORY_LOCAL
 
 
 class Preferencias(QtWidgets.QDialog):
-    def __init__(self, parent: object = None, database: str = None) -> NoReturn:
+    def __init__(self, parent: object = None) -> NoReturn:
         QtWidgets.QWidget.__init__(self, parent)
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
@@ -24,8 +24,6 @@ class Preferencias(QtWidgets.QDialog):
         self.state_ok = 'Ok'  # estado inicial
         self.state_cancel = 'Cancelado'  # final
         self.state_current = self.state_ok  # actual
-        self.db = database
-        self.ruta = DIRECTORY_LOCAL
 
         self.setWindowTitle('Preferencias de configuracion')
         self.ui.tabWidget.setCurrentIndex(0)
@@ -39,7 +37,7 @@ class Preferencias(QtWidgets.QDialog):
         all_items = [self.ui.BoxId.itemText(i) for i in range(self.ui.BoxId.count())]
         logger.info(all_items)
 
-        with open(rf'{self.ruta}/id.conf', 'r') as f:
+        with open(rf'{DIRECTORY_LOCAL}/id.conf', 'r') as f:
             id_fich = f.readline().replace('/n', '')
 
         try:
@@ -84,7 +82,7 @@ class Preferencias(QtWidgets.QDialog):
         """
 
         """
-        response_query: Query = Controller.get_preferences(self.db)
+        response_query: Query = Controller.get_preferences()
         self.configuraciones = response_query.response
         # self.configuraciones = conection_sqlite(self.db, query, True)
         if not response_query.is_empty():
@@ -129,12 +127,12 @@ class Preferencias(QtWidgets.QDialog):
 
         if preferences.id == self.other:
             logger.info('insert')
-            Controller.insert_preferences(preferences, self.db)
+            Controller.insert_preferences(preferences)
             self.initials_operations()
         else:
-            Controller.update_preferences(preferences, self.db)
+            Controller.update_preferences(preferences)
 
-        with open(rf'{self.ruta}/id.conf', 'w') as f:
+        with open(rf'{DIRECTORY_LOCAL}/id.conf', 'w') as f:
             f.write(str(preferences.id))
 
         return True
@@ -164,14 +162,14 @@ class Preferencias(QtWidgets.QDialog):
             self.accept()
 
     @staticmethod
-    def get_data(parent: object = None, database: str = None) -> NoReturn:
-        dialog = Preferencias(parent, database)
+    def get_data(parent: object = None) -> NoReturn:
+        dialog = Preferencias(parent)
         dialog.exec_()
 
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
-    Preferencias.get_data(database=PATH_DATABASE)
+    Preferencias.get_data()
     return app
 
 

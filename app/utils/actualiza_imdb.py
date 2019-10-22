@@ -27,7 +27,7 @@ class UpdateImdb:
     def __init__(self):
         self.imdb = Imdb()
         self.database = PATH_DATABASE
-        self.preferences = Controller.get_database_configuration(self.database)
+        self.preferences = Controller.get_database_configuration()
         # self.imdb = Imdb(cache=True, cache_dir='/tmp/imdbpie-cache-here', anonymize=False)
 
     @staticmethod
@@ -75,7 +75,7 @@ class UpdateImdb:
 
     def update_season(self):  # tarda mucho
         # para actualizar_insertar series con mod parcial
-        response_query: Query = Controller.get_series_following_imdb(self.database)
+        response_query: Query = Controller.get_series_following_imdb()
 
         for serie in response_query.response:
             logger.info(serie.title)
@@ -83,25 +83,25 @@ class UpdateImdb:
 
             if not self.check_data_partial(data_imdb, serie):
                 logger.info(data_imdb)
-                Controller.update_serie_partial_imdb(self.database, data_imdb)
+                Controller.update_serie_partial_imdb(data_imdb)
 
     def update_completed(self):
         """
         busca las series que tienen vacios los cambios de imdb y los actualiza por primera vez
         """
-        response_query: Query = Controller.get_series_completed_imdb(self.database)
+        response_query: Query = Controller.get_series_completed_imdb()
         logger.info(response_query.response)
 
         for serie in response_query.response:
             data_imdb: SerieImdb = self.get_serie_imdb(serie.imdb_id)
             if not self.check_data(data_imdb, serie):
                 # logger.info('completo')
-                Controller.update_serie_imdb(self.database, data_imdb)
+                Controller.update_serie_imdb(data_imdb)
 
     def update_series(self, imdb_id: str):
         logger.info(imdb_id)
         data_imdb: SerieImdb = self.get_serie_imdb(imdb_id)
-        Controller.update_serie_imdb(self.database, data_imdb)
+        Controller.update_serie_imdb(data_imdb)
 
     def check_title(self, imdb_id):
         """
@@ -120,7 +120,7 @@ class UpdateImdb:
         busca las series finalizadas que tienen el imdb_seguir a si y lo actualiza a no para
         hacer mas rapidas las futuras actualizaciones
         """
-        Controller.update_series_finished_imdb(self.database)
+        Controller.update_series_finished_imdb()
 
 
 def main():
