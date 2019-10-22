@@ -1,0 +1,51 @@
+BEGIN TRANSACTION;
+CREATE TABLE IF NOT EXISTS "Configuraciones" (
+	"id"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+	"UrlFeedNewpct"	TEXT,
+	"UrlFeedShowrss"	TEXT,
+	"RutaDescargas"	TEXT
+);
+CREATE TABLE IF NOT EXISTS "Series" (
+	"ID"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
+	"Nombre"	TEXT NOT NULL UNIQUE,
+	"Temporada"	INTEGER DEFAULT 1,
+	"Capitulo"	INTEGER DEFAULT 1,
+	"Siguiendo"	TEXT DEFAULT 'Si',
+	"VOSE"	TEXT DEFAULT 'No',
+	"Acabada"	TEXT DEFAULT 'No',
+	"Dia"	TEXT DEFAULT 'None',
+	"Estado"	TEXT DEFAULT 'Activa',
+	"imdb_id"	TEXT UNIQUE,
+	"imdb_Temporada"	TEXT,
+	"imdb_Capitulos"	TEXT,
+	"imdb_Finaliza"	TEXT,
+	"imdb_seguir"	INTEGER DEFAULT 'Si',
+	"Capitulo_Descargado"	INTEGER
+);
+CREATE TABLE IF NOT EXISTS "Notificaciones" (
+	"ID"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
+	"Nombre"	TEXT UNIQUE,
+	"API"	TEXT,
+	"Activo"	INTEGER DEFAULT 0
+);
+CREATE TABLE IF NOT EXISTS "Id_Url" (
+	"Id"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
+	"Url"	TEXT UNIQUE,
+	"Descripcion"	TEXT
+);
+CREATE TABLE IF NOT EXISTS "ID_Estados" (
+	"ID"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
+	"Estados"	TEXT UNIQUE
+);
+CREATE TABLE IF NOT EXISTS "Genero" (
+	"id"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+	"genero"	INTEGER,
+	FOREIGN KEY("id") REFERENCES "ID_Estados"("ID")
+);
+CREATE TABLE IF NOT EXISTS "Credenciales" (
+	"pass_transmission"	TEXT,
+	"user_tviso"	TEXT,
+	"pass_tviso"	TEXT,
+	"api_telegram"	TEXT
+);
+COMMIT;
