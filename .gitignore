@@ -1,11 +1,8 @@
 #PROPIOS
-*.pyc
 build/
 dist/
 app/SQL/*.sql
 Pruebas.py
-sync.conf
-id.conf
 ui/*.py*
 geany_run_script.bat
 

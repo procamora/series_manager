@@ -155,7 +155,7 @@ class ActualizarInsertar(QtWidgets.QDialog):
         self.list_seasons(self.serie.season, self.serie.season + 2)
         self.list_chapters(self.serie.chapter, self.serie.chapter + 8)
 
-        if self.serie.following == 'Si':
+        if self.serie.following:
             self.ui.radioSeguirSi.click()
         else:
             self.ui.radioSeguirNo.click()
@@ -167,12 +167,12 @@ class ActualizarInsertar(QtWidgets.QDialog):
             print(self.serie.day)
             self.ui.BoxEmision.setCurrentIndex(all_items.index(self.serie.day))
 
-        if self.serie.vose == 'Si':
+        if self.serie.vose:
             self.ui.radioVOSE_Si.click()
         else:
             self.ui.radioVOSE_No.click()
 
-        if self.serie.finished == 'Si':
+        if self.serie.finished:
             self.ui.radioAcabadaSi.click()
         else:
             self.ui.radioAcabadaNo.click()
@@ -194,32 +194,21 @@ class ActualizarInsertar(QtWidgets.QDialog):
 
         serie: Serie = Serie()
         serie.title = str(self.ui.lineTitulo.text()).lstrip().rstrip()
-        serie.season = str(self.ui.lineTemp.text())
-        serie.chapter = str(self.ui.lineCapitulo.text())
+        serie.season = int(self.ui.lineTemp.text())
+        serie.chapter = int(self.ui.lineCapitulo.text())
         serie.day = str(self.ui.BoxEmision.currentText())
         serie.state = str(self.ui.BoxEstado.currentText())
 
-        if self.ui.radioVOSE_Si.isChecked():
-            serie.vose = 'Si'
-        else:
-            serie.vose = 'No'
-
-        if self.ui.radioAcabadaSi.isChecked():
-            serie.finished = 'Si'
-        else:
-            serie.finished = 'No'
-
-        if self.ui.radioImdbSi.isChecked():
-            serie.imdb_following = 'Si'
-        else:
-            serie.imdb_following = 'No'
+        serie.vose = bool(self.ui.radioVOSE_Si.isChecked())
+        serie.finished = bool(self.ui.radioAcabadaSi.isChecked())
+        serie.imdb_following = bool(self.ui.radioImdbSi.isChecked())
 
         if len(self.ui.lineImdb.text()) == 0:  # añadido de insertar
             serie.imdb_id = 'NULL'
         else:
             # Ponemos las comillas del string usado por la query, ya que si es NULL buscamos que este sin comillas
             # para que no se añada a la BD
-            serie.imdb_id = f'"{self.ui.lineImdb.text()}"'
+            serie.imdb_id = self.ui.lineImdb.text()
 
         if self.ui.radioSeguirSi.isChecked():
             update_imdb: bool = True

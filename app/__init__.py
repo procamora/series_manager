@@ -16,7 +16,7 @@ absolut_path = PurePath(__file__)  # Ruta absoluta de este fichero
 __all__ = [PurePath(str(f)).stem for f in Path(absolut_path.parent).glob("*.py")]
 
 
-def get_logger(verbose, name='Series'):
+def get_logger(verbose: bool, name: str = 'Series') -> logging:
     # Desabilita log de modulos
     # for _ in ("boto", "elasticsearch", "urllib3"):
     #    logging.getLogger(_).setLevel(logging.CRITICAL)

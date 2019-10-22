@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import configparser
-import os
 import sys
+from pathlib import Path, PurePosixPath  # nueva forma de trabajar con rutas
 from typing import NoReturn
 
 from PyQt5 import QtWidgets
@@ -10,7 +10,6 @@ from app.views.ui.asistente_inicial_ui import Ui_Dialog
 
 from app import logger
 from app.utils.settings import PATH_FILE_CONFIG, DIRECTORY_WORKING
-from pathlib import Path  # nueva forma de trabajar con rutas
 
 
 class AsistenteInicial(QtWidgets.QDialog):
@@ -72,12 +71,13 @@ class AsistenteInicial(QtWidgets.QDialog):
         """
 
         # filenames = QtGui.QFileDialog.getOpenFileName()
-        filenames = QtWidgets.QFileDialog.getExistingDirectory(self, "Open Directory", str(self.ui.lineRuta.text()),
-                                                               QtWidgets.QFileDialog.ShowDirsOnly |
-                                                               QtWidgets.QFileDialog.DontResolveSymlinks)
+        filenames: Path = Path(
+            QtWidgets.QFileDialog.getExistingDirectory(self, "Open Directory", str(self.ui.lineRuta.text()),
+                                                       QtWidgets.QFileDialog.ShowDirsOnly |
+                                                       QtWidgets.QFileDialog.DontResolveSymlinks))
 
         self.ui.lineRuta.setText(filenames)
-        if os.path.exists(filenames):
+        if filenames.exists():
             self.ui.checkBoxValido.setChecked(True)
             self.show_message(self.ui.checkBoxValido, 'Valido', True)
         else:
@@ -101,8 +101,8 @@ class AsistenteInicial(QtWidgets.QDialog):
             print(self.ui.checkBoxSync.isChecked())
             self.config["CONFIGURABLE"]['WORKDIR_DEFAULT'] = str(not self.ui.checkBoxSync.isChecked())
             if self.ui.checkBoxSync.isChecked():
-                self.config["CONFIGURABLE"]['WORKDIR'] = self.change_bars(self.ui.lineRuta.text())
-            with open(PATH_FILE_CONFIG, 'w') as configfile:
+                self.config["CONFIGURABLE"]['WORKDIR'] = PurePosixPath(self.ui.lineRuta.text())
+            with open(str(PATH_FILE_CONFIG), 'w') as configfile:
                 print("escribi datos")
                 self.config.write(configfile)
 
@@ -116,7 +116,6 @@ class AsistenteInicial(QtWidgets.QDialog):
         """
         Boton Aceptar, primero aplicas los datos, si retorna True, cierra la ventana
         """
-
         if self.apply_data():
             self.accept()
 
@@ -126,7 +125,6 @@ class AsistenteInicial(QtWidgets.QDialog):
         Muestra una determinada label con rojo o verde (depende del estado) y
         con el texto indicado
         """
-
         label.setText(texto)
         if estado:
             label.setStyleSheet('color: green')
@@ -134,21 +132,11 @@ class AsistenteInicial(QtWidgets.QDialog):
             label.setStyleSheet('color: red')
 
     @staticmethod
-    def change_bars(texto: str) -> str:
-        """
-        Funcion para sustituir las barra de windows por las de linux, esta implementada
-        en funciones.py, pero este fichero no puede importar nada de otros, ya que
-        es el primero en ejecutarse la primera vez
-        """
-        return texto.replace('\\', '/')
-
-    @staticmethod
     def check_integrity_sqlite(id_sqlite: str) -> bool:
         """
         Metodo para checkear que es correcto el fichero que contiene el id de la configuracion de la base de datos
         :return boolean: indicando si el valor es un integer o no 
         """
-
         try:
             int(id_sqlite)  # si falla la conversion no es un integer
             return True
@@ -160,10 +148,8 @@ class AsistenteInicial(QtWidgets.QDialog):
         """
         Metodo para checkear que es correcto el fichero que contiene el la ruta del directorio de rtrabajo con la base 
         de datos
-
         :return boolean: indicando si es correcto o no
         """
-
         try:
             int(id_gdrive)  # si falla la conversion no es un integer
             return True
@@ -175,11 +161,9 @@ class AsistenteInicial(QtWidgets.QDialog):
         """
         Comprobamos que existen los ficheros de cofiguracion necesarios y son correctos, en caso contrario llamamos a 
         asistente_inicial y terminamos
-
         tendra que ejecutarlo al inicio Series.py
         :return: 
         """
-
         # Si no existe uno de los ficheros necesarios asistente inicial
         logger.debug(f'Analized exists: {PATH_FILE_CONFIG}')
         if not PATH_FILE_CONFIG.exists():

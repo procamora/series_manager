@@ -5,6 +5,7 @@ import logging
 import os
 import platform
 from pathlib import Path, PurePath  # nueva forma de trabajar con rutas
+from typing import NoReturn
 
 import colorlog  # https://medium.com/@galea/python-logging-example-with-color-formatting-file-handlers-6ee21d363184
 
@@ -30,7 +31,7 @@ WORKDIR = /tmp/
 FILE_CONFIG = 'settings.ini'
 
 
-def get_logger(verbose, name='Series'):
+def get_logger(verbose: bool, name: str = 'Series') -> logging:
     log_format = '%(levelname)s - %(module)s - %(message)s'
 
     bold_seq = '\033[1m'
@@ -54,13 +55,25 @@ def get_logger(verbose, name='Series'):
     return log
 
 
+def write_config(new_config: configparser.ConfigParser) -> NoReturn:
+    """
+    Metodo para escribir en el fichero de configuracion una nueva configuracion
+    :param new_config:
+    :return:
+    """
+    with open(FILE_CONFIG, 'w') as configfile:
+        print("escribo en settings")
+        new_config.write(configfile)
+
+
 MODE_DEBUG: bool = True
 logger = get_logger(MODE_DEBUG, 'series')
 
 absolut_path = PurePath(os.path.realpath(__file__))  # Ruta absoluta del fichero
 # print(absolut_path.parent)# ruta adsoluta del directorio donde esta el fichero
 # retroceder 2 niveles para la raiz del proyecto
-PATH_FILE_CONFIG: Path = Path('{}/../../{}'.format(absolut_path.parent, FILE_CONFIG))
+# PATH_FILE_CONFIG: Path = Path(f'{absolut_path.parent}/../../{FILE_CONFIG}')
+PATH_FILE_CONFIG: Path = Path(absolut_path.parent, "../../", FILE_CONFIG)
 print(PATH_FILE_CONFIG)
 
 config = configparser.ConfigParser()
@@ -69,9 +82,7 @@ if Path(PATH_FILE_CONFIG).exists():
     config.read(PATH_FILE_CONFIG)
 else:
     config.read_string(sample_config)
-    with open(FILE_CONFIG, 'w') as configfile:
-        print("escribo en settings")
-        config.write(configfile)
+    write_config(config)
 
 basics = config["BASICS"]
 configurable = config["CONFIGURABLE"]
@@ -82,12 +93,14 @@ SYSTEM: str = platform.system()
 
 # Inicializacion
 DIRECTORY_WORKING: Path
-DIRECTORY_LOCAL: Path = Path(str(absolut_path.parent) + '/../')
+DIRECTORY_LOCAL: Path = Path(absolut_path.parent, '../')
+print(absolut_path.parent)
+print(DIRECTORY_LOCAL)
 
 # directorio personalizado
 if not configurable.getboolean('WORKDIR_DEFAULT'):
     dir_drive = configurable.get('WORKDIR')  # lineas_fich[1].replace('\n', '')
-    DIRECTORY_WORKING = Path(f'{dir_drive}/{basics.get("NAME_WORKDIR")}')
+    DIRECTORY_WORKING = Path(dir_drive, basics.get("NAME_WORKDIR"))
     if SYSTEM == "Windows":
         # tengo que eliminar /modulos para que coga ../ y no este directorio
         # para cuando lo ejecuto con el exe
@@ -99,22 +112,35 @@ if not configurable.getboolean('WORKDIR_DEFAULT'):
 # directorio por defecto
 else:
     if SYSTEM == "Windows":
-        DIRECTORY_WORKING = Path(f'{os.environ["LOCALAPPDATA"]}/{basics.get("NAME_WORKDIR")}')
+        DIRECTORY_WORKING = Path(os.environ["LOCALAPPDATA"], basics.get("NAME_WORKDIR"))
         # para cuando lo ejecuto con el exe
         # if DIRECTORY_LOCAL.split('/')[-1] == 'library.zip':
         if str(DIRECTORY_LOCAL.name) == 'library.zip':  # fixme funciona bien??
             DIRECTORY_LOCAL += '/.2.'
     else:
-        DIRECTORY_WORKING = Path(f'{os.environ["HOME"]}/.{basics.get("NAME_WORKDIR")}')
+        DIRECTORY_WORKING = Path(os.environ["HOME"], basics.get("NAME_WORKDIR"))
 
+# BASE DE DATOS
 DATABASE_ID: int = configurable.getint("DATABASE_ID")
+PATH_DATABASE: Path = Path(DIRECTORY_WORKING, basics["NAME_DATABASE"])
 
-PATH_DATABASE: Path = Path(f'{DIRECTORY_WORKING}/{basics["NAME_DATABASE"]}')
-
-FILE_LOG_DOWNLOADS: str = basics['FILE_LOG_DOWNLOADS']
-FILE_LOG_FEED: str = basics['FILE_LOG_FEED']
-FILE_LOG_FEED_VOSE: str = basics['FILE_LOG_FEED_VOSE']
+# DEFINICION DE DIRECTORIO DE LOGS con sus ficheros
+directory_logs: Path = Path(DIRECTORY_WORKING, 'log')
+FILE_LOG_DOWNLOADS: Path = Path(directory_logs, basics['FILE_LOG_DOWNLOADS'])
+FILE_LOG_FEED: Path = Path(directory_logs, basics['FILE_LOG_FEED'])
+FILE_LOG_FEED_VOSE: Path = Path(directory_logs, basics['FILE_LOG_FEED_VOSE'])
+if not directory_logs.exists():  # Si no existe directorio se crea junto con los ficheros
+    Path.mkdir(directory_logs)
+    FILE_LOG_DOWNLOADS.write_text("")
+    FILE_LOG_FEED.write_text("")
+    FILE_LOG_FEED_VOSE.write_text("")
 
 logger.debug(f'DIRECTORY_LOCAL: {DIRECTORY_LOCAL}')
 logger.debug(f'DIRECTORY_WORKING: {DIRECTORY_WORKING}')
 logger.debug(f'PATH_DATABASE: {PATH_DATABASE}')
+
+logger.debug(f'FILE_LOG_DOWNLOADS: {FILE_LOG_DOWNLOADS}')
+logger.debug(f'FILE_LOG_FEED: {FILE_LOG_FEED}')
+logger.debug(f'FILE_LOG_FEED_VOSE: {FILE_LOG_FEED_VOSE}')
+
+logger.debug(f'DATABASE_ID: {DATABASE_ID}')

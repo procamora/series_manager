@@ -10,7 +10,6 @@ ultimos capitulos
 from __future__ import annotations
 
 import logging
-import os
 import re
 import sys
 import time
@@ -28,10 +27,9 @@ if new_path not in sys.path:
     sys.path.append(new_path)
 
 from app.utils import funciones
-from app.utils.connect_sqlite import execute_script_sqlite
 from app.utils.mail2 import ML2
 from app.utils.pushbullet2 import PB2
-from app.utils.settings import DIRECTORY_WORKING, FILE_LOG_FEED, FILE_LOG_FEED_VOSE, FILE_LOG_DOWNLOADS
+from app.utils.settings import FILE_LOG_FEED, FILE_LOG_FEED_VOSE, FILE_LOG_DOWNLOADS
 from app.utils.telegram2 import Telegram
 from app import logger
 import app.controller.Controller as Controller
@@ -135,7 +133,6 @@ class DescargaAutomaticaCli:
             # Diccionario con las series y capitulos para actualizar la bd el capitulo descargado
             self.capDescargado: Dict[str, str] = dict()
             self.consultaUpdate: str = str()
-            self.rutlog: str = str()
             self.ultimaSerieNew: str = str()
             self.ultimaSerieShow: str = str()
             self.titleSerie: str = str()
@@ -151,26 +148,19 @@ class DescargaAutomaticaCli:
             self.consultaSeries: List[Serie] = response_query.response
 
     def run(self) -> NoReturn:
-        serie_actual_new = str()
-        serie_actual_show = str()
+        serie_actual_new: str = str()
+        serie_actual_show: str = str()
         # SerieActualTemp = str()
 
-        self.rutlog: Path = Path(rf'{DIRECTORY_WORKING}/log')
+        self.ultimaSerieNew = FILE_LOG_FEED.read_text()  # FIXME REVISAR
+        logging.critical(FILE_LOG_FEED)
+        logging.critical(self.ultimaSerieNew)
+        # with open(f'{self.directory_logs}/{FILE_LOG_FEED}', 'r') as f:
+        #    self.ultimaSerieNew = f.readline()
 
-        if not self.rutlog.exists():
-            Path.mkdir(self.rutlog)
-
-        if not os.path.exists(f'{self.rutlog}/{FILE_LOG_FEED}'):
-            funciones.create_file(f'{self.rutlog}/{FILE_LOG_FEED}')
-
-        if not os.path.exists(f'{self.rutlog}/{FILE_LOG_FEED_VOSE}'):
-            funciones.create_file(f'{self.rutlog}/{FILE_LOG_FEED_VOSE}')
-
-        with open(f'{self.rutlog}/{FILE_LOG_FEED}', 'r') as f:
-            self.ultimaSerieNew = f.readline()
-
-        with open(f'{self.rutlog}/{FILE_LOG_FEED_VOSE}', 'r') as f:
-            self.ultimaSerieShow = f.readline()
+        self.ultimaSerieShow = FILE_LOG_FEED_VOSE.read_text()  # FIXME REVISAR
+        # with open(f'{self.directory_logs}/{FILE_LOG_FEED_VOSE}', 'r') as f:
+        #    self.ultimaSerieShow = f.readline()
 
         for serie in self.consultaSeries:
             try:
@@ -186,7 +176,7 @@ class DescargaAutomaticaCli:
         if len(self.ultimaSerieNew) != 0:  # or len(self.ultimaSerieShow) != 0:
             # self._logger.info(self.actualizaDia)
             # actualiza los dias en los que sale el capitulo
-            execute_script_sqlite(self.db, self.actualizaDia)  # fixme meter a controlador
+            Controller.execute_query_script_sqlite(self.actualizaDia)  # fixme meter a controlador
 
             for notification in self.notificaciones:
                 if notification.active:
@@ -205,14 +195,16 @@ class DescargaAutomaticaCli:
         self._logger.info(self.consultaUpdate)
 
         # actualiza el ultimo capitulo que he descargado
-        execute_script_sqlite(self.db, self.consultaUpdate)
+        Controller.execute_query_script_sqlite(self.consultaUpdate)
 
         # Guardar ultima serie del feed
         if serie_actual_show is not None and serie_actual_new is not None:
-            with open(f'{self.rutlog}/{FILE_LOG_FEED}', 'w') as f:
-                f.write(funciones.remove_tildes(serie_actual_new))
-            with open(f'{self.rutlog}/{FILE_LOG_FEED_VOSE}', 'w') as f:
-                f.write(funciones.remove_tildes(serie_actual_show))
+            FILE_LOG_FEED.write_text(funciones.remove_tildes(serie_actual_new))  # FIXME REVISAR
+            FILE_LOG_FEED_VOSE.write_text(funciones.remove_tildes(serie_actual_show))
+            # with open(f'{self.directory_logs}/{FILE_LOG_FEED}', 'w') as f:
+            #    f.write(funciones.remove_tildes(serie_actual_new))
+            # with open(f'{self.directory_logs}/{FILE_LOG_FEED_VOSE}', 'w') as f:
+            #    f.write(funciones.remove_tildes(serie_actual_show))
         else:
             self._logger.error('PROBLEMA CON if SerieActualShow is not None and SerieActualNew is not None:')
 
@@ -226,8 +218,8 @@ class DescargaAutomaticaCli:
             last_serie = self.ultimaSerieNew
             feed = self.feedNew
 
-        if not os.path.exists(self.preferences.path_download):
-            os.mkdir(self.preferences.path_download)
+        if not self.preferences.path_download.exists():
+            Path.mkdir(self.preferences.path_download)
 
         # if len(str(cap)) == 1:
         #    cap = '0' + str(cap)
@@ -273,9 +265,12 @@ class DescargaAutomaticaCli:
                     title_serie = title_serie.replace(u"\uFFFD", "?")
 
                 # fixme revisar si funciona antes habia u'...'
-                if not os.path.exists(f'{self.preferences.path_download}{title_serie}.torrent'):
-                    with open(f'{self.rutlog}/{FILE_LOG_DOWNLOADS}', 'a') as f:
-                        f.write(f'{time.strftime("%Y%m%d")} {title_serie}\n')
+                # FIXME REVISAR PATH
+                file_torrent: Path = Path(self.preferences.path_download, title_serie, '.torrent')
+                if not file_torrent.exists():
+                    FILE_LOG_DOWNLOADS.write_text(f'{time.strftime("%Y%m%d")} {title_serie}\n')
+                    # with open(f'{self.directory_logs}/{FILE_LOG_DOWNLOADS}', 'a') as f:
+                    #    f.write(f'{time.strftime("%Y%m%d")} {title_serie}\n')
 
                     if serie.vose:
                         self.extra_action(title_serie)
@@ -318,6 +313,7 @@ class DescargaAutomaticaCli:
         """
         poner las api de la base de datos
         """
+        # TODO CREAR CLASE QUE TENGA LA LISTA Y LAS CLASES PARA NO TENER VARIABELS GLOBALES
         response_query: Query = Controller.get_notifications()
         notifications: List[Notifications] = response_query.response
         global tg3, pb3, ml3, api_ml3

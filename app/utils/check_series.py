@@ -3,16 +3,18 @@
 
 import os
 import sys
+from pathlib import PurePath  # nueva forma de trabajar con rutas
 from typing import List, Dict
 
 # Confirmamos que tenemos en el path la ruta de la aplicacion, para poder lanzarlo desde cualquier ruta
-new_path = '{}/../../'.format(os.path.dirname(os.path.realpath(__file__)))
+absolut_path: PurePath = PurePath(os.path.realpath(__file__))  # Ruta absoluta del fichero
+new_path: str = f'{absolut_path.parent}/../../'
 if new_path not in sys.path:
     sys.path.append(new_path)
 
 from app import logger
 from app.utils.settings import PATH_DATABASE
-from app.utils.connect_sqlite import conection_sqlite, execute_script_sqlite
+import app.controller.Controller as Controller
 
 
 def finished(write: bool = False) -> str:
@@ -49,7 +51,7 @@ def make_update(query: List[Dict], update: str, write: bool = False) -> str:
 
     if write and len(query_update_str) != 0:
         logger.info('ejecutar script')
-        execute_script_sqlite(PATH_DATABASE, query_update_str)
+        Controller.execute_query_script_sqlite(query_update_str)
 
     return query_update_str
 

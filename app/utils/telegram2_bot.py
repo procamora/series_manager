@@ -9,28 +9,24 @@ import os
 import re
 import sys
 import tempfile
+from pathlib import PurePath  # nueva forma de trabajar con rutas
 from typing import NoReturn, Union
 
 import requests
 from telebot import TeleBot, types  # Importamos la librería Y los tipos especiales de esta
 
 # Confirmamos que tenemos en el path la ruta de la aplicacion, para poder lanzarlo desde cualquier ruta
-new_path = '{}/../../'.format(os.path.dirname(os.path.realpath(__file__)))
+absolut_path: PurePath = PurePath(os.path.realpath(__file__))  # Ruta absoluta del fichero
+new_path: str = f'{absolut_path.parent}/../../'
 if new_path not in sys.path:
     sys.path.append(new_path)
 from app import logger
-from app.utils.settings import MODE_DEBUG, PATH_DATABASE, DIRECTORY_LOCAL, DIRECTORY_WORKING
+from app.utils.settings import MODE_DEBUG, DIRECTORY_WORKING
 import app.utils.funciones as funciones
 import app.controller.Controller as Controller
 from app.models.model_query import Query
 
-
-def get_id_fileconf() -> str:
-    with open(rf'{DIRECTORY_LOCAL}/id.conf', 'r') as f:
-        return f.readline().replace('/n', '')
-
-
-response_query: Query = Controller.get_credentials_fileconf(get_id_fileconf())
+response_query: Query = Controller.get_credentials_fileconf()
 credentials = response_query.response[0]
 administrador = 33063767
 users_permitted = [33063767, 40522670]

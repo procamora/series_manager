@@ -11,7 +11,6 @@ import app.controller.Controller as Controller
 from app import logger
 from app.models.model_query import Query
 from app.models.model_serie import Serie
-from app.utils.connect_sqlite import execute_script_sqlite
 from app.utils.tviso import conect_tviso
 
 
@@ -107,7 +106,7 @@ class EstadoSeries(QtWidgets.QDialog):
         Ejecuta todas las consultas que hay en la lista
         """
         logger.debug(self.query_complete_str)
-        execute_script_sqlite(self.db, self.query_complete_str)
+        Controller.execute_query_script_sqlite(self.query_complete_str)
         self.query_complete_str = str()
         return True
 

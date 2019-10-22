@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 import datetime
 import glob
-import os
 import re
 import time
 from pathlib import Path  # nueva forma de trabajar con rutas
@@ -15,8 +14,8 @@ import urllib3
 from bs4 import BeautifulSoup
 
 from app import logger
-from app.utils.connect_sqlite import execute_script_sqlite, dump_database
 from app.utils.settings import DIRECTORY_WORKING, DIRECTORY_LOCAL, PATH_DATABASE
+import app.controller.Controller as Controller
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -41,15 +40,6 @@ def create_directory_work() -> NoReturn:
         # if not os.path.exists(SYNC_SQLITE) or os.stat(SYNC_SQLITE).st_size == 0:
         #    logger.info(2)
         #    template_file_conf()
-
-
-def create_file(fichero) -> NoReturn:
-    with open(fichero, 'w') as f:
-        f.write("")
-
-
-def change_bars(texto) -> str:
-    return texto.replace('\\', '/')
 
 
 '''
@@ -87,9 +77,9 @@ def template_database() -> NoReturn:
 
     if not PATH_DATABASE.exists() or not Path.stat(PATH_DATABASE).st_size > 50000:  # estructura pesa 72Kb
         logger.debug("creando db")
-        with open(change_bars(ficheros_sql[-1]), 'r') as f:
+        with open(Path(ficheros_sql[-1]), 'r') as f:
             plantilla = f.read()
-        execute_script_sqlite(PATH_DATABASE, plantilla)
+        Controller.execute_query_script_sqlite(plantilla)
 
 
 def create_full_backup_db() -> NoReturn:
@@ -97,7 +87,7 @@ def create_full_backup_db() -> NoReturn:
     Funcion encargada de generar backup de la base de datos y guardarlo 
     """
 
-    data = dump_database(PATH_DATABASE)
+    data = Controller.execute_dump()
     if data is None:
         logger.error(f'database {PATH_DATABASE} not exists')
         return

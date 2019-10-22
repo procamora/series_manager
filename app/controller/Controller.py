@@ -13,7 +13,7 @@ from app.models.model_query import Query
 from app.models.model_serie import Serie
 from app.models.model_serie_imdb import SerieImdb
 from app.models.model_states import States
-from app.utils.connect_sqlite import conection_sqlite, execute_script_sqlite
+from app.utils.connect_sqlite import conection_sqlite, execute_script_sqlite, dump_database
 from app.utils.settings import DATABASE_ID, PATH_DATABASE
 
 
@@ -41,6 +41,10 @@ def execute_query_select(sql_query: str, database: Path, to_class: object = None
 def execute_query(sql_query: str, database: Path) -> NoReturn:
     logger.debug(sql_query)
     conection_sqlite(database, sql_query, False)
+
+
+def execute_dump() -> Optional[str]:
+    return dump_database(PATH_DATABASE)
 
 
 def execute_query_script_sqlite(sql_query, database: Path = None) -> NoReturn:
@@ -114,8 +118,8 @@ def get_states() -> Query:
     return execute_query_select(query_str, PATH_DATABASE, States())
 
 
-def get_credentials_fileconf(id_fich: int) -> Query:
-    query_str = f'SELECT * FROM Configuraciones, Credenciales WHERE ID LIKE {id_fich} LIMIT 1'
+def get_credentials_fileconf() -> Query:
+    query_str = f'SELECT * FROM Configuraciones, Credenciales WHERE ID LIKE {DATABASE_ID} LIMIT 1'
     return execute_query_select(query_str, PATH_DATABASE)
 
 
@@ -129,8 +133,10 @@ def get_preferences() -> Query:
     return execute_query_select(query_str, PATH_DATABASE, Preferences())
 
 
-def get_preferences_id(id_db: int) -> Query:
-    query_str = f'SELECT * FROM Configuraciones WHERE id IS {id_db}'
+def get_preferences_id(id: int = None) -> Query:
+    if id is None:
+        id = DATABASE_ID
+    query_str = f'SELECT * FROM Configuraciones WHERE id IS {id}'
     return execute_query_select(query_str, PATH_DATABASE, Preferences())
 
 
@@ -235,7 +241,7 @@ def get_database_configuration() -> Query:
     :return dict: Nos devuelve un diccionario con los datos
     """
 
-    response_query: Query = get_preferences_id(DATABASE_ID)
+    response_query: Query = get_preferences_id()
     # Si falla al obtener datos para el id indicado obtenemos la primera fila
     if response_query.is_empty():
         return get_preferences_id(1)

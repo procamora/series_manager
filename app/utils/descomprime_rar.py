@@ -19,7 +19,7 @@ from app.utils.telegram2 import Telegram
 
 def search_pass(url):
     """
-    funcion para buscar la password en la url dada, parsea todo el html
+    funcion para buscar la password en la url dada, parsea todos el html
     """
     session = requests.session()
     page = session.get(url, verify=False).text

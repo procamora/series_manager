@@ -4,16 +4,17 @@
 import json
 import os
 import sys
+from pathlib import PurePath  # nueva forma de trabajar con rutas
 
 import requests
 
 # Confirmamos que tenemos en el path la ruta de la aplicacion, para poder lanzarlo desde cualquier ruta
-new_path = '{}/../../'.format(os.path.dirname(os.path.realpath(__file__)))
+absolut_path: PurePath = PurePath(os.path.realpath(__file__))  # Ruta absoluta del fichero
+new_path: str = f'{absolut_path.parent}/../../'
 if new_path not in sys.path:
     sys.path.append(new_path)
 
 from app import logger
-from app.utils.settings import PATH_DATABASE
 from app.models.model_query import Query
 import app.controller.Controller as Controller
 

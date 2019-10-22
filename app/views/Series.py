@@ -3,9 +3,9 @@
 
 # SISTEMA
 import functools
-import os
 import subprocess
 import sys
+from pathlib import Path  # nueva forma de trabajar con rutas
 from typing import List, NoReturn
 
 # TERCEROS
@@ -18,7 +18,7 @@ from app import logger
 from app.models.model_query import Query
 from app.models.model_serie import Serie
 from app.utils import funciones
-from app.utils.settings import DIRECTORY_WORKING, SYSTEM, DATABASE_ID
+from app.utils.settings import DIRECTORY_WORKING, SYSTEM
 from app.views import acerca_de
 from app.views import actualizar_insertar
 from app.views import asistente_inicial
@@ -371,8 +371,7 @@ class Series(QtWidgets.QMainWindow):
 
     def menu_download_automatic(self) -> NoReturn:
         preferences: Query = Controller.get_database_configuration()
-
-        if not os.path.exists(preferences.response[0].path_download):
+        if not preferences.response[0].path_download.exists():
             dat = {'title': 'No existe el directorio',
                    'text': f'El directorio {preferences.response[0].path_download} no existe'}
             msgbox.MsgBox.get_data(datos=dat)
@@ -383,7 +382,7 @@ class Series(QtWidgets.QMainWindow):
         preferences: Query = Controller.get_database_configuration()
         # ruta_desc = str(preferences.response[0].path_download)  # es unicode
 
-        if not os.path.exists(preferences.response[0].path_download):
+        if not preferences.response[0].path_download.exists():
             dat = {'title': 'No existe el directorio',
                    'text': f'El directorio {preferences.response[0].path_download} no existe'}
             msgbox.MsgBox.get_data(datos=dat)
@@ -424,11 +423,10 @@ class Series(QtWidgets.QMainWindow):
         """
 
         lista_log = list()
-
-        consultas_log = Controller.get_credentials_fileconf(DATABASE_ID)
+        consultas_log = Controller.get_credentials_fileconf()
 
         if not consultas_log.is_empty():
-            if num == 'newpct1':
+            if num == 'newpct1':  # FIXME PONER FICHERO CON RUTA PATH
                 lista_log.append(f'{DIRECTORY_WORKING}/log/{consultas_log.response[0]["FicheroFeedNewpct"]}')
             elif num == 'showrss':
                 lista_log.append(f'{DIRECTORY_WORKING}/log/{consultas_log.response[0]["FicheroFeedShowrss"]}')
@@ -447,9 +445,8 @@ class Series(QtWidgets.QMainWindow):
         """
         Borra los ficheros que estan la la lista (si existen)
         """
-
         for files in list_log:
-            if os.path.exists(files):
+            if Path(files).exists():
                 with open(files, 'w'):
                     pass
 

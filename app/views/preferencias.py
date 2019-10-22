@@ -1,18 +1,20 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import configparser
 import sys
+from pathlib import Path  # nueva forma de trabajar con rutas
 from typing import NoReturn, List
 
 from PyQt5 import QtWidgets
 from app.views.ui.preferencias_ui import Ui_Dialog
 
 import app.controller.Controller as Controller
+import app.utils.settings
 from app import logger
 from app.models.model_preferences import Preferences
 from app.models.model_query import Query
-from app.utils import funciones
-from app.utils.settings import DIRECTORY_LOCAL
+from app.utils.settings import PATH_FILE_CONFIG, write_config
 
 
 class Preferencias(QtWidgets.QDialog):
@@ -32,17 +34,13 @@ class Preferencias(QtWidgets.QDialog):
         self.preferences_actual: Preferences = Preferences()
         self.initials_operations()
 
-        # recogo todos los dias de la caja y le paso el indice del dia en el
-        # que sale
+        # recogo todos los dias de la caja y le paso el indice del dia en el que sale
         all_items = [self.ui.BoxId.itemText(i) for i in range(self.ui.BoxId.count())]
         logger.info(all_items)
-
-        with open(rf'{DIRECTORY_LOCAL}/id.conf', 'r') as f:
-            id_fich = f.readline().replace('/n', '')
-
         try:
-            self.ui.BoxId.setCurrentIndex(all_items.index(id_fich))
-        except ValueError:
+            self.ui.BoxId.setCurrentIndex(all_items.index(str(app.utils.settings.DATABASE_ID)))
+        except ValueError as e:
+            logger.debug(e)
             if len(all_items) == 1:  # si solo hay 1 es 'otra'
                 self.ui.BoxId.setCurrentIndex(all_items.index(self.other))
             else:
@@ -103,7 +101,6 @@ class Preferencias(QtWidgets.QDialog):
 
     def get_configuration(self) -> NoReturn:
         """
-
         """
         for i in self.configuraciones:
             if str(self.ui.BoxId.currentText()) == str(i.id):
@@ -113,17 +110,16 @@ class Preferencias(QtWidgets.QDialog):
 
     def common_processes(self) -> NoReturn:
         """
-
         """
         self.get_configuration()
         self.insert_serie()
 
     def apply_data(self) -> bool:
         preferences: Preferences = Preferences()
-        preferences.id = self.ui.BoxId.currentText()
+        preferences.id = int(self.ui.BoxId.currentText())
         preferences.url_feed = self.ui.lineNewpct.text()
         preferences.url_feed_vose = self.ui.lineShowrss.text()
-        preferences.path_download = funciones.change_bars(str(self.ui.lineRuta.text()))
+        preferences.path_download = Path(self.ui.lineRuta.text())
 
         if preferences.id == self.other:
             logger.info('insert')
@@ -132,14 +128,18 @@ class Preferencias(QtWidgets.QDialog):
         else:
             Controller.update_preferences(preferences)
 
-        with open(rf'{DIRECTORY_LOCAL}/id.conf', 'w') as f:
-            f.write(str(preferences.id))
+
+        config = configparser.ConfigParser()
+        config.read(PATH_FILE_CONFIG)
+        config['CONFIGURABLE']['DATABASE_ID'] = str(preferences.id)
+        write_config(config)
+        app.utils.settings.DATABASE_ID = preferences.id
+
 
         return True
 
     def insert_serie(self) -> NoReturn:
         """
-
         """
         self.ui.lineNewpct.setText(self.preferences_actual.url_feed)
         self.ui.lineShowrss.setText(self.preferences_actual.url_feed_vose)
@@ -149,7 +149,6 @@ class Preferencias(QtWidgets.QDialog):
         """
         Establece el estado actual en cancelado para retornar None y ejecuta reject
         """
-
         self.state_current = self.state_cancel
         self.reject()
 
@@ -157,7 +156,6 @@ class Preferencias(QtWidgets.QDialog):
         """
         Boton Aceptar, primero aplicas los datos, si retorna True, cierra la ventana
         """
-
         if self.apply_data():
             self.accept()
 
