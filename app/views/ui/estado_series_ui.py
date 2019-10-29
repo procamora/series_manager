@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'ui/estado_series.ui'
+# Form implementation generated from reading ui file '/home/procamora/Documents/Gestor-Series/app/utils/../../app/views/ui/estado_series.ui'
 #
-# Created by: PyQt5 UI code generator 5.7
+# Created by: PyQt5 UI code generator 5.12.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -21,7 +21,6 @@ class Ui_Dialog(object):
         self.widget = QtWidgets.QWidget(Dialog)
         self.widget.setObjectName("widget")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.widget)
-        self.verticalLayout.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout.setObjectName("verticalLayout")
         self.radioButtonEmpieza = QtWidgets.QRadioButton(self.widget)
         self.radioButtonEmpieza.setObjectName("radioButtonEmpieza")
@@ -57,7 +56,6 @@ class Ui_Dialog(object):
         self.widget_2 = QtWidgets.QWidget(Dialog)
         self.widget_2.setObjectName("widget_2")
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.widget_2)
-        self.verticalLayout_2.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
         spacerItem = QtWidgets.QSpacerItem(20, 158, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.verticalLayout_2.addItem(spacerItem)
@@ -65,7 +63,6 @@ class Ui_Dialog(object):
         self.WidgetBotones = QtWidgets.QWidget(Dialog)
         self.WidgetBotones.setObjectName("WidgetBotones")
         self.LayoutBotones_2 = QtWidgets.QHBoxLayout(self.WidgetBotones)
-        self.LayoutBotones_2.setContentsMargins(0, 0, 0, 0)
         self.LayoutBotones_2.setObjectName("LayoutBotones_2")
         self.label_Info = QtWidgets.QLabel(self.WidgetBotones)
         self.label_Info.setText("")
@@ -109,11 +106,11 @@ class Ui_Dialog(object):
         self.pushButtonAceptar.setText(_translate("Dialog", "Aceptar"))
 
 
-import app.views.ui.fatcow_rc
+import fatcow_rc
+
 
 if __name__ == "__main__":
     import sys
-
     app = QtWidgets.QApplication(sys.argv)
     Dialog = QtWidgets.QDialog()
     ui = Ui_Dialog()

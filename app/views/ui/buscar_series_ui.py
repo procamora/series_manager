@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'ui/buscar_series.ui'
+# Form implementation generated from reading ui file '/home/procamora/Documents/Gestor-Series/app/utils/../../app/views/ui/buscar_series.ui'
 #
-# Created by: PyQt5 UI code generator 5.7
+# Created by: PyQt5 UI code generator 5.12.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -21,7 +21,6 @@ class Ui_Dialog(object):
         self.widget = QtWidgets.QWidget(Dialog)
         self.widget.setObjectName("widget")
         self.horizontalLayout = QtWidgets.QHBoxLayout(self.widget)
-        self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.label = QtWidgets.QLabel(self.widget)
         self.label.setObjectName("label")
@@ -39,7 +38,6 @@ class Ui_Dialog(object):
         self.widget_2 = QtWidgets.QWidget(Dialog)
         self.widget_2.setObjectName("widget_2")
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout(self.widget_2)
-        self.horizontalLayout_2.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
         self.pushButtonAplicar = QtWidgets.QPushButton(self.widget_2)
         icon2 = QtGui.QIcon()
@@ -70,11 +68,11 @@ class Ui_Dialog(object):
         self.pushButtonCerrar.setText(_translate("Dialog", "Cerrar"))
 
 
-import app.views.ui.fatcow_rc
+import fatcow_rc
+
 
 if __name__ == "__main__":
     import sys
-
     app = QtWidgets.QApplication(sys.argv)
     Dialog = QtWidgets.QDialog()
     ui = Ui_Dialog()

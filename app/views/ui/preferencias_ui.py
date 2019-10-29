@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'ui/preferencias.ui'
+# Form implementation generated from reading ui file '/home/procamora/Documents/Gestor-Series/app/utils/../../app/views/ui/preferencias.ui'
 #
-# Created by: PyQt5 UI code generator 5.7
+# Created by: PyQt5 UI code generator 5.12.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -22,7 +22,6 @@ class Ui_Dialog(object):
         self.WidgetBotones = QtWidgets.QWidget(Dialog)
         self.WidgetBotones.setObjectName("WidgetBotones")
         self.LayoutBotones = QtWidgets.QHBoxLayout(self.WidgetBotones)
-        self.LayoutBotones.setContentsMargins(0, 0, 0, 0)
         self.LayoutBotones.setObjectName("LayoutBotones")
         self.label_Info = QtWidgets.QLabel(self.WidgetBotones)
         self.label_Info.setText("")
@@ -54,7 +53,6 @@ class Ui_Dialog(object):
         self.tab = QtWidgets.QWidget()
         self.tab.setObjectName("tab")
         self.formLayout = QtWidgets.QFormLayout(self.tab)
-        self.formLayout.setContentsMargins(0, 0, 0, 0)
         self.formLayout.setObjectName("formLayout")
         self.checkBox = QtWidgets.QCheckBox(self.tab)
         self.checkBox.setObjectName("checkBox")
@@ -63,7 +61,6 @@ class Ui_Dialog(object):
         self.tab_2 = QtWidgets.QWidget()
         self.tab_2.setObjectName("tab_2")
         self.gridLayout = QtWidgets.QGridLayout(self.tab_2)
-        self.gridLayout.setContentsMargins(0, 0, 0, 0)
         self.gridLayout.setObjectName("gridLayout")
         self.pushButton = QtWidgets.QPushButton(self.tab_2)
         self.pushButton.setText("")
@@ -79,7 +76,6 @@ class Ui_Dialog(object):
         self.widget_2 = QtWidgets.QWidget(self.tab_2)
         self.widget_2.setObjectName("widget_2")
         self.horizontalLayout_3 = QtWidgets.QHBoxLayout(self.widget_2)
-        self.horizontalLayout_3.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout_3.setObjectName("horizontalLayout_3")
         self.label_4 = QtWidgets.QLabel(self.widget_2)
         self.label_4.setObjectName("label_4")
@@ -91,7 +87,6 @@ class Ui_Dialog(object):
         self.widget_3 = QtWidgets.QWidget(self.tab_2)
         self.widget_3.setObjectName("widget_3")
         self.horizontalLayout = QtWidgets.QHBoxLayout(self.widget_3)
-        self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.BoxId = QtWidgets.QComboBox(self.widget_3)
         self.BoxId.setObjectName("BoxId")
@@ -100,7 +95,6 @@ class Ui_Dialog(object):
         self.widget_4 = QtWidgets.QWidget(self.tab_2)
         self.widget_4.setObjectName("widget_4")
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout(self.widget_4)
-        self.horizontalLayout_2.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
         self.label_2 = QtWidgets.QLabel(self.widget_4)
         self.label_2.setObjectName("label_2")
@@ -131,11 +125,11 @@ class Ui_Dialog(object):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("Dialog", "Preferencias del Sistema"))
 
 
-import app.views.ui.fatcow_rc
+import fatcow_rc
+
 
 if __name__ == "__main__":
     import sys
-
     app = QtWidgets.QApplication(sys.argv)
     Dialog = QtWidgets.QDialog()
     ui = Ui_Dialog()

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'ui/series.ui'
+# Form implementation generated from reading ui file '/home/procamora/Documents/Gestor-Series/app/utils/../../app/views/ui/series.ui'
 #
-# Created by: PyQt5 UI code generator 5.7
+# Created by: PyQt5 UI code generator 5.12.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -103,7 +103,6 @@ class Ui_MainWindow(object):
         self.WidgetBotones = QtWidgets.QWidget(self.centralwidget)
         self.WidgetBotones.setObjectName("WidgetBotones")
         self.LayoutBotones = QtWidgets.QHBoxLayout(self.WidgetBotones)
-        self.LayoutBotones.setContentsMargins(0, 0, 0, 0)
         self.LayoutBotones.setObjectName("LayoutBotones")
         self.label_Info = QtWidgets.QLabel(self.WidgetBotones)
         self.label_Info.setText("")
@@ -252,7 +251,7 @@ class Ui_MainWindow(object):
         self.label_4.setText(_translate("MainWindow", "Disminuir"))
         self.label_5.setText(_translate("MainWindow", "Aumentar"))
         self.label_2.setText(_translate("MainWindow", "Nombre"))
-        self.label.setText(_translate("MainWindow", "  Emision"))
+        self.label.setText(_translate("MainWindow", "Emision"))
         self.label_3.setText(_translate("MainWindow", "Capitulo"))
         self.label_6.setText(_translate("MainWindow", "Descargado"))
         self.pushButtonAplicar.setText(_translate("MainWindow", "Aplicar"))
@@ -298,11 +297,11 @@ class Ui_MainWindow(object):
         self.actionAsistente_inicial.setText(_translate("MainWindow", "Asistente inicial"))
 
 
-import app.views.ui.fatcow_rc
+import fatcow_rc
+
 
 if __name__ == "__main__":
     import sys
-
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()

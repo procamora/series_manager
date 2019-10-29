@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'ui/asistente_inicial.ui'
+# Form implementation generated from reading ui file '/home/procamora/Documents/Gestor-Series/app/utils/../../app/views/ui/asistente_inicial.ui'
 #
-# Created by: PyQt5 UI code generator 5.7
+# Created by: PyQt5 UI code generator 5.12.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -21,7 +21,6 @@ class Ui_Dialog(object):
         self.WidgetBotones = QtWidgets.QWidget(Dialog)
         self.WidgetBotones.setObjectName("WidgetBotones")
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout(self.WidgetBotones)
-        self.horizontalLayout_2.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
         self.label = QtWidgets.QLabel(self.WidgetBotones)
         self.label.setText("")
@@ -51,7 +50,6 @@ class Ui_Dialog(object):
         self.Widget1 = QtWidgets.QWidget(Dialog)
         self.Widget1.setObjectName("Widget1")
         self.horizontalLayout = QtWidgets.QHBoxLayout(self.Widget1)
-        self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.pushButtonRuta = QtWidgets.QPushButton(self.Widget1)
         self.pushButtonRuta.setMaximumSize(QtCore.QSize(35, 16777215))
@@ -69,7 +67,6 @@ class Ui_Dialog(object):
         self.WidgetDir = QtWidgets.QWidget(Dialog)
         self.WidgetDir.setObjectName("WidgetDir")
         self.horizontalLayout_3 = QtWidgets.QHBoxLayout(self.WidgetDir)
-        self.horizontalLayout_3.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout_3.setObjectName("horizontalLayout_3")
         self.checkBoxSync = QtWidgets.QCheckBox(self.WidgetDir)
         self.checkBoxSync.setObjectName("checkBoxSync")
@@ -99,11 +96,11 @@ class Ui_Dialog(object):
         self.checkBoxValido.setText(_translate("Dialog", "Valido"))
 
 
-import app.views.ui.fatcow_rc
+import fatcow_rc
+
 
 if __name__ == "__main__":
     import sys
-
     app = QtWidgets.QApplication(sys.argv)
     Dialog = QtWidgets.QDialog()
     ui = Ui_Dialog()

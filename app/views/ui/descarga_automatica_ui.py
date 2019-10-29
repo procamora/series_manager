@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'ui/descarga_automatica.ui'
+# Form implementation generated from reading ui file '/home/procamora/Documents/Gestor-Series/app/utils/../../app/views/ui/descarga_automatica.ui'
 #
-# Created by: PyQt5 UI code generator 5.7
+# Created by: PyQt5 UI code generator 5.12.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -23,21 +23,18 @@ class Ui_Dialog(object):
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.textEditVistas = QtWidgets.QTextEdit(Dialog)
         self.textEditVistas.setEnabled(False)
-        self.textEditVistas.setTextInteractionFlags(
-            QtCore.Qt.TextSelectableByKeyboard | QtCore.Qt.TextSelectableByMouse)
+        self.textEditVistas.setTextInteractionFlags(QtCore.Qt.TextSelectableByKeyboard|QtCore.Qt.TextSelectableByMouse)
         self.textEditVistas.setObjectName("textEditVistas")
         self.horizontalLayout.addWidget(self.textEditVistas)
         self.textEditDescargadas = QtWidgets.QTextEdit(Dialog)
         self.textEditDescargadas.setEnabled(False)
-        self.textEditDescargadas.setTextInteractionFlags(
-            QtCore.Qt.TextSelectableByKeyboard | QtCore.Qt.TextSelectableByMouse)
+        self.textEditDescargadas.setTextInteractionFlags(QtCore.Qt.TextSelectableByKeyboard|QtCore.Qt.TextSelectableByMouse)
         self.textEditDescargadas.setObjectName("textEditDescargadas")
         self.horizontalLayout.addWidget(self.textEditDescargadas)
         self.gridLayout.addLayout(self.horizontalLayout, 0, 0, 1, 1)
         self.widget = QtWidgets.QWidget(Dialog)
         self.widget.setObjectName("widget")
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout(self.widget)
-        self.horizontalLayout_2.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
         self.progressBar = QtWidgets.QProgressBar(self.widget)
         self.progressBar.setProperty("value", 24)
@@ -60,11 +57,11 @@ class Ui_Dialog(object):
         self.pushButtonCerrar.setText(_translate("Dialog", "Cerrar"))
 
 
-import app.views.ui.fatcow_rc
+import fatcow_rc
+
 
 if __name__ == "__main__":
     import sys
-
     app = QtWidgets.QApplication(sys.argv)
     Dialog = QtWidgets.QDialog()
     ui = Ui_Dialog()

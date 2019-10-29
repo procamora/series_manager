@@ -1,4 +1,5 @@
 #PROPIOS
+settings.ini
 build/
 dist/
 app/SQL/*.sql

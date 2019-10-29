@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'ui/lista_activa.ui'
+# Form implementation generated from reading ui file '/home/procamora/Documents/Gestor-Series/app/utils/../../app/views/ui/lista_activa.ui'
 #
-# Created by: PyQt5 UI code generator 5.7
+# Created by: PyQt5 UI code generator 5.12.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -33,7 +33,6 @@ class Ui_Dialog(object):
         self.WidgetBotones = QtWidgets.QWidget(Dialog)
         self.WidgetBotones.setObjectName("WidgetBotones")
         self.LayoutBotones = QtWidgets.QHBoxLayout(self.WidgetBotones)
-        self.LayoutBotones.setContentsMargins(0, 0, 0, 0)
         self.LayoutBotones.setObjectName("LayoutBotones")
         self.label_Info = QtWidgets.QLabel(self.WidgetBotones)
         self.label_Info.setText("")
@@ -73,11 +72,11 @@ class Ui_Dialog(object):
         self.pushButtonAceptar.setText(_translate("Dialog", "Aceptar"))
 
 
-import app.views.ui.fatcow_rc
+import fatcow_rc
+
 
 if __name__ == "__main__":
     import sys
-
     app = QtWidgets.QApplication(sys.argv)
     Dialog = QtWidgets.QDialog()
     ui = Ui_Dialog()

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'ui/actualizar_insertar.ui'
+# Form implementation generated from reading ui file '/home/procamora/Documents/Gestor-Series/app/utils/../../app/views/ui/actualizar_insertar.ui'
 #
-# Created by: PyQt5 UI code generator 5.7
+# Created by: PyQt5 UI code generator 5.12.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -60,7 +60,6 @@ class Ui_Dialog(object):
         self.widget_5 = QtWidgets.QWidget(Dialog)
         self.widget_5.setObjectName("widget_5")
         self.gridLayout_4 = QtWidgets.QGridLayout(self.widget_5)
-        self.gridLayout_4.setContentsMargins(0, 0, 0, 0)
         self.gridLayout_4.setObjectName("gridLayout_4")
         self.radioSeguirSi = QtWidgets.QRadioButton(self.widget_5)
         self.radioSeguirSi.setChecked(True)
@@ -92,7 +91,6 @@ class Ui_Dialog(object):
         self.widget_3 = QtWidgets.QWidget(Dialog)
         self.widget_3.setObjectName("widget_3")
         self.gridLayout_2 = QtWidgets.QGridLayout(self.widget_3)
-        self.gridLayout_2.setContentsMargins(0, 0, 0, 0)
         self.gridLayout_2.setObjectName("gridLayout_2")
         self.radioVOSE_Si = QtWidgets.QRadioButton(self.widget_3)
         self.radioVOSE_Si.setChecked(False)
@@ -111,7 +109,6 @@ class Ui_Dialog(object):
         self.widget_2 = QtWidgets.QWidget(Dialog)
         self.widget_2.setObjectName("widget_2")
         self.gridLayout_3 = QtWidgets.QGridLayout(self.widget_2)
-        self.gridLayout_3.setContentsMargins(0, 0, 0, 0)
         self.gridLayout_3.setObjectName("gridLayout_3")
         self.radioAcabadaSi = QtWidgets.QRadioButton(self.widget_2)
         self.radioAcabadaSi.setObjectName("radioAcabadaSi")
@@ -129,7 +126,6 @@ class Ui_Dialog(object):
         self.widget = QtWidgets.QWidget(Dialog)
         self.widget.setObjectName("widget")
         self.horizontalLayout_3 = QtWidgets.QHBoxLayout(self.widget)
-        self.horizontalLayout_3.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout_3.setObjectName("horizontalLayout_3")
         self.BoxEstado = QtWidgets.QComboBox(self.widget)
         self.BoxEstado.setObjectName("BoxEstado")
@@ -149,7 +145,6 @@ class Ui_Dialog(object):
         self.widget_4 = QtWidgets.QWidget(Dialog)
         self.widget_4.setObjectName("widget_4")
         self.gridLayout_5 = QtWidgets.QGridLayout(self.widget_4)
-        self.gridLayout_5.setContentsMargins(0, 0, 0, 0)
         self.gridLayout_5.setObjectName("gridLayout_5")
         self.radioImdbNo = QtWidgets.QRadioButton(self.widget_4)
         self.radioImdbNo.setObjectName("radioImdbNo")
@@ -164,7 +159,6 @@ class Ui_Dialog(object):
         self.WidgetBotones = QtWidgets.QWidget(Dialog)
         self.WidgetBotones.setObjectName("WidgetBotones")
         self.LayoutBotones = QtWidgets.QHBoxLayout(self.WidgetBotones)
-        self.LayoutBotones.setContentsMargins(0, 0, 0, 0)
         self.LayoutBotones.setObjectName("LayoutBotones")
         self.label_Info = QtWidgets.QLabel(self.WidgetBotones)
         self.label_Info.setText("")
@@ -253,11 +247,11 @@ class Ui_Dialog(object):
         self.pushButtonAceptar.setText(_translate("Dialog", "Aceptar"))
 
 
-import app.views.ui.fatcow_rc
+import fatcow_rc
+
 
 if __name__ == "__main__":
     import sys
-
     app = QtWidgets.QApplication(sys.argv)
     Dialog = QtWidgets.QDialog()
     ui = Ui_Dialog()

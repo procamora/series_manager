@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'ui/listar_todas.ui'
+# Form implementation generated from reading ui file '/home/procamora/Documents/Gestor-Series/app/utils/../../app/views/ui/listar_todas.ui'
 #
-# Created by: PyQt5 UI code generator 5.7
+# Created by: PyQt5 UI code generator 5.12.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -23,7 +23,6 @@ class Ui_Dialog(object):
         self.widget = QtWidgets.QWidget(Dialog)
         self.widget.setObjectName("widget")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.widget)
-        self.verticalLayout.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout.setObjectName("verticalLayout")
         self.radioButtonEmpieza = QtWidgets.QRadioButton(self.widget)
         self.radioButtonEmpieza.setObjectName("radioButtonEmpieza")
@@ -51,7 +50,6 @@ class Ui_Dialog(object):
         self.widget_2 = QtWidgets.QWidget(Dialog)
         self.widget_2.setObjectName("widget_2")
         self.horizontalLayout = QtWidgets.QHBoxLayout(self.widget_2)
-        self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.radioButtonAct = QtWidgets.QRadioButton(self.widget_2)
         self.radioButtonAct.setChecked(True)
@@ -84,7 +82,6 @@ class Ui_Dialog(object):
         self.WidgetBotones = QtWidgets.QWidget(Dialog)
         self.WidgetBotones.setObjectName("WidgetBotones")
         self.LayoutBotones = QtWidgets.QHBoxLayout(self.WidgetBotones)
-        self.LayoutBotones.setContentsMargins(0, 0, 0, 0)
         self.LayoutBotones.setObjectName("LayoutBotones")
         self.label_Info = QtWidgets.QLabel(self.WidgetBotones)
         self.label_Info.setText("")
@@ -134,11 +131,11 @@ class Ui_Dialog(object):
         self.pushButtonAceptar.setText(_translate("Dialog", "Aceptar"))
 
 
-import app.views.ui.fatcow_rc
+import fatcow_rc
+
 
 if __name__ == "__main__":
     import sys
-
     app = QtWidgets.QApplication(sys.argv)
     Dialog = QtWidgets.QDialog()
     ui = Ui_Dialog()
