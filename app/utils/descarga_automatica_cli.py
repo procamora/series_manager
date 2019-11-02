@@ -10,19 +10,23 @@ ultimos capitulos
 from __future__ import annotations
 
 import logging
+import os
 import re
 import sys
 import time
 from dataclasses import dataclass
 from pathlib import Path  # nueva forma de trabajar con rutas
-from typing import List, NoReturn, Dict
+from pathlib import PurePath  # nueva forma de trabajar con rutas
+from typing import List, NoReturn, Dict, Optional
 
 import feedparser
 import requests
 import urllib3
 from bs4 import BeautifulSoup
 
-new_path: str = '../../'
+# Confirmamos que tenemos en el path la ruta de la aplicacion, para poder lanzarlo desde cualquier ruta
+absolut_path: PurePath = PurePath(os.path.realpath(__file__))  # Ruta absoluta del fichero
+new_path: str = f'{absolut_path.parent}/../../'
 if new_path not in sys.path:
     sys.path.append(new_path)
 
@@ -53,7 +57,7 @@ class Feed:
     season: int = int()
     epi: str = str()  # formato de temporada y sesion TxS
 
-    def update_fields(self) -> NoReturn:
+    def __post_init__(self) -> NoReturn:
         self.name = self.title.split('-')[0]
         season = re.search(r'(\d+). Temporada', self.title)
         if season is not None:
@@ -75,7 +79,6 @@ class FeedparserPropio:
     def add(self, title: str, cap: int, link: str) -> NoReturn:
         # print(cap)
         f = Feed(title.strip(), link, cap)
-        f.update_fields()
         self.entries.append(f)
 
     @staticmethod
@@ -154,7 +157,6 @@ class DescargaAutomaticaCli:
 
         self.ultimaSerieNew = FILE_LOG_FEED.read_text()  # FIXME REVISAR
         logging.critical(FILE_LOG_FEED)
-        logging.critical(self.ultimaSerieNew)
         # with open(f'{self.directory_logs}/{FILE_LOG_FEED}', 'r') as f:
         #    self.ultimaSerieNew = f.readline()
 
@@ -208,7 +210,7 @@ class DescargaAutomaticaCli:
         else:
             self._logger.error('PROBLEMA CON if SerieActualShow is not None and SerieActualNew is not None:')
 
-    def parser_feed(self, serie: Serie) -> str:
+    def parser_feed(self, serie: Serie) -> Optional[str]:
         """Solo funciona con series de 2 digitos por la expresion regular"""
         # cap = str(serie.chapter)
         if serie.vose:
@@ -223,7 +225,6 @@ class DescargaAutomaticaCli:
 
         # if len(str(cap)) == 1:
         #    cap = '0' + str(cap)
-
         for entrie in feed.entries:
             self.titleSerie = funciones.remove_tildes(entrie.title)
             # cuando llegamos al ultimo capitulo pasamos a la siguiente serie
@@ -293,7 +294,11 @@ class DescargaAutomaticaCli:
 
                 self._logger.info(f'DESCARGANDO: {serie.title}')
 
-        return funciones.remove_tildes(feed.entries[0].title)
+        if len(feed.entries) > 0:
+            return funciones.remove_tildes(feed.entries[0].title)
+        else:
+            self._logger.warning("feed.entries is empty")
+            return None
 
     def extra_action(self, serie: str) -> NoReturn:
         """

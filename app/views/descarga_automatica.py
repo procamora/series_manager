@@ -14,7 +14,7 @@ import app.controller.Controller as Controller
 from app.models.model_query import Query
 from app.models.model_serie import Serie
 from app.utils import funciones
-from app.views.descarga_automatica_cli import DescargaAutomaticaCli
+from app.utils.descarga_automatica_cli import DescargaAutomaticaCli
 from app.views.msgbox import MsgBox
 
 
