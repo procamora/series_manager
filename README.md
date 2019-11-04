@@ -29,6 +29,11 @@ README
 + [ ] actualizar metodo actualizar series con imdb y usar api tviso
 
 
+
+
+
+
+
 ## Requerimientos
 
 Para compilar el código fuente, se requieren algunas bibliotecas externas.
@@ -42,6 +47,8 @@ Las librerías que he usado con sus respectivas versiones a día de hoy (29/08/2
 * PyQt5
 
 > Importante: La libreria imdbpie ha cambiado, por lo que la ultima version valida es la 4.0.2, posteriores no funcion
+
+
 
 ### No necesarias
 
@@ -66,20 +73,31 @@ pip3 install -r requirements.txt
 
 **Debian**:
 
-sudo apt-get install python3-pip python3-pyqt5 python3-pyqt5.qtsql pyqt5-dev-tools
-
+```bash
+sudo apt-get install python3-pip python3-pyqt5 python3-pyqt5.qtsql pyqt5-dev-tools python-libtorrent 
+```
 
 **Fedora**:
 
-sudo dnf install python3-pip python3-PyQt5 PyQt5-devel
+```bash
+sudo dnf install python3-pip python3-PyQt5 PyQt5-devel rb_libtorrent-python3
+```
+
+
+
+
 
 
 ### Probar si este es el nuevo comando
-dnf install qt5-designer
 
+```bash
+dnf install qt5-designer
+```
 2. Instalar las librerias necesarias para python 3.
 
+```bash
 pip3 install -r requirements.txt
+```
 
 
 #### Comandos restantes
@@ -101,13 +119,21 @@ para generar los ficheros ui
 `pyuic5 fichero.ui -o fichero.py`
 
 # documentacion
+
 compila_ui.py
+
+
+
+
+
+
 
 
 
 ## Funcionalidades
 
 ##### Series
+
 * __Series Activas__: Muestra todas las series activas con un botón de sumar o restar capítulos; para que se apliquen los cambios en los capítulos tienes que darle a aplicar para que se ejecute la query en la base de datos. *(Ctrl + A)*
 
 * __Modificar Series__: Te permite modificar las series; para cambios generales (acaba/empieza temporada) se puede usar *modificación en masa*, pero para cambios más específicos se usa la modificación individual.
@@ -122,6 +148,7 @@ compila_ui.py
 * __Salir__: Cierra el programa. *(Ctrl + X)*
 
 ##### Herramientas
+
 * __Actualizar db de Imdb__: **En proceso de implementar** Actualiza la base de datos de las series con los valores sacados de [Imdb](http://www.imdb.com/)
 
 * __Descarga Automática__: Comprueba todas las series que sigo; en caso de que haya salido algún capítulo nuevo, se descarga el torrent en la ruta indicada y envía una notificación con el servicio que esté habilitado. El programa de torrent que uses es el que se debe de encargar de coger automáticamente el torrent de esa ruta y empezar a descargarlo; en caso de que no haya Internet, se cierra.
@@ -129,6 +156,7 @@ compila_ui.py
 	* __ShowRss__: Comprueba las series en V.O.S.E *(Ctrl + S)*
 
 ##### Opciones
+
 * __Preferencias__: Para cambiar la configuración por defecto del programa puedes tener distintas configuraciones. Puedes añadir más configuraciones cambiando el id a otro. *(Ctrl + P)*
 
 * __Notificaciones__: Para habilitar o deshabilitar los servicios de notificaciones cuando nos descargamos una serie *(Ctrl + K)*
@@ -146,7 +174,14 @@ compila_ui.py
 * __Id de opcion__: **En proceso de implementar** Para seleccionar el id de la configuración que está activo de forma rápida; de momento se hace a través de las preferencias.
 
 ##### Ayuda
+
 * __Acerda De__: *(Ctrl + H)*
+
+
+
+
+
+
 
 
 ## Configuración de la base de datos
@@ -190,6 +225,11 @@ CREATE TABLE "Configuraciones" (
 );
 COMMIT;
 ```
+
+
+
+
+
 
 License
 -----
