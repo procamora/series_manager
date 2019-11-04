@@ -170,116 +170,6 @@ def download_file(url, destino, libreria='requests'):
         import wget
         wget.download(url, destino)
 
-
-# YA NO ES VALIDA
-def _descarga_url_torrent(direcc, bot=None, message=None):
-    """
-    Funcion que obtiene la url torrent del la dirreccion que recibe,hay que tener en cuenta que la url que recibe es la 
-    del feed y que no es la apgina que contiene el torrent, pero como todas tienen la misma forma se modifica la url 
-    poniendole descarga-torrent
-
-    :param str direcc: Dirreccion de la pagina web que contiene el torrent
-    :param obj bot: bot 
-    :param obj message: instancia del mensaje recibido
-
-    :return str: Nos devuelve el string con la url del torrent
-    """
-
-    if not re.match(r"^(http://).*", direcc):
-        direcc = 'http://' + direcc
-
-    logger.debug(direcc)
-
-    if not re.match(r"^(http://).*", direcc):
-        direcc = 'http://' + direcc
-
-    regex_recursion = "(tumejortorrent|newpct1|newpct)"
-
-    if re.search("torrentlocura", direcc):
-        if bot is not None and message is not None:
-            bot.reply_to(message, 'Buscando torrent en torrentlocura.com')
-        session = requests.session()
-
-        comp1 = _descarga_url_torrent_aux(
-            session.get(direcc.replace('torrentlocura.com/', 'torrentlocura.com/descarga-torrent/'), verify=False).text)
-        if comp1 is not None:
-            return comp1
-
-        # opcion 2
-        comp2 = _descarga_url_torrent_aux(
-            session.get(direcc.replace('torrentlocura.com/', 'torrentlocura.com/descargar-seriehd/'),
-                        verify=False).text)
-        if comp2 is not None:
-            return comp2
-
-        return None
-
-    elif re.search(regex_recursion, direcc):
-        return _descarga_url_torrent(re.sub(regex_recursion, "torrentlocura", direcc), message)
-
-
-# YA NO ES VALIDA
-def _descarga_url_torrent_aux(page):
-    try:
-        sopa = BeautifulSoup(page, 'html.parser')
-        result = sopa.find('a', {"class": "btn-torrent"})['href']
-        # Si obtenemos una url es correcto sino buscamos en el codigo html
-        regex = r"^(http://www\.|https://www\.|http://|https://)?[a-z0-9]+([\-\.][a-z0-9]+)*\.[a-z]{2,5}" \
-                r"(:[0-9]{1,5})?(\/.*)?$"
-        if re.match(regex, result):
-            return result
-        else:  # FIXME USAR selenium para simular navegador
-            """ si tiene puesto en href "javascript:void(0)" llamara a la funcion openTorrent() que tiene en la variable
-            window.location.href la url del torrent a descaegar, por lo que lo buscamos a pelo en el html y eliminamos
-            lo sobrante, feo pero funcional
-            """
-            javascript = re.findall(r'window\.location\.href = \".*\";', page)
-            return javascript[0].replace("window.location.href = \"", "").replace("\";", "")
-            # return sopa.find('div', {"id": "tab1"}).a['href']
-    except Exception as e:
-        print(e)
-        return None
-
-
-# YA NO ES VALIDA
-def _descarga_url_torrent_pctnew(direcc, bot=None, message=None):
-    """
-    Funcion que obtiene la url torrent del la dirreccion que recibe,hay que tener en cuenta que la url que recibe es la 
-    del feed y que no es la apgina que contiene el torrent, pero como todas tienen la misma forma se modifica la url 
-    poniendole descarga-torrent
-
-    :param str direcc: Dirreccion de la pagina web que contiene el torrent
-    :param obj bot: bot 
-    :param obj message: instancia del mensaje recibido
-
-    :return str: Nos devuelve el string con la url del torrent
-    """
-
-    if not re.match(r"^(https?://).*", direcc):
-        direcc = 'https://' + direcc
-
-    logger.debug(direcc)
-
-    if re.search("pctnew", direcc):
-        if bot is not None and message is not None:
-            bot.reply_to(message, 'Buscando torrent en pctnew.com')
-        session = requests.session()
-
-        my_url = direcc.replace('pctnew.com/', 'pctnew.com/descarga-torrent/')
-        logger.debug(my_url)
-        comp1 = _descarga_url_torrent_aux_pctnew(session.get(my_url, verify=False).text)
-        if comp1 is not None:
-            return comp1
-
-        # opcion 2
-        comp2 = _descarga_url_torrent_aux_pctnew(
-            session.get(direcc.replace('pctnew.com/', 'pctnew.com/descargar-seriehd/'), verify=False).text)
-        if comp2 is not None:
-            return comp2
-
-        return None
-
-
 # YA NO ES VALIDA
 def _descarga_url_torrent_aux_pctnew(page):
     try:
@@ -320,72 +210,6 @@ def _busca_torrent_antiguo(direcc):  # para newpct
     return sopa.find('span', id="content-torrent").a['href']
 
 
-def get_url_torrent_dontorrent(direcc, bot=None, message=None):
-    """
-    Funcion que obtiene la url torrent del la dirreccion que recibe,hay que tener en cuenta que la url que recibe es la
-    del feed y que no es la apgina que contiene el torrent, pero como todas tienen la misma forma se modifica la url
-    poniendole descarga-torrent
-
-    :param str direcc: Dirreccion de la pagina web que contiene el torrent
-    :param obj bot: bot
-    :param obj message: instancia del mensaje recibido
-
-    :return str: Nos devuelve el string con la url del torrent
-    """
-
-    if not re.match(r"^(https?://).*", direcc):
-        direcc = 'https://' + direcc
-
-    if re.search("dontorrent", direcc):
-        if bot is not None and message is not None:
-            bot.reply_to(message, 'Buscando torrent en pctnew.com')
-
-        req_headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; WOW64; rv:35.0) Gecko/20100101 Firefox/35.0',
-                       'Content-Type': 'application/x-www-form-urlencoded'}
-
-        session = requests.session()
-        login = session.get(direcc, headers=req_headers, verify=False)
-        sopa = BeautifulSoup(login.text, 'html.parser')
-        mtable = sopa.findAll('table', {"class": "table table-sm table-striped text-center"})
-
-        # urls = re.findall(r'href\=\"(.*)" ', str(mtable)) # misma regex pero generica
-        urls = re.findall(r'href=\"((\/\w*)*.torrent)\"', str(mtable))
-
-        new_urls = list()
-        for i in urls:
-            new_urls.append(f'https://dontorrent.com{i[0]}')
-
-        return new_urls
-
-
-def get_url_torrent_dontorrent_direct(direcc, bot=None, message=None):
-    """
-    es similar a al ade arriba pero solo busca un torrent especifdico en un a
-    """
-
-    if not re.match(r"^(https?://).*", direcc):
-        direcc = 'https://' + direcc
-
-    # if modo_debug:
-    #    print(direcc)
-
-    if re.search("dontorrent", direcc):
-        if bot is not None and message is not None:
-            bot.reply_to(message, 'Buscando torrent en pctnew.com')
-
-        req_headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; WOW64; rv:35.0) Gecko/20100101 Firefox/35.0',
-                       'Content-Type': 'application/x-www-form-urlencoded'}
-
-        session = requests.session()
-        login = session.get(direcc, headers=req_headers, verify=False)
-        sopa = BeautifulSoup(login.text, 'html.parser')
-        mtable = sopa.find('a', {"class": "text-white bg-primary rounded-pill d-block shadow text-decoration-none p-1"})
-        print(mtable)
-        print(mtable['href'])
-
-        return f'https://dontorrent.com{mtable["href"]}'
-
-
 def feed_parser(url):
     """
     Da un fallo en fedora 23, por eso hace falta esta funcion
@@ -402,7 +226,7 @@ def feed_parser(url):
             raise
 
 
-def show_message(label, texto='Texto plantilla', estado=True):
+def show_message(label, texto='Texto plantilla', estado=True)-> NoReturn:
     """
     Muestra una determinada label con rojo o verde (depende del estado) y con el texto indicado
     """
@@ -414,14 +238,14 @@ def show_message(label, texto='Texto plantilla', estado=True):
         label.setStyleSheet('color: red')
 
 
-def scapes_parenthesis(texto):
+def scapes_parenthesis(texto) -> str:
     """
     No he probado si funciona con series como powers
     """
     return texto.replace('(', '\\(').replace(')', '\\)')
 
 
-def internet_on():
+def internet_on()-> bool:
     try:
         session = requests.session()
         session.get('http://www.google.com', verify=False)
