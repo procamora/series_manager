@@ -23,21 +23,34 @@ if new_path not in sys.path:
 from app import logger
 from app.utils.settings import DIRECTORY_WORKING
 import app.utils.funciones as funciones
+from app.utils.settings import FILE_LOG_FEED
 import app.controller.Controller as Controller
 from app.models.model_query import Query
+from app.models.model_credentials import Credentials
+from app.models.model_preferences import Preferences
 
-response_query: Query = Controller.get_credentials()
-if not response_query.is_empty():
-    credentials = response_query.response[0]
+response_query_credentials: Query = Controller.get_credentials()
+response_query_preferences: Query = Controller.get_preferences()
+
+credentials: Credentials
+if not response_query_credentials.is_empty():
+    credentials = response_query_credentials.response[0]
 else:
     logger.critical("No se han obtenido las credenciales")
     sys.exit(1)
 
+preferences: Preferences
+if not response_query_preferences.is_empty():
+    credentials = response_query_preferences.response[0]
+else:
+    logger.critical("No se han obtenido las preferencias")
+    sys.exit(1)
+
 administrador = 33063767
 users_permitted = [33063767, 40522670]
-pass_transmission = credentials['pass_transmission']
+pass_transmission = credentials.pass_transmission
 
-bot = TeleBot(credentials['api_telegram'])
+bot = TeleBot(credentials.api_telegram)
 bot.send_message(administrador, "El bot se ha iniciado")
 
 dicc_botones = {
@@ -118,8 +131,7 @@ def send_cgs(message) -> Union[NoReturn, None]:
 
 @bot.message_handler(func=lambda message: message.chat.id == administrador, commands=['/empty_log'])
 def send_log(message) -> NoReturn:
-    fichero = f'{DIRECTORY_WORKING}/log/{credentials["FicheroFeedNewpct"]}'
-    with open(fichero, 'w'):
+    with open(FILE_LOG_FEED, 'w'):
         pass
 
     bot.reply_to(message, 'Log vaciado')
@@ -297,7 +309,7 @@ def handle_torrent(message) -> Union[NoReturn, None]:
 
     url = funciones.get_url_torrent_dontorrent_direct(message.text, message)
     if url is not None:
-        with tempfile.NamedTemporaryFile(mode='rb', dir=credentials['RutaDescargas'], suffix='.torrent',
+        with tempfile.NamedTemporaryFile(mode='rb', dir=preferences.path_download, suffix='.torrent',
                                          delete=False) as fp:
             try:
                 print(url)
@@ -357,7 +369,7 @@ def my_document(message) -> NoReturn:
     if message.document.mime_type == 'application/x-bittorrent':
         file_info = bot.get_file(message.document.file_id)
         # bot.send_message(message.chat.id, f'https://api.telegram.org/file/bot{TOKEN}/{file_info.file_path}')
-        file = requests.get(f'https://api.telegram.org/file/bot{credentials["api_telegram"]}/{file_info.file_path}')
+        file = requests.get(f'https://api.telegram.org/file/bot{credentials.api_telegram}/{file_info.file_path}')
         with open(f'/home/pi/Downloads/{message.document.file_id}.torrent', "wb") as code:
             code.write(file.content)
         bot.reply_to(message, f'Descargando torrent: "{message.document.file_name}"')

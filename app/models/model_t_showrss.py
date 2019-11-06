@@ -80,7 +80,7 @@ class ShowRss(Torrent):
             logger.critical("No se ha proporcionado un cliente torrent")
             sys.exit(1)
 
-        command: str = f'{binary} {magnet}'
+        command: str = f'{binary} {magnet} &' # sino se lanza como hilo se queda bloqueado hasta que termina
         logger.debug(f'execute_command: {command}')
         execute = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         stdout, stderr = execute.communicate()
@@ -96,8 +96,6 @@ class ShowRss(Torrent):
             self.magnet2torrent(self.url_web, str(self.path_download))
         except ModuleNotFoundError:
             self.execute_command(self.client_torrent, self.url_web)
-            sys.exit(0)
-            pass
 
         logger.info("FIN")
         # time.sleep(10)
