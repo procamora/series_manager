@@ -19,24 +19,19 @@ new_path: str = f'{absolut_path.parent}/../../'
 if new_path not in sys.path:
     sys.path.append(new_path)
 
-from app.models.model_torrent import Torrent
-from app.models.model_feed import Feed
+from app.models.model_t_torrent import Torrent
+from app.models.model_t_feedparser import FeedParser
+from app.models.model_t_feed import Feed
 from app import logger
 
 
-class FeedparserPropio:
+class FeedparserTorrentLocura(FeedParser):
     def __init__(self) -> NoReturn:
         self.entries: List[Feed] = list()
 
-    def add(self, title: str, cap: int, link: str) -> NoReturn:
-        # print(cap)
-        f = Feed(title.strip(), link, cap)
-        logger.warning(f)
-        self.entries.append(f)
-
     @staticmethod
     def parse(url='https://torrentlocura.cc/ultimas-descargas/', category='1469',
-              dat='Hoy') -> FeedparserPropio:
+              dat='Hoy') -> FeedparserTorrentLocura:
         """
         category='1469' series en hd
         """
@@ -51,12 +46,13 @@ class FeedparserPropio:
         sopa = BeautifulSoup(login.text, 'html.parser')
         # sopa = BeautifulSoup(fichero, 'html.parser')
         result = sopa.findAll('ul', {"class": "noticias-series"})
-        f = FeedparserPropio()
+        f = FeedparserTorrentLocura()
         for ul in result:
             for li in ul.findAll('li'):
                 logger.critical(li.div.find('h2').text)
                 logger.critical(li.a['href'])
-                f.add(li.div.find('h2').text, li.a['href'])
+                # FIXME CAMBIAR 44 Y 33 POR season Y chapter
+                f.add(li.div.find('h2').text, 44, 33, li.a['href'])
                 # f.add(li.a['title'], li.a['href'])
                 # f.add(serie.text, int(chapters[-1]), url)
 

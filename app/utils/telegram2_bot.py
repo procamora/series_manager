@@ -21,22 +21,24 @@ new_path: str = f'{absolut_path.parent}/../../'
 if new_path not in sys.path:
     sys.path.append(new_path)
 from app import logger
-from app.utils.settings import MODE_DEBUG, DIRECTORY_WORKING
+from app.utils.settings import DIRECTORY_WORKING
 import app.utils.funciones as funciones
 import app.controller.Controller as Controller
 from app.models.model_query import Query
 
-response_query: Query = Controller.get_credentials_fileconf()
-credentials = response_query.response[0]
+response_query: Query = Controller.get_credentials()
+if not response_query.is_empty():
+    credentials = response_query.response[0]
+else:
+    logger.critical("No se han obtenido las credenciales")
+    sys.exit(1)
+
 administrador = 33063767
 users_permitted = [33063767, 40522670]
 pass_transmission = credentials['pass_transmission']
 
-if MODE_DEBUG:
-    bot = TeleBot('694076475:AAFfiSVSnuf387hnvJOIjQOHP6w7veZbO-M')
-    bot.send_message(administrador, "El bot se ha iniciado")
-else:
-    bot = TeleBot(credentials['api_telegram'])
+bot = TeleBot(credentials['api_telegram'])
+bot.send_message(administrador, "El bot se ha iniciado")
 
 dicc_botones = {
     'cgs': '/cron_Gestor_Series',

@@ -19,16 +19,17 @@ if new_path not in sys.path:
 @dataclass
 class Feed:
     title: str
-    chapter: int
-    season: int
+    season: int  # Temporada
+    chapter: int  # Capitulo
     link: str
     epi: str = str()  # formato de temporada y sesion TxS
 
     def __post_init__(self) -> NoReturn:
-        if (len(str(self.season))) > 1:
-            self.epi = f"{self.chapter}x{self.season}"
+
+        if (len(str(self.chapter))) > 1:
+            self.epi = f"{self.season}x{self.chapter}"
         else:
-            self.epi = f"{self.chapter}x0{self.season}"
+            self.epi = f"{self.season}x0{self.chapter}"
 
     # def __str__(self) -> NoReturn:
     #    return f'{self.title} - {self.chapter} - {self.link}'

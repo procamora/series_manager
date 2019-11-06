@@ -26,6 +26,8 @@ DATABASE_ID = 1
 WORKDIR_DEFAULT = True
 # No se usa por defecto
 WORKDIR = /tmp/
+# Cliente torrent que se usara como comando para añadir enlaces magnet
+CLIENT_TORRENT = transmission-cli
 """
 
 FILE_CONFIG = 'settings.ini'
@@ -120,6 +122,8 @@ else:
     else:
         DIRECTORY_WORKING = Path(os.environ["HOME"], basics.get("NAME_WORKDIR"))
 
+CLIENT_TORRENT = configurable.get('CLIENT_TORRENT')
+
 # BASE DE DATOS
 DATABASE_ID: int = configurable.getint("DATABASE_ID")
 PATH_DATABASE: Path = Path(DIRECTORY_WORKING, basics["NAME_DATABASE"])
@@ -144,3 +148,4 @@ logger.debug(f'FILE_LOG_FEED: {FILE_LOG_FEED}')
 logger.debug(f'FILE_LOG_FEED_VOSE: {FILE_LOG_FEED_VOSE}')
 
 logger.debug(f'DATABASE_ID: {DATABASE_ID}')
+logger.debug(f'CLIENT_TORRENT: {CLIENT_TORRENT}')

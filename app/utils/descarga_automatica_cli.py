@@ -17,9 +17,8 @@ import time
 from abc import abstractmethod
 from pathlib import Path  # nueva forma de trabajar con rutas
 from pathlib import PurePath  # nueva forma de trabajar con rutas
-from typing import List, NoReturn, Dict, Optional, Union
+from typing import List, NoReturn, Dict, Optional
 
-import feedparser
 import urllib3
 
 # Confirmamos que tenemos en el path la ruta de la aplicacion, para poder lanzarlo desde cualquier ruta
@@ -33,15 +32,17 @@ from app import logger
 from app.utils import funciones
 from app.utils.mail2 import ML2
 from app.utils.pushbullet2 import PB2
-from app.utils.settings import FILE_LOG_FEED, FILE_LOG_FEED_VOSE, FILE_LOG_DOWNLOADS
+from app.utils.settings import FILE_LOG_FEED, FILE_LOG_FEED_VOSE, FILE_LOG_DOWNLOADS, CLIENT_TORRENT
 from app.utils.telegram2 import Telegram
 from app.models.model_query import Query
 from app.models.model_notifications import Notifications
 from app.models.model_serie import Serie
 from app.models.model_preferences import Preferences
-from app.models.model_torrent import Torrent
-from app.models.model_grantorrent import FeedparserPropio, GranTorrent
-from app.models.model_showrss import ShowRss
+from app.models.model_t_torrent import Torrent
+from app.models.model_t_grantorrent import FeedparserGranTorrent, GranTorrent
+from app.models.model_t_showrss import FeedparserShowRss, ShowRss
+from app.models.model_t_feedparser import FeedParser
+from app.models.model_t_feed import Feed
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 SERIE_DEBUG = "MR Robot"
@@ -58,92 +59,89 @@ class DescargaAutomaticaCli:
             self.pb3: PB2
             self.ml3: ML2
 
-            self.notificaciones: List[Notifications] = self.show_notifications()  # variable publica
+            self.notifications: List[Notifications] = self.show_notifications()  # variable publica
 
-            self.listaNotificaciones: str = str()
-            self.actualizaDia: str = str()
+            self.series_download_notification: str = str()
+            self.day_updated: str = str()
             preferences: Query = Controller.get_database_configuration()
             self.preferences: Preferences = preferences.response[0]
             # urlNew = self.conf['UrlFeedNewpct']
             url_show: str = self.preferences.url_feed_vose
 
             # Diccionario con las series y capitulos para actualizar la bd el capitulo descargado
-            self.capDescargado: Dict[str, str] = dict()
-            self.consultaUpdate: str = str()
-            self.ultimaSerieNew: str = str()
-            self.ultimaSerieShow: str = str()
-            self.titleSerie: str = str()
+            self.chapter_download: Dict[str, str] = dict()
+            self.query_update: str = str()
+            self.last_serie_esp: str = str()
+            self.last_serie_eng: str = str()
+            self.title_serie: str = str()
 
-            self.feedNew: FeedparserPropio = FeedparserPropio.parse()
-            try:
-                self.feedShow: feedparser.FeedParserDict = feedparser.parse(url_show)
-            except TypeError:  # Para el fallo en fedora
-                self.feedShow: feedparser.FeedParserDict = funciones.feed_parser(url_show)
+            self.feed_esp: FeedParser = FeedparserGranTorrent.parse()
+            self.feed_eng: FeedParser = FeedparserShowRss.parse(url_show)
 
             response_query: Query = Controller.get_series_follow()
-            self.consultaSeries: List[Serie] = response_query.response
+            self.query_series: List[Serie] = response_query.response
 
     def run(self) -> NoReturn:
-        serie_actual_new: str = str()
-        serie_actual_show: str = str()
+        serie_actual_esp: str = str()
+        serie_actual_eng: str = str()
         # SerieActualTemp = str()
 
         if FILE_LOG_FEED.exists():
-            self.ultimaSerieNew: str = FILE_LOG_FEED.read_text()  # FIXME REVISAR
+            self.last_serie_esp: str = FILE_LOG_FEED.read_text()  # FIXME REVISAR
         else:
             FILE_LOG_FEED.write_text('')
-            self.ultimaSerieNew: str = ''
+            self.last_serie_esp: str = ''
 
         if FILE_LOG_FEED_VOSE.exists():
-            self.ultimaSerieShow: str = FILE_LOG_FEED_VOSE.read_text()  # FIXME REVISAR
+            self.last_serie_eng: str = FILE_LOG_FEED_VOSE.read_text()  # FIXME REVISAR
         else:
             FILE_LOG_FEED_VOSE.write_text('')
-            self.ultimaSerieShow: str = ''
+            self.last_serie_eng: str = ''
 
-        for serie in self.consultaSeries:
+        for serie in self.query_series:
             try:
                 logger.info(f'Revisa: {funciones.remove_tildes(serie.title)}')
                 serie_actual_temp: str = self.parser_feed(serie)
                 if serie.vose:
-                    serie_actual_show: str = serie_actual_temp
+                    serie_actual_eng: str = serie_actual_temp
                 else:
-                    serie_actual_new: str = serie_actual_temp
+                    serie_actual_esp: str = serie_actual_temp
 
                 ############################################
                 ############################################
-                #if re.search(SERIE_DEBUG, serie.title, re.IGNORECASE):
+                # if re.search(SERIE_DEBUG, serie.title, re.IGNORECASE):
                 #    sys.exit(0)
                 ############################################
                 ############################################
             except Exception as e:
                 logger.error(f'################ {serie.title} FALLO {e}')
 
-        if len(self.listaNotificaciones) != 0:
+        if len(self.series_download_notification) != 0:
             # logger.info(self.actualizaDia)
             # actualiza los dias en los que sale el capitulo
-            Controller.execute_query_script_sqlite(self.actualizaDia)
+            Controller.execute_query_script_sqlite(self.day_updated)
 
-            for notification in self.notificaciones:
+            for notification in self.notifications:
                 if notification.active:
                     if notification.name == 'Telegram':
                         logger.critical("TEST A")
-                        self.tg3.send_tg(self.listaNotificaciones)
+                        self.tg3.send_tg(self.series_download_notification)
                         logger.critical("TEST B")
                     elif notification.name == 'Pushbullet':
-                        self.pb3.send_text_pb('Gestor series', self.listaNotificaciones)
+                        self.pb3.send_text_pb('Gestor series', self.series_download_notification)
 
         # capitulos que descargo
-        for serie in self.capDescargado.items():
+        for serie in self.chapter_download.items():
             query: str = f'UPDATE Series SET Capitulo_Descargado={str(serie[1])} WHERE Nombre LIKE "{serie[0]}";\n'
-            self.consultaUpdate += query
+            self.query_update += query
 
         # actualiza el ultimo capitulo que he descargado
-        Controller.execute_query_script_sqlite(self.consultaUpdate)
+        Controller.execute_query_script_sqlite(self.query_update)
 
         # Guardar ultima serie del feed
-        if serie_actual_show is not None and serie_actual_new is not None:
-            FILE_LOG_FEED.write_text(funciones.remove_tildes(serie_actual_new))  # FIXME REVISAR
-            FILE_LOG_FEED_VOSE.write_text(funciones.remove_tildes(serie_actual_show))
+        if serie_actual_eng is not None and serie_actual_esp is not None:
+            FILE_LOG_FEED.write_text(funciones.remove_tildes(serie_actual_esp))  # FIXME REVISAR
+            FILE_LOG_FEED_VOSE.write_text(funciones.remove_tildes(serie_actual_eng))
         else:
             logger.error('PROBLEMA CON if SerieActualShow is not None and SerieActualNew is not None:')
 
@@ -154,52 +152,49 @@ class DescargaAutomaticaCli:
         :return:
         """
         # Contine el feed de series en español o vose segun el idioma en el que se ve la serie
-        feed: Union[feedparser.FeedParserDict, FeedparserPropio]
+        feed_parser: FeedParser
 
         if serie.vose:
-            last_serie: str = self.ultimaSerieShow
-            feed = self.feedShow
+            last_serie: str = self.last_serie_eng
+            feed_parser = self.feed_eng
         else:
-            last_serie: str = self.ultimaSerieNew
-            feed = self.feedNew
+            last_serie: str = self.last_serie_esp
+            feed_parser = self.feed_esp
 
         if not self.preferences.path_download.exists():
             Path.mkdir(self.preferences.path_download)
 
         # if len(str(cap)) == 1:
         #    cap = '0' + str(cap)
-        import app.models.model_feed
-        entrie: Union[feedparser.FeedParserDict, app.models.model_feed.Feed]
-        for entrie in feed.entries:
-            self.titleSerie = funciones.remove_tildes(entrie.title)
+        entrie: Feed
+        for entrie in feed_parser.entries:
+            self.title_serie = funciones.remove_tildes(entrie.title)
             # cuando llegamos al ultimo capitulo pasamos a la siguiente serie
             # logger.info(self.titleSerie, ".........", ultimaSerie, ".FIN")
-            if self.titleSerie == last_serie:
+            if self.title_serie == last_serie:
                 # retornamos el valor que luego usaremos en ultima serie para guardarlo en el fichero
                 pass
                 # return funciones.remove_tildes(entrie.title)  # FIXME DESCOMENTAR
 
-            regex_vose = rf'({funciones.scapes_parenthesis(serie.title.lower())}) S(\d+).*E(\d+).*'
-            # regex_cast = r'(?i){}.*Temporada( )?({}|{}|{}).*Capitulo( )?\d+.*'.format(
-            #    funciones.escapaParentesis(serie.lower()), tem, tem + 1, tem + 2)
-            regex_cast = rf'{funciones.scapes_parenthesis(serie.title.lower())}'
+            regex_eng = rf'{re.escape(serie.title.lower())}'
+            regex_esp = rf'{re.escape(serie.title.lower())}'
 
             if serie.title.lower() == SERIE_DEBUG.lower():
-                logger.warning(f"{regex_cast} - {self.titleSerie}")
+                logger.warning(f"{regex_esp} - {self.title_serie}")
                 logger.warning(entrie.link)
 
             estado: bool = False
             if serie.vose:
-                if re.search(regex_vose, self.titleSerie, re.IGNORECASE):
+                if re.search(regex_eng, self.title_serie, re.IGNORECASE):
                     logger.info(f'DESCARGA: {entrie}')
                     estado = True
             else:
-                if re.search(regex_cast, self.titleSerie, re.IGNORECASE):
+                if re.search(regex_esp, self.title_serie, re.IGNORECASE):
                     logger.info(f'DESCARGA: {entrie}')
                     estado = True
 
             if estado:
-                title_serie = self.titleSerie  # conversion necesaria para usar como str
+                title_serie = self.title_serie  # conversion necesaria para usar como str
                 try:  # arreglar problema codificacion de algunas series
                     logger.info(title_serie)
                 except Exception as e:
@@ -209,21 +204,13 @@ class DescargaAutomaticaCli:
 
                 torrents: Torrent
                 if serie.vose:
-                    torrents = ShowRss(title_serie, entrie.link, self.preferences.path_download)
+                    torrents = ShowRss(title_serie, entrie.link, self.preferences.path_download,
+                                       client_torrent=CLIENT_TORRENT)
                 else:
                     torrents = GranTorrent(title_serie, entrie.link, self.preferences.path_download)
 
                 FILE_LOG_DOWNLOADS.write_text(f'{time.strftime("%Y%m%d")} {title_serie}\n')
-
-                if serie.vose:
-                    # self.extra_action(title_serie)
-                    response = re.search(regex_vose, self.titleSerie, re.IGNORECASE)
-                    # creo un string para solo mandar una notificacion
-                    self.listaNotificaciones += f'{response.group(1)} {response.group(2)}x{response.group(3)}\n'
-                else:
-                    # self.extra_action(f'{entrie.title} {entrie.chapter}')
-                    # creo un string para solo mandar una notificacion
-                    self.listaNotificaciones += f'{entrie.title} {entrie.epi}\n'
+                self.series_download_notification += f'{entrie.title} {entrie.epi}\n'
 
                 logger.debug(f'{torrents}')
                 # Descargamos el/los torrents de la serie
@@ -234,18 +221,15 @@ class DescargaAutomaticaCli:
 
                 # Diccionario con todos los capitulos descargados, para actualizar la bd con los capitulos por
                 # donde voy regex para coger el capitulo unicamente
-                if not isinstance(entrie, feedparser.FeedParserDict):
-                    if entrie.season != 99:
-                        self.actualizaDia += f'''\nUPDATE series SET Dia="{funciones.calculate_day_week()}" WHERE Nombre LIKE "{serie.title}";'''
-                        self.capDescargado[serie.title] = entrie.season
-                else:
-                    self.actualizaDia += f'''\nUPDATE series SET Dia="{funciones.calculate_day_week()}" WHERE Nombre LIKE "{serie.title}";'''
-                    self.capDescargado[serie.title] = re.search(regex_vose, self.titleSerie, re.IGNORECASE).group(3)
+                # chapter 99 implica que es una temporada completa
+                if entrie.chapter != FeedparserGranTorrent.NUMBER:
+                    self.day_updated += f'''\nUPDATE series SET Dia="{funciones.calculate_day_week()}" WHERE Nombre LIKE "{serie.title}";'''
+                    self.chapter_download[serie.title] = str(entrie.chapter)
 
                 logger.debug(f'DESCARGANDO: {serie.title}')
 
-        if len(feed.entries) > 0:
-            return funciones.remove_tildes(feed.entries[0].title)
+        if len(feed_parser.entries) > 0:
+            return funciones.remove_tildes(feed_parser.entries[0].title)
         else:
             logger.warning("feed.entries is empty")
             return None
@@ -256,13 +240,12 @@ class DescargaAutomaticaCli:
         Metodo que no hace nada en esta clase pero que en herencia es usado para usar el entorno ggrafico que QT
         :return:
         """
-        pass
 
     def get_series(self) -> List[Serie]:
-        return self.consultaSeries
+        return self.query_series
 
     def get_actual_serie(self) -> str:
-        return self.titleSerie
+        return self.title_serie
 
     def show_notifications(self) -> List[Notifications]:
         """

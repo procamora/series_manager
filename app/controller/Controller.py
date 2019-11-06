@@ -14,7 +14,7 @@ from app.models.model_serie import Serie
 from app.models.model_serie_imdb import SerieImdb
 from app.models.model_states import States
 from app.utils.connect_sqlite import conection_sqlite, execute_script_sqlite, dump_database
-from app.utils.settings import DATABASE_ID, PATH_DATABASE
+from app.utils.settings import DATABASE_ID, PATH_DATABASE, MODE_DEBUG
 
 
 def format_text(param_text: bytes) -> Optional[str]:
@@ -125,7 +125,11 @@ def get_credentials_fileconf() -> Query:
 
 def get_credentials() -> Query:
     query_str = 'SELECT * FROM Credenciales LIMIT 1'
-    return execute_query_select(query_str, PATH_DATABASE, Credentials())
+    response_query = execute_query_select(query_str, PATH_DATABASE, Credentials())
+    if not response_query.is_empty() and MODE_DEBUG:
+        # bot de pruebas
+        response_query.response[0].api_telegram = '694076475:AAFfiSVSnuf387hnvJOIjQOHP6w7veZbO-M'
+    return response_query
 
 
 def get_preferences() -> Query:

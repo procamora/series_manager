@@ -21,22 +21,19 @@ if new_path not in sys.path:
     sys.path.append(new_path)
 
 from app import logger
-from app.models.model_torrent import Torrent
-from app.models.model_feed import Feed
+from app.models.model_t_feedparser import FeedParser
+from app.models.model_t_torrent import Torrent
+from app.models.model_t_feed import Feed
+
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 
-class FeedparserPropio:
+class FeedparserDonTorrent(FeedParser):
     def __init__(self) -> NoReturn:
         self.entries: List[Feed] = list()
 
-    def add(self, title: str, cap: int, link: str) -> NoReturn:
-        # print(cap)
-        f = Feed(title.strip(), link, cap)
-        self.entries.append(f)
-
     @staticmethod
-    def parse(url: str = 'https://dontorrent.com/series/hd') -> FeedparserPropio:
+    def parse(url: str = 'https://dontorrent.com/series/hd') -> FeedParser:
         """
         """
         req_headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; WOW64; rv:35.0) Gecko/20100101 Firefox/35.0',
@@ -53,7 +50,7 @@ class FeedparserPropio:
         # sopa = BeautifulSoup(fichero, 'html.parser')
         days = sopa.findAll('div', {"class": "card-body"})
         # result = sopa.findAll('ul', {"class": "noticias-series"})
-        f = Feedparser()
+        f = FeedparserDonTorrent()
         for day in days:
             if not day.findAll('h5'):  # si tiene h5 signigica que es una caja de imagenes de las series
                 print(day)
@@ -67,8 +64,9 @@ class FeedparserPropio:
                         logger.debug(capitulo.text)
                         url = f'https://dontorrent.com{serie["href"]}'
                         # obtenemos todos los episodios y mandamos unicammente el ultimo
-                        chapters = re.findall('\d+', str(capitulo.text))
-                        f.add(serie.text, int(chapters[-1]), url)
+                        season = re.findall('\d+', str(capitulo.text))
+                        # FIXME CAMBIAR 88 POR EL chapter CORRESPONDIENTE
+                        f.add(serie.text, int(season[-1]), 88, url)
 
         [logger.debug(f'-> {i}') for i in f.entries]
         return f

@@ -6,7 +6,7 @@ from __future__ import annotations
 import os
 import re
 import sys
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import PurePath, Path  # nueva forma de trabajar con rutas
 from typing import NoReturn, Optional, List
 
@@ -20,23 +20,19 @@ new_path: str = f'{absolut_path.parent}/../../'
 if new_path not in sys.path:
     sys.path.append(new_path)
 
-from app.models.model_torrent import Torrent
-from app.models.model_feed import Feed
+from app.models.model_t_torrent import Torrent
+from app.models.model_t_feedparser import FeedParser
 from app import logger
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 
 @dataclass
-class FeedparserPropio():
-    entries: List[Feed] = field(default_factory=list)
-
-    def add(self, title: str, chapter: int, season: int, link: str) -> NoReturn:
-        f = Feed(title.strip(), chapter, season, link)
-        self.entries.append(f)
+class FeedparserGranTorrent(FeedParser):
+    NUMBER:int = 99 # INDICA QUE ES UNA TEMPORADA COMPLETA
 
     @staticmethod
-    def parse(url: str = 'https://grantorrent.tv/series-2/') -> FeedparserPropio:
+    def parse(url: str = 'https://grantorrent.tv/series-2/') -> FeedParser:
         """
         """
         req_headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; WOW64; rv:35.0) Gecko/20100101 Firefox/35.0',
@@ -51,26 +47,26 @@ class FeedparserPropio():
 
         sopa = BeautifulSoup(login.text, 'html.parser')
         all_box = sopa.findAll('div', {"class": "contenedor-home"})
-        f = FeedparserPropio()
+        f = FeedparserGranTorrent()
 
         for box in all_box[1].findAll('div', {'class': 'imagen-post'}):
             url = box.a['href']
             name = box.find("div", {"class": "bloque-inferior"}).text.strip()
             regex = r'(.*)( )+((\d+).(\d+))'
             regex_response = re.search(regex, name)
-            #logger.debug(name)
+            # logger.debug(name)
             # Series con capitulo o capitulos: Navy  17×02 or Keeping 2×05-06
             if regex_response is not None:
-                season = int(re.search(regex, name).group(5))
+                chapter = int(re.search(regex, name).group(5))
             # Series que tiene la temporada completa
             else:
                 regex = r'(.*)( )+(Temporada (\d+) Completa)'
                 regex_response = re.search(regex, name)
-                season = 99
+                chapter = FeedparserGranTorrent.NUMBER
 
             title = regex_response.group(1)
-            chapter = int(re.search(regex, name).group(4))
-            f.add(title, chapter, season, url)
+            season = int(re.search(regex, name).group(4))
+            f.add(title, season, chapter, url)
 
         [logger.debug(f'-> {i}') for i in f.entries]
         return f
@@ -139,4 +135,4 @@ if __name__ == '__main__':
     t.download_file_torrent()
     print(t)
     print("##############")
-    FeedparserPropio.parse()
+    FeedparserGranTorrent.parse()

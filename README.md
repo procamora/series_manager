@@ -39,7 +39,7 @@ README
 Para compilar el código fuente, se requieren algunas bibliotecas externas.
 Las librerías que he usado con sus respectivas versiones a día de hoy (29/08/2016) son:
 
-* Python > 3.4
+* Python >= 3.6
 * BeautifulSoup4 (4.5.1)
 * feedparser (5.2.1)
 * imdbpie (4.0.2)
@@ -60,8 +60,8 @@ Las librerías que he usado con sus respectivas versiones a día de hoy (29/08/2
 
 #### Instalación en Windows:
 
-1. Tener instalado python 3.5 y pip3 en el sistema, y que ambos estén el el path de windows.
-poner url de python  3.5
+1. Tener instalado Python >= 3.6 y pip3 en el sistema, y que ambos estén el el path de windows.
+poner url de python  3.6
 2. Instalar las librerias necesarias para python 3.
 
 pip3 install -r requirements.txt
@@ -69,12 +69,12 @@ pip3 install -r requirements.txt
 
 #### Instalación en Linux
 
-1. Tener instalado python 3.4 y pip3 en el sistema, esta testeado en *Debien 7* y *Fedora 24*, el resto de distribuciones no estan testeadas.
+1. Tener instalado python 3.7 y pip3 en el sistema, esta testeado en *Raspbian* y *Fedora 30*, el resto de distribuciones no estan testeadas.
 
 **Debian**:
 
 ```bash
-sudo apt-get install python3-pip python3-pyqt5 python3-pyqt5.qtsql pyqt5-dev-tools python-libtorrent 
+sudo apt-get install python3-pip python3-pyqt5 python3-pyqt5.qtsql pyqt5-dev-tools python3-libtorrent 
 ```
 
 **Fedora**:

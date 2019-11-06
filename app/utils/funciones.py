@@ -2,20 +2,17 @@
 # -*- coding: utf-8 -*-
 import datetime
 import glob
-import re
 import time
 from pathlib import Path  # nueva forma de trabajar con rutas
 from typing import List, NoReturn
 
-import feedparser
 import requests
 import unidecode
 import urllib3
-from bs4 import BeautifulSoup
 
+import app.controller.Controller as Controller
 from app import logger
 from app.utils.settings import DIRECTORY_WORKING, DIRECTORY_LOCAL, PATH_DATABASE
-import app.controller.Controller as Controller
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -170,63 +167,8 @@ def download_file(url, destino, libreria='requests'):
         import wget
         wget.download(url, destino)
 
-# YA NO ES VALIDA
-def _descarga_url_torrent_aux_pctnew(page):
-    try:
-        sopa = BeautifulSoup(page, 'html.parser')
-        result = sopa.find('a', {"class": "btn-torrent"})['href']
-        # Si obtenemos una url es correcto sino buscamos en el codigo html
-        regex = r"^(https?://www\.|https://www\.|http://|https://)?[a-z0-9]+([\-\.][a-z0-9]+)*\.[a-z]{2,5}" \
-                r"(:[0-9]{1,5})?(\/.*)?$"
-        if re.match(regex, result):
-            return result
-        else:  # FIXME USAR selenium para simular navegador
-            """ si tiene puesto en href "javascript:void(0)" llamara a la funcion openTorrent() que tiene en la variable
-            window.location.href la url del torrent a descaegar, por lo que lo buscamos a pelo en el html y eliminamos
-            lo sobrante, feo pero funcional
-            """
-            javascript = re.findall(r'window\.location\.href = \".*\";', page)
-            return javascript[0].replace("window.location.href = \"", "").replace("\";", "")
-            # return sopa.find('div', {"id": "tab1"}).a['href']
-    except Exception as e:
-        print(e)
-        return None
 
-
-# YA NO ES VALIDA
-def _busca_torrent_antiguo(direcc):  # para newpct
-    """
-    Funcion que obtiene la url torrent del la dirreccion que recibe
-
-    :param str direcc: Dirreccion de la pagina web que contiene el torrent
-
-    :return str: Nos devuelve el string con la url del torrent
-    """
-
-    session = requests.session()
-    page = session.get(direcc, verify=False).text
-    sopa = BeautifulSoup(page, 'html.parser')
-
-    return sopa.find('span', id="content-torrent").a['href']
-
-
-def feed_parser(url):
-    """
-    Da un fallo en fedora 23, por eso hace falta esta funcion
-    https://github.com/kurtmckee/feedparser/issues/30
-    """
-
-    try:
-        return feedparser.parse(url)
-    except TypeError:
-        if 'drv_libxml2' in feedparser.PREFERRED_XML_PARSERS:
-            feedparser.PREFERRED_XML_PARSERS.remove('drv_libxml2')
-            return feedparser.parse(url)
-        else:
-            raise
-
-
-def show_message(label, texto='Texto plantilla', estado=True)-> NoReturn:
+def show_message(label, texto='Texto plantilla', estado=True) -> NoReturn:
     """
     Muestra una determinada label con rojo o verde (depende del estado) y con el texto indicado
     """
@@ -245,7 +187,7 @@ def scapes_parenthesis(texto) -> str:
     return texto.replace('(', '\\(').replace(')', '\\)')
 
 
-def internet_on()-> bool:
+def internet_on() -> bool:
     try:
         session = requests.session()
         session.get('http://www.google.com', verify=False)

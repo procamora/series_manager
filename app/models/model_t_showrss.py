@@ -4,14 +4,16 @@
 from __future__ import annotations
 
 import os
+import re
+import subprocess
 import sys
 import time
 from builtins import print
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import PurePath, Path  # nueva forma de trabajar con rutas
-from typing import NoReturn, List
+from typing import NoReturn
 
-import libtorrent
+import feedparser
 import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
@@ -22,20 +24,47 @@ if new_path not in sys.path:
     sys.path.append(new_path)
 
 from app import logger
-from app.models.model_torrent import Torrent
-from app.models.model_feed import Feed
+from app.models.model_t_torrent import Torrent
+from app.models.model_t_feedparser import FeedParser
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 
 @dataclass
-class FeedparserPropio():
-    entries: List[Feed] = field(default_factory=list)
+class FeedparserShowRss(FeedParser):
+    regex: str = 'S(\d+).*E(\d+).*'
 
     @staticmethod
-    def parse(url: str = 'https://grantorrent.tv/series-2/') -> FeedparserPropio:
-        f = FeedparserPropio()
+    def parse(url: str) -> FeedParser:
+        feed_show: feedparser.FeedParserDict = FeedparserShowRss.feed_parser(url)
+
+        f = FeedparserShowRss()
+        for entrie in feed_show.entries:
+            new_regex = f'{FeedparserShowRss.regex}'
+            # Para obtener el titulo parto por el S00E00  (Mr Robot S04E05 1080p WEB x264 XLF)
+            title: str = str(re.sub(new_regex, '', entrie.title, re.IGNORECASE))
+            season = int(re.search(FeedparserShowRss.regex, entrie.title, re.IGNORECASE).group(1))
+            chapter = int(re.search(FeedparserShowRss.regex, entrie.title, re.IGNORECASE).group(2))
+            f.add(title, season, chapter, entrie.link)
+
+        [logger.debug(f'-> {i}') for i in f.entries]
         return f
+
+    @staticmethod
+    def feed_parser(url) -> feedparser.FeedParserDict:
+        """
+        Da un fallo en fedora 23, por eso hace falta esta funcion
+        https://github.com/kurtmckee/feedparser/issues/30
+        """
+
+        try:
+            return feedparser.parse(url)
+        except TypeError:
+            if 'drv_libxml2' in feedparser.PREFERRED_XML_PARSERS:
+                feedparser.PREFERRED_XML_PARSERS.remove('drv_libxml2')
+                return feedparser.parse(url)
+            else:
+                raise
 
 
 @dataclass
@@ -43,10 +72,33 @@ class ShowRss(Torrent):
     """
     """
 
+    client_torrent: str = None
+
+    @staticmethod
+    def execute_command(binary: str, magnet: str) -> NoReturn:
+        if binary is None:
+            logger.critical("No se ha proporcionado un cliente torrent")
+            sys.exit(1)
+
+        command: str = f'{binary} {magnet}'
+        logger.debug(f'execute_command: {command}')
+        execute = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        stdout, stderr = execute.communicate()
+        print(len(stderr))
+        print(stderr)
+        if len(stderr) != 0:
+            logger.error(f"{binary} ha fallado añadiendo el magnet: {magnet}")
+
     def download_file_torrent(self) -> NoReturn:
         # Por herencia  se pone http:// pero los magnet no lo tienen y hay que borrarlo
         self.url_web = self.url_web[7:]
-        self.magnet2torrent(self.url_web, str(self.path_download))
+        try:
+            self.magnet2torrent(self.url_web, str(self.path_download))
+        except ModuleNotFoundError:
+            self.execute_command(self.client_torrent, self.url_web)
+            sys.exit(0)
+            pass
+
         logger.info("FIN")
         # time.sleep(10)
 
@@ -58,6 +110,7 @@ class ShowRss(Torrent):
         :param path_download:
         :return:
         """
+        import libtorrent
         logger.info(magnet)
         logger.info(path_download)
         sess = libtorrent.session()
