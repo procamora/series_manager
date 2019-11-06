@@ -17,7 +17,7 @@ import time
 from abc import abstractmethod
 from pathlib import Path  # nueva forma de trabajar con rutas
 from pathlib import PurePath  # nueva forma de trabajar con rutas
-from typing import List, NoReturn, Dict, Optional
+from typing import List, NoReturn, Dict, Optional, AnyStr
 
 import urllib3
 
@@ -46,6 +46,9 @@ from app.models.model_t_feed import Feed
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 SERIE_DEBUG = "MR Robot"
+
+# global global_response
+global_response: str = str()
 
 
 # https://gist.github.com/kaotika/e8ca5c340ec94f599fb2
@@ -81,10 +84,11 @@ class DescargaAutomaticaCli:
             response_query: Query = Controller.get_series_follow()
             self.query_series: List[Serie] = response_query.response
 
-    def run(self) -> NoReturn:
+    def run(self) -> AnyStr:
         serie_actual_esp: str = str()
         serie_actual_eng: str = str()
         # SerieActualTemp = str()
+        global global_response
 
         if FILE_LOG_FEED.exists():
             self.last_serie_esp: str = FILE_LOG_FEED.read_text()  # FIXME REVISAR
@@ -101,6 +105,7 @@ class DescargaAutomaticaCli:
         for serie in self.query_series:
             try:
                 logger.info(f'Revisa: {funciones.remove_tildes(serie.title)}')
+                global_response += f'Revisa: {funciones.remove_tildes(serie.title)}\n'
                 serie_actual_temp: str = self.parser_feed(serie)
                 if serie.vose:
                     serie_actual_eng: str = serie_actual_temp
@@ -145,6 +150,8 @@ class DescargaAutomaticaCli:
         else:
             logger.error('PROBLEMA CON if SerieActualShow is not None and SerieActualNew is not None:')
 
+        return global_response
+
     def parser_feed(self, serie: Serie) -> Optional[str]:
         """
         Metodo que comprueba para la serie proporcionada si se encuentra en el feed de nuevos capitulos publicados
@@ -153,6 +160,7 @@ class DescargaAutomaticaCli:
         """
         # Contine el feed de series en español o vose segun el idioma en el que se ve la serie
         feed_parser: FeedParser
+        global global_response
 
         if serie.vose:
             last_serie: str = self.last_serie_eng
@@ -187,10 +195,12 @@ class DescargaAutomaticaCli:
             if serie.vose:
                 if re.search(regex_eng, self.title_serie, re.IGNORECASE):
                     logger.info(f'DESCARGA: {entrie}')
+                    global_response += f'DESCARGA: {entrie}'
                     estado = True
             else:
                 if re.search(regex_esp, self.title_serie, re.IGNORECASE):
                     logger.info(f'DESCARGA: {entrie}')
+                    global_response += f'DESCARGA: {entrie}'
                     estado = True
 
             if estado:

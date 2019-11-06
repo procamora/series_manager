@@ -22,10 +22,11 @@ if new_path not in sys.path:
     sys.path.append(new_path)
 
 from app import logger
-from app.utils.settings import DIRECTORY_WORKING, PASSWORD_CLIENT_TORRENT, CLIENT_TORRENT
+from app.utils.settings import PASSWORD_CLIENT_TORRENT, CLIENT_TORRENT
 import app.utils.funciones as funciones
 from app.utils.settings import FILE_LOG_FEED
 import app.controller.Controller as Controller
+from app.utils.descarga_automatica_cli import DescargaAutomaticaCli
 from app.models.model_query import Query
 from app.models.model_credentials import Credentials
 from app.models.model_preferences import Preferences
@@ -116,10 +117,16 @@ def command_system(message) -> NoReturn:
 def send_cgs(message) -> Union[NoReturn, None]:
     bot.reply_to(message, 'Ejecutado con gs')
 
-    command = 'cd /home/pi/Gestor-de-Series/ && /usr/bin/python3 /home/pi/Gestor-de-Series/descarga_automatica_cli.py'
+    d = DescargaAutomaticaCli()
+    d.run()
+
+    command = 'cd /home/pi/Gestor-de-Series/ && python3.7 /home/pi/Gestor-de-Series/app/utils/descarga_automatica_cli.py'
     stdout, stderr, execute = Controller.execute_command(command)
     # stdout = formatea(stdout) # sino stdout esta en bytes
 
+    print(stdout)
+    print(stderr)
+    print(execute)
     if check_error(execute, stderr):
         bot.reply_to(message, f'Error: {stderr}')
         return
@@ -228,17 +235,24 @@ def send_show_torrent(message) -> Union[NoReturn, None]:
     command = f'transmission-remote 127.0.0.1:9091 --auth=pi:{PASSWORD_CLIENT_TORRENT} -l | egrep -v "Finished|Stopped|Seeding|ID|Sum:"'
     stdout, stderr, execute = Controller.execute_command(command)
 
+    response: str = str()
     if check_error(execute, stderr):
         bot.reply_to(message, f'Error: {stderr}')
         return
     elif len(stdout) != 0:
-        for i in stdout:
-            regex = r'\[AC3 5\.1-Castellano-AC3 5.1 Ingles\+Subs\]|\[ES-EN\]|\[AC3 5.1 Español Castellano\]|' \
-                    r'\[HDTV 720p?\]|(\d+\.?\d+|None)( )+(MB|GB|kB|Unknown).*(Up & Down|Downloading|Queued|' \
-                    r'Idle|Uploading)( )*| - Temporada \d+ |(\d+\.\d+)( )+(\d+\.\d+)',
-            line = re.sub(regex, '', i)  # fixme revisar que esta bien
-            # line = re.sub(regex, '', stdout)
-        bot.reply_to(message, line)
+        for i in stdout.split('\n'):
+            # Sustituimos la columna anterior al nombre de la serie por \n
+            split_lines = re.sub('Idle|Downloading|Up & Down|Queued', '\n', i)
+            # Partimos por el \n puesto anteriormente y la ultima columna tiene el nombre
+            name_serie = (split_lines.split('\n')[-1]).strip()
+            regex = r'\[ES-EN\]|\[AC3 5.1 (Español )?Castellano\]|\[HDTV 720p?\]| - Temporada \d+( COMPLETA)? |\[www.descargas2020.org\]|\[www.pctnew.org\]|\.www.DESCARGASMIX.com.mkv|\[AC3 (5\.1-DTS )?5\.1-Castellano-AC3 5\.1( |\-)Ingles\+Subs\]|\[Español Castellano\]|\[wWw.EliteTorrent.IO\]|\[HDTV\]|\.WEB.x264-XLF\[rarbg\]'
+            # print(regex)
+            if len(name_serie) > 0:
+                name_serie = re.sub(regex, '', name_serie)
+                # print(name_serie)
+                response += f'{name_serie}\n'
+
+        bot.reply_to(message, response)
     else:
         bot.reply_to(message, 'Ningun torrent activo en este momento.')
 
@@ -280,7 +294,7 @@ def handle_cmd(message) -> NoReturn:
 def handle_magnet(message) -> NoReturn:
     bot.reply_to(message, 'Ejecutado add torrent')
     command = f'{CLIENT_TORRENT} "message.text"'
-    #command = f'transmission-remote 127.0.0.1:9091 --auth=pi:{pass_transmission} --add "{message.text}"'
+    # command = f'transmission-remote 127.0.0.1:9091 --auth=pi:{pass_transmission} --add "{message.text}"'
     stdout, stderr, execute = Controller.execute_command(command)
     # stdout = formatea(stdout)  # sino stdout esta en bytes
 
