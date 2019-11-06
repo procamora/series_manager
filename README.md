@@ -1,6 +1,15 @@
 README
 ======
 
+
+![main](images/main.png)
+![main](images/search.png)
+![main](images/edit.png)
+![main](images/revisar.png)
+![main](images/update_all.png)
+![main](images/preferencias.png)
+![main](images/notificaciones.png)
+
 # IMPLEMENTACIONES FUTURAS
 + [ ] Usar API tviso
 + [ ] Hacer una plantilla por defecto de la configuración mínimo de sql, si uso la de la ultima por fecha a veces falla, ya que no esta subida a github

@@ -9,6 +9,7 @@ from app.views.ui.lista_activa_ui import Ui_Dialog
 
 from app import logger
 
+from app.utils.settings import PATH_DATABASE
 
 class ListaActiva(QtWidgets.QDialog):
     def __init__(self, parent: object = None) -> NoReturn:
@@ -21,8 +22,6 @@ class ListaActiva(QtWidgets.QDialog):
         self.state_current = self.state_ok  # actual
 
         self.setWindowTitle('Series Activas')
-
-        logger.debug(self.db)
 
         self.database = QtSql.QSqlDatabase.addDatabase('QSQLITE')
         self.create_connection()
@@ -44,7 +43,7 @@ class ListaActiva(QtWidgets.QDialog):
 
         """
 
-        self.database.setDatabaseName(self.db)
+        self.database.setDatabaseName(str(PATH_DATABASE))
         if self.database.open():
             return True
         else:
