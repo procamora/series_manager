@@ -27,7 +27,8 @@ WORKDIR_DEFAULT = True
 # No se usa por defecto
 WORKDIR = /tmp/
 # Cliente torrent que se usara como comando para añadir enlaces magnet
-CLIENT_TORRENT = transmission-cli
+CLIENT_TORRENT = transmission-remote 127.0.0.1:9091 --auth=pi:raspberry --add
+PASS_CLIENT_TORRENT = raspberry
 """
 
 FILE_CONFIG = 'settings.ini'
@@ -122,7 +123,9 @@ else:
     else:
         DIRECTORY_WORKING = Path(os.environ["HOME"], basics.get("NAME_WORKDIR"))
 
+# CLIENT TORRENT
 CLIENT_TORRENT = configurable.get('CLIENT_TORRENT')
+PASSWORD_CLIENT_TORRENT = configurable.get('PASS_CLIENT_TORRENT')
 
 # BASE DE DATOS
 DATABASE_ID: int = configurable.getint("DATABASE_ID")

@@ -20,8 +20,9 @@ absolut_path: PurePath = PurePath(os.path.realpath(__file__))  # Ruta absoluta d
 new_path: str = f'{absolut_path.parent}/../../'
 if new_path not in sys.path:
     sys.path.append(new_path)
+
 from app import logger
-from app.utils.settings import DIRECTORY_WORKING
+from app.utils.settings import DIRECTORY_WORKING, PASSWORD_CLIENT_TORRENT, CLIENT_TORRENT
 import app.utils.funciones as funciones
 from app.utils.settings import FILE_LOG_FEED
 import app.controller.Controller as Controller
@@ -41,14 +42,13 @@ else:
 
 preferences: Preferences
 if not response_query_preferences.is_empty():
-    credentials = response_query_preferences.response[0]
+    preferences = response_query_preferences.response[0]
 else:
     logger.critical("No se han obtenido las preferencias")
     sys.exit(1)
 
 administrador = 33063767
 users_permitted = [33063767, 40522670]
-pass_transmission = credentials.pass_transmission
 
 bot = TeleBot(credentials.api_telegram)
 bot.send_message(administrador, "El bot se ha iniciado")
@@ -131,8 +131,7 @@ def send_cgs(message) -> Union[NoReturn, None]:
 
 @bot.message_handler(func=lambda message: message.chat.id == administrador, commands=['/empty_log'])
 def send_log(message) -> NoReturn:
-    with open(FILE_LOG_FEED, 'w'):
-        pass
+    FILE_LOG_FEED.write_text('')
 
     bot.reply_to(message, 'Log vaciado')
     return  # solo esta puesto para que no falle la inspeccion de codigo
@@ -226,7 +225,7 @@ def send_info(message) -> Union[NoReturn, None]:
 
 @bot.message_handler(func=lambda message: message.chat.id == administrador, commands=['show_torrent'])
 def send_show_torrent(message) -> Union[NoReturn, None]:
-    command = f'transmission-remote 127.0.0.1:9091 --auth=pi:{pass_transmission} -l | egrep -v "Finished|Stopped|Seeding|ID|Sum:"'
+    command = f'transmission-remote 127.0.0.1:9091 --auth=pi:{PASSWORD_CLIENT_TORRENT} -l | egrep -v "Finished|Stopped|Seeding|ID|Sum:"'
     stdout, stderr, execute = Controller.execute_command(command)
 
     if check_error(execute, stderr):
@@ -280,8 +279,8 @@ def handle_cmd(message) -> NoReturn:
 @bot.message_handler(func=lambda message: message.chat.id == administrador, regexp=r"^magnet:\?xt=urn.*")
 def handle_magnet(message) -> NoReturn:
     bot.reply_to(message, 'Ejecutado add torrent')
-
-    command = f'transmission-remote 127.0.0.1:9091 --auth=pi:{pass_transmission} --add "{message.text}"'
+    command = f'{CLIENT_TORRENT} "message.text"'
+    #command = f'transmission-remote 127.0.0.1:9091 --auth=pi:{pass_transmission} --add "{message.text}"'
     stdout, stderr, execute = Controller.execute_command(command)
     # stdout = formatea(stdout)  # sino stdout esta en bytes
 

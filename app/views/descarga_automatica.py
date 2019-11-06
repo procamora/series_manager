@@ -55,8 +55,6 @@ class DescargaAutomatica(QtWidgets.QDialog):
         self.setWindowTitle('Descarga automatica de newpct1')
         self.ui.progressBar.setValue(self.n)
 
-        # variable de acceso compartido, no se como hacerlo de otra forma
-        DescargaAutomatica.notificaciones = DescargaAutomaticaCli.show_notifications()
         response_query: Query = Controller.get_series_follow()
         self.series: List[Serie] = response_query.response
 
@@ -64,6 +62,9 @@ class DescargaAutomatica(QtWidgets.QDialog):
         self.ui.pushButtonCerrar.clicked.connect(self.close)
 
         self.thread = Mythread(self.ui.progressBar, self.ui.textEditDescargadas)
+        # variable de acceso compartido, no se como hacerlo de otra forma
+        self.thread.show_notifications()
+        #DescargaAutomatica.notificaciones = DescargaAutomaticaCli.show_notifications()
         self.thread.total.connect(self.ui.progressBar.setMaximum)
         self.thread.update.connect(self.update)
         self.thread.finished.connect(self.close)

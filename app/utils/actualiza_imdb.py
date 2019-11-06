@@ -62,8 +62,9 @@ class UpdateImdb:
         :param imdb_id:
         :return:
         """
+        title: Title = None
         try:
-            title: Title = self.imdb.get_title_by_id(imdb_id)
+            title = self.imdb.get_title_by_id(imdb_id)
             if title.data['seasons'][-1] == 'unknown':  # en algunas series la ultima temporada pone unknown
                 season = title.data['seasons'][-2]
             else:
@@ -73,7 +74,9 @@ class UpdateImdb:
             return SerieImdb(title.data['title'], season, chapter, title.data['year_end'], imdb_id)
         except Exception as e:
             logger.error(e)
-            logger.error(f'FALLO: {title.data["title"]}')
+            logger.error(f'FALLO: {imdb_id}')
+            if title is not None:
+                logger.error(f'FALLO: {title.data["title"]}')
 
     def update_season(self):  # tarda mucho
         # para actualizar_insertar series con mod parcial

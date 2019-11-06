@@ -80,7 +80,7 @@ class ShowRss(Torrent):
             logger.critical("No se ha proporcionado un cliente torrent")
             sys.exit(1)
 
-        command: str = f'{binary} {magnet} &' # sino se lanza como hilo se queda bloqueado hasta que termina
+        command: str = f'{binary} {magnet}'
         logger.debug(f'execute_command: {command}')
         execute = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         stdout, stderr = execute.communicate()

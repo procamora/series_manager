@@ -162,7 +162,7 @@ class DonTorrent(Torrent):
 
 if __name__ == '__main__':
     url1 = 'https://dontorrent.org/pelicula/21371/Mongol'
-    url1 = 'https://dontorrent.org/serie/63845/63846/Batwoman-1-Temporada-720p'
+    #url1 = 'https://dontorrent.org/serie/63845/63846/Batwoman-1-Temporada-720p'
     t = DonTorrent('test1', url1, PurePath('/home/procamora/Documents/Gestor-Series/'))
     print(t)
     print(t.get_url_torrent())

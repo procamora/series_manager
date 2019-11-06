@@ -166,9 +166,9 @@ class Preferencias(QtWidgets.QDialog):
 
 
 def main():
-    app = QtWidgets.QApplication(sys.argv)
+    qapp = QtWidgets.QApplication(sys.argv)
     Preferencias.get_data()
-    return app
+    return qapp
 
 
 # revisar cuando pongo otra, poner insetar en vez de otra

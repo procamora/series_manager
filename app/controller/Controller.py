@@ -137,10 +137,10 @@ def get_preferences() -> Query:
     return execute_query_select(query_str, PATH_DATABASE, Preferences())
 
 
-def get_preferences_id(id: int = None) -> Query:
-    if id is None:
-        id = DATABASE_ID
-    query_str = f'SELECT * FROM Configuraciones WHERE id IS {id}'
+def get_preferences_id(id_preferences: int = None) -> Query:
+    if id_preferences is None:
+        id_preferences = DATABASE_ID
+    query_str = f'SELECT * FROM Configuraciones WHERE id IS {id_preferences}'
     return execute_query_select(query_str, PATH_DATABASE, Preferences())
 
 

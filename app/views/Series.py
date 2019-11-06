@@ -327,39 +327,39 @@ class Series(QtWidgets.QMainWindow):
         self.ui.actionAcerca_de.setShortcut('Ctrl+H')
         self.ui.actionAcerca_de.setStatusTip('A cerca de')
 
-    def menu_series_actives(self) -> NoReturn:
+    @staticmethod
+    def menu_series_actives() -> NoReturn:
         """
         Muestra todas las series activas con un boton de sumar o restar capitulos
         """
-
         lista_activa.ListaActiva.get_data()
 
-    def menu_list(self) -> NoReturn:
+    @staticmethod
+    def menu_list() -> NoReturn:
         """
         Muestra las series para hacer modificaciones en masa
         """
-
         listar_todas.ListarTodas.get_data()
 
-    def menu_serie_update(self) -> NoReturn:
+    @staticmethod
+    def menu_serie_update() -> NoReturn:
         """
         Busca una serie especifica en la bd y te abre la ventana de modificacion de la serie
         """
-
         buscar_series.BuscarSeries.get_data()
 
-    def menu_insert(self) -> NoReturn:
+    @staticmethod
+    def menu_insert() -> NoReturn:
         """
         Abre una ventana para meter una nueva serie en la bd
         """
-
         actualizar_insertar.ActualizarInsertar.get_data()
 
-    def check_series_states(self):
+    @staticmethod
+    def check_series_states():
         """
         Revisa los estados de las series, si empiezan temporada, acaban temporadao acaban serie
         """
-
         estado_series.EstadoSeries.get_data()
 
     @staticmethod
@@ -369,7 +369,8 @@ class Series(QtWidgets.QMainWindow):
         logger.info('actulizaCompleto')
         a.update_completed()
 
-    def menu_download_automatic(self) -> NoReturn:
+    @staticmethod
+    def menu_download_automatic() -> NoReturn:
         preferences: Query = Controller.get_database_configuration()
         if not preferences.response[0].path_download.exists():
             dat = {'title': 'No existe el directorio',
@@ -378,7 +379,8 @@ class Series(QtWidgets.QMainWindow):
         else:
             descarga_automatica.DescargaAutomatica.get_data()
 
-    def menu_download_automatic_complete(self) -> NoReturn:
+    @staticmethod
+    def menu_download_automatic_complete() -> NoReturn:
         preferences: Query = Controller.get_database_configuration()
         # ruta_desc = str(preferences.response[0].path_download)  # es unicode
 
@@ -392,7 +394,8 @@ class Series(QtWidgets.QMainWindow):
     @staticmethod
     def open_directory_data() -> NoReturn:
         if SYSTEM == 'Windows':
-            command = 'explorer "{}"'.format(DIRECTORY_WORKING.replace('/', '\\'))
+
+            command = f'explorer "{str(DIRECTORY_WORKING)}"'
             Controller.execute_command(command)
         else:
             entorno_grafico: str = None
@@ -411,10 +414,12 @@ class Series(QtWidgets.QMainWindow):
                 Controller.execute_command(command)
 
     # PREFERENCIAS
-    def menu_preferences(self) -> NoReturn:
+    @staticmethod
+    def menu_preferences() -> NoReturn:
         preferencias.Preferencias.get_data()
 
-    def menu_notifications(self) -> NoReturn:
+    @staticmethod
+    def menu_notifications() -> NoReturn:
         notificaciones.Notificaciones.get_data()
 
     def menu_select_log(self, num: str) -> NoReturn:
