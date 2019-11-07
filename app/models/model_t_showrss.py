@@ -32,7 +32,7 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 @dataclass
 class FeedparserShowRss(FeedParser):
-    regex: str = 'S(\d+).*E(\d+).*'
+    regex: str = r'S(\d+).*E(\d+).*'
 
     @staticmethod
     def parse(url: str) -> FeedParser:
@@ -134,7 +134,10 @@ class ShowRss(Torrent):
 if __name__ == '__main__':
     # url1 = 'https://grantorrent.tv/series-2/jack-ryan-temporada-2/'
     # url1 = 'https://grantorrent.tv/series-2/gotham-temporada-5/'
-    url1 = "magnet:?xt=urn:btih:834DAC50F4F3C8F167C72EDF913FA9E36CF79AF5&dn=Mr+Robot+S04E05+1080p+WEB+x264+XLF&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&tr=http%3A%2F%2Ftracker.trackerfix.com%3A80%2Fannounce"
+    url1 = "magnet:?xt=urn:btih:834DAC50F4F3C8F167C72EDF913FA9E36CF79AF5&dn=Mr+Robot+S04E05+1080p+WEB+x264+XLF&tr=" \
+           "udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%" \
+           "3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&tr=http%3A%2F%2F" \
+           "tracker.trackerfix.com%3A80%2Fannounce"
     t = ShowRss('mia1', url1, PurePath('/home/procamora/Documents/Gestor-Series/'))
     t.download_file_torrent()
     print(t)

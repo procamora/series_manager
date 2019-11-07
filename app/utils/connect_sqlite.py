@@ -64,5 +64,6 @@ def dump_database(database: Path) -> Optional[str]:
     """
     if database.exists():
         con = sqlite3.connect(str(database))
-        return '\n'.join(con.iterdump())
+        a: str = '\n'.join(con.iterdump())
+        return str(a)
     return None

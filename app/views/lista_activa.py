@@ -8,8 +8,8 @@ from PyQt5 import QtWidgets, QtSql
 from app.views.ui.lista_activa_ui import Ui_Dialog
 
 from app import logger
-
 from app.utils.settings import PATH_DATABASE
+
 
 class ListaActiva(QtWidgets.QDialog):
     def __init__(self, parent: object = None) -> NoReturn:

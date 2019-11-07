@@ -79,7 +79,6 @@ class TorrentLocura(Torrent):
         la del feed y que no es la pagina que contiene el torrent, pero como todas tienen la misma forma se modifica la
         url poniendole descarga-torrent
 
-        :param str direcc: Dirreccion de la pagina web que contiene el torrent
         :param obj bot: bot
         :param obj message: instancia del mensaje recibido
 
@@ -122,9 +121,9 @@ class TorrentLocura(Torrent):
             if re.match(regex, result):
                 return result
             else:  # FIXME USAR selenium para simular navegador
-                """ si tiene puesto en href "javascript:void(0)" llamara a la funcion openTorrent() que tiene en la variable
-                window.location.href la url del torrent a descaegar, por lo que lo buscamos a pelo en el html y eliminamos
-                lo sobrante, feo pero funcional
+                """ si tiene puesto en href "javascript:void(0)" llamara a la funcion openTorrent() que tiene en la 
+                variable window.location.href la url del torrent a descaegar, por lo que lo buscamos a pelo en el html 
+                y eliminamos lo sobrante, feo pero funcional
                 """
                 javascript = re.findall(r'window\.location\.href = \".*\";', html_page)
                 return javascript[0].replace("window.location.href = \"", "").replace("\";", "")

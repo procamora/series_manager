@@ -128,13 +128,11 @@ class Preferencias(QtWidgets.QDialog):
         else:
             Controller.update_preferences(preferences)
 
-
         config = configparser.ConfigParser()
         config.read(PATH_FILE_CONFIG)
         config['CONFIGURABLE']['DATABASE_ID'] = str(preferences.id)
         write_config(config)
         app.utils.settings.DATABASE_ID = preferences.id
-
 
         return True
 

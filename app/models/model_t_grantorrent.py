@@ -95,9 +95,9 @@ class GranTorrent(Torrent):
 
     def get_url_torrent(self, bot=None, message: str = None) -> Optional[List[str]]:
         """
-        Funcion que obtiene la url torrent del la dirreccion que recibe,hay que tener en cuenta que la url que recibe es la
-        del feed y que no es la apgina que contiene el torrent, pero como todas tienen la misma forma se modifica la url
-        poniendole descarga-torrent
+        Funcion que obtiene la url torrent del la dirreccion que recibe,hay que tener en cuenta que la url que recibe es
+        la del feed y que no es la apgina que contiene el torrent, pero como todas tienen la misma forma se modifica la
+        url poniendole descarga-torrent
 
         :param obj bot: bot
         :param obj message: instancia del mensaje recibido
@@ -136,7 +136,7 @@ class GranTorrent(Torrent):
 if __name__ == '__main__':
     # url1 = 'https://grantorrent.tv/series-2/jack-ryan-temporada-2/'
     # url1 = 'https://grantorrent.tv/series-2/gotham-temporada-5/'
-    url1 = 'https://grantorrent.tv/toy-story-4/'
+    # url1 = 'https://grantorrent.tv/toy-story-4/'
     url1 = 'https://grantorrent.tv/series-2/la-materiada-1/'
     t = GranTorrent('test1', url1, PurePath('/home/procamora/Documents/Gestor-Series/'))
     print(t.get_url_torrent())

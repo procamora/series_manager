@@ -39,9 +39,9 @@ class AsistenteInicial(QtWidgets.QDialog):
             self.ui.checkBoxSync.setChecked(True)
 
         # Comprobamos que el directorio sea valido
-        if  Path(DIRECTORY_WORKING, '../').exists():  # comprobamos el directorio anterior a donde creamos el directorio
+        if Path(DIRECTORY_WORKING, '../').exists():  # comprobamos el directorio anterior a donde creamos el directorio
             self.ui.checkBoxValido.setChecked(True)
-            #self.ui.checkBoxValido.setChecked(True)
+            # self.ui.checkBoxValido.setChecked(True)
             self.show_message(self.ui.checkBoxValido, 'Valido', True)
         else:
             self.ui.checkBoxValido.setChecked(False)

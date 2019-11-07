@@ -62,7 +62,7 @@ class FeedparserDonTorrent(FeedParser):
                         logger.debug(capitulo.text)
                         url = f'https://dontorrent.com{serie["href"]}'
                         # obtenemos todos los episodios y mandamos unicammente el ultimo
-                        season = re.findall('\d+', str(capitulo.text))
+                        season = re.findall(r'\d+', str(capitulo.text))
                         # FIXME CAMBIAR 88 POR EL chapter CORRESPONDIENTE
                         f.add(serie.text, int(season[-1]), 88, url)
 
@@ -102,11 +102,10 @@ class DonTorrent(Torrent):
 
     def get_url_torrent(self, bot=None, message: str = None) -> Optional[List[str]]:
         """
-        Funcion que obtiene la url torrent del la dirreccion que recibe,hay que tener en cuenta que la url que recibe es la
-        del feed y que no es la apgina que contiene el torrent, pero como todas tienen la misma forma se modifica la url
-        poniendole descarga-torrent
+        Funcion que obtiene la url torrent del la dirreccion que recibe,hay que tener en cuenta que la url que recibe es
+        la del feed y que no es la apgina que contiene el torrent, pero como todas tienen la misma forma se modifica la
+        url poniendole descarga-torrent
 
-        :param str direcc: Dirreccion de la pagina web que contiene el torrent
         :param obj bot: bot
         :param obj message: instancia del mensaje recibido
 

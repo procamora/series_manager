@@ -148,6 +148,7 @@ def remove_tildes(cadena):
     # https://stackoverflow.com/questions/517923/what-is-the-best-way-to-remove-accents-in-a-python-unicode-string
     return unidecode.unidecode(cadena)
 
+
 '''
 def download_file(url, destino, libreria='requests'):
     if libreria == 'urllib2':
@@ -168,6 +169,7 @@ def download_file(url, destino, libreria='requests'):
         wget.download(url, destino)
 '''
 
+
 def show_message(label, texto='Texto plantilla', estado=True) -> NoReturn:
     """
     Muestra una determinada label con rojo o verde (depende del estado) y con el texto indicado
@@ -178,9 +180,6 @@ def show_message(label, texto='Texto plantilla', estado=True) -> NoReturn:
         label.setStyleSheet('color: green')
     else:
         label.setStyleSheet('color: red')
-
-
-
 
 
 def internet_on() -> bool:

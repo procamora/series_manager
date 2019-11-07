@@ -227,7 +227,8 @@ def send_info(message) -> Union[NoReturn, None]:
 
 @bot.message_handler(func=lambda message: message.chat.id == administrador, commands=['show_torrent'])
 def send_show_torrent(message) -> Union[NoReturn, None]:
-    command = f'transmission-remote 127.0.0.1:9091 --auth=pi:{PASSWORD_CLIENT_TORRENT} -l | egrep -v "Finished|Stopped|Seeding|ID|Sum:"'
+    command = f'transmission-remote 127.0.0.1:9091 --auth=pi:{PASSWORD_CLIENT_TORRENT} -l | ' \
+              f'egrep -v "Finished|Stopped|Seeding|ID|Sum:"'
     stdout, stderr, execute = Controller.execute_command(command)
 
     response: str = str()
@@ -240,7 +241,10 @@ def send_show_torrent(message) -> Union[NoReturn, None]:
             split_lines = re.sub('Idle|Downloading|Up & Down|Queued', '\n', i)
             # Partimos por el \n puesto anteriormente y la ultima columna tiene el nombre
             name_serie = (split_lines.split('\n')[-1]).strip()
-            regex = r'\[ES-EN\]|\[AC3 5.1 (Español )?Castellano\]|\[HDTV 720p?\]| - Temporada \d+( COMPLETA)? |\[www.descargas2020.org\]|\[www.pctnew.org\]|\.www.DESCARGASMIX.com.mkv|\[AC3 (5\.1-DTS )?5\.1-Castellano-AC3 5\.1( |\-)Ingles\+Subs\]|\[Español Castellano\]|\[wWw.EliteTorrent.IO\]|\[HDTV\]|\.WEB.x264-XLF\[rarbg\]'
+            regex = r'\[ES-EN\]|\[AC3 5.1 (Español )?Castellano\]|\[HDTV 720p?\]| - Temporada \d+( COMPLETA)? |' \
+                    r'\[www.descargas2020.org\]|\[www.pctnew.org\]|\.www.DESCARGASMIX.com.mkv|\
+                    [AC3 (5\.1-DTS )?5\.1-Castellano-AC3 5\.1( |\-)Ingles\+Subs\]|\[Español Castellano\]|\
+                    [wWw.EliteTorrent.IO\]|\[HDTV\]|\.WEB.x264-XLF\[rarbg\]'
             # print(regex)
             if len(name_serie) > 0:
                 name_serie = re.sub(regex, '', name_serie)

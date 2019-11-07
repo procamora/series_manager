@@ -233,7 +233,8 @@ class DescargaAutomaticaCli:
                 # donde voy regex para coger el capitulo unicamente
                 # chapter 99 implica que es una temporada completa
                 if entrie.chapter != FeedparserGranTorrent.NUMBER:
-                    self.day_updated += f'''\nUPDATE series SET Dia="{funciones.calculate_day_week()}" WHERE Nombre LIKE "{serie.title}";'''
+                    self.day_updated += f'\nUPDATE series SET Dia="{funciones.calculate_day_week()}" ' \
+                                        f'WHERE Nombre LIKE "{serie.title}";'
                     self.chapter_download[serie.title] = str(entrie.chapter)
 
                 logger.debug(f'DESCARGANDO: {serie.title}')

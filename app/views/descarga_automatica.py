@@ -64,7 +64,7 @@ class DescargaAutomatica(QtWidgets.QDialog):
         self.thread = Mythread(self.ui.progressBar, self.ui.textEditDescargadas)
         # variable de acceso compartido, no se como hacerlo de otra forma
         self.thread.show_notifications()
-        #DescargaAutomatica.notificaciones = DescargaAutomaticaCli.show_notifications()
+        # DescargaAutomatica.notificaciones = DescargaAutomaticaCli.show_notifications()
         self.thread.total.connect(self.ui.progressBar.setMaximum)
         self.thread.update.connect(self.update)
         self.thread.finished.connect(self.close)
