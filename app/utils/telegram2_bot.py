@@ -9,7 +9,7 @@ import os
 import re
 import sys
 import tempfile
-from pathlib import PurePath  # nueva forma de trabajar con rutas
+from pathlib import PurePath, Path  # nueva forma de trabajar con rutas
 from typing import NoReturn, Union
 
 import requests
@@ -30,9 +30,10 @@ from app.utils.descarga_automatica_cli import DescargaAutomaticaCli
 from app.models.model_query import Query
 from app.models.model_credentials import Credentials
 from app.models.model_preferences import Preferences
+from app.utils import descomprime_rar
 
 response_query_credentials: Query = Controller.get_credentials()
-response_query_preferences: Query = Controller.get_preferences()
+response_query_preferences: Query = Controller.get_preferences_id()
 
 credentials: Credentials
 if not response_query_credentials.is_empty():
@@ -114,12 +115,13 @@ def command_system(message) -> NoReturn:
 
 
 @bot.message_handler(func=lambda message: message.chat.id == administrador, commands=['/cron_Gestor_Series'])
-def send_cgs(message) -> Union[NoReturn, None]:
+def send_cgs(message) -> NoReturn:
     bot.reply_to(message, 'Ejecutado con descarga_cli')
 
     d = DescargaAutomaticaCli()
     response = d.run()
     bot.reply_to(message, response)
+    return
 
 
 @bot.message_handler(func=lambda message: message.chat.id == administrador, commands=['/empty_log'])
@@ -147,6 +149,8 @@ def send_mount(message) -> Union[NoReturn, None]:
 @bot.message_handler(func=lambda message: message.chat.id == administrador, commands=['/descomprime'])
 def send_descomprime(message) -> Union[NoReturn, None]:
     bot.reply_to(message, 'Ejecutado unrar')
+
+    descomprime_rar.main('/media/pi/640Gb/*/*.rar')
     command = "cd /home/pi/Gestor-de-Series/modulos/ && /usr/bin/python3 " \
               "/home/pi/Gestor-de-Series/modulos/descomprime_rar.py"
     stdout, stderr, execute = Controller.execute_command(command)
@@ -204,16 +208,22 @@ def send_df(message) -> Union[NoReturn, None]:
 @bot.message_handler(func=lambda message: message.chat.id == administrador, commands=['info'])
 def send_info(message) -> Union[NoReturn, None]:
     # uptime, cpu, ram, disk, speed download/upload
-    command = 'pwd'
-    stdout, stderr, execute = Controller.execute_command(command)
+    mem = """free -m | awk 'NR==2 { printf "Total: %sMB, Used: %sMB, Free: %sMB",$2,$3,$4; }'"""
+    disk = """df -h ~ | awk 'NR==2 { printf "Total: %sB, Used: %sB, Free: %sB",$2,$3,$4; }'"""
+    temp = '/opt/vc/bin/vcgencmd measure_temp | cut -c "6-9"'
+    response: str = str()
+    for cmd, info in zip([mem, disk, temp], ['Memory', 'Home space', 'Temperature']):
+        stdout, stderr, execute = Controller.execute_command(cmd)
+        if check_error(execute, stderr):
+            bot.reply_to(message, 'Error: {stderr}')
+            return
+        if info == 'Temperature':
+            stdout = stdout.replace('\n', '')
+            response += f'{info}: {stdout}ºC\n'
+        else:
+            response += f'{info}: {stdout}\n'
 
-    if check_error(execute, stderr):
-        bot.reply_to(message, 'Error: {stderr}')
-        return
-    elif len(stderr) == 0:
-        bot.reply_to(message, 'Ejecutado, pero esta en proceso')
-    else:
-        bot.reply_to(message, stdout)
+    bot.reply_to(message, response)
 
 
 @bot.message_handler(func=lambda message: message.chat.id == administrador, commands=['show_torrent'])
@@ -278,12 +288,10 @@ def handle_cmd(message) -> NoReturn:
 
 @bot.message_handler(func=lambda message: message.chat.id == administrador, regexp=r"^magnet:\?xt=urn.*")
 def handle_magnet(message) -> NoReturn:
-    bot.reply_to(message, 'Ejecutado add torrent')
+    bot.reply_to(message, 'Ejecutado add torrent magnet')
     command = f'{CLIENT_TORRENT} "message.text"'
     # command = f'transmission-remote 127.0.0.1:9091 --auth=pi:{pass_transmission} --add "{message.text}"'
     stdout, stderr, execute = Controller.execute_command(command)
-    # stdout = formatea(stdout)  # sino stdout esta en bytes
-
     logger.debug(command)
 
     if check_error(execute, stderr):
@@ -293,7 +301,7 @@ def handle_magnet(message) -> NoReturn:
         send_show_torrent(message)
 
 
-@bot.message_handler(regexp=r"^(https://)?(www.)?(dontorrent).com\/.*")
+@bot.message_handler(regexp=r"^(https?://)?(www.)?(dontorrent).com\/.*")
 def handle_torrent(message) -> Union[NoReturn, None]:
     # si no envio yo la url no continuo
     if message.chat.id != administrador:
@@ -369,8 +377,10 @@ def my_document(message) -> NoReturn:
         file_info = bot.get_file(message.document.file_id)
         # bot.send_message(message.chat.id, f'https://api.telegram.org/file/bot{TOKEN}/{file_info.file_path}')
         file = requests.get(f'https://api.telegram.org/file/bot{credentials.api_telegram}/{file_info.file_path}')
-        with open(f'/home/pi/Downloads/{message.document.file_id}.torrent', "wb") as code:
-            code.write(file.content)
+        torrent_file: Path = Path(preferences.path_download, f'{message.document.file_id}.torrent')
+        torrent_file.write_bytes(file.content)
+        # with open(f'/home/pi/Downloads/{message.document.file_id}.torrent', "wb") as code:
+        #    code.write(file.content)
         bot.reply_to(message, f'Descargando torrent: "{message.document.file_name}"')
         send_show_torrent(message)
     else:
