@@ -115,25 +115,11 @@ def command_system(message) -> NoReturn:
 
 @bot.message_handler(func=lambda message: message.chat.id == administrador, commands=['/cron_Gestor_Series'])
 def send_cgs(message) -> Union[NoReturn, None]:
-    bot.reply_to(message, 'Ejecutado con gs')
+    bot.reply_to(message, 'Ejecutado con descarga_cli')
 
     d = DescargaAutomaticaCli()
-    d.run()
-
-    command = 'cd /home/pi/Gestor-de-Series/ && python3.7 /home/pi/Gestor-de-Series/app/utils/descarga_automatica_cli.py'
-    stdout, stderr, execute = Controller.execute_command(command)
-    # stdout = formatea(stdout) # sino stdout esta en bytes
-
-    print(stdout)
-    print(stderr)
-    print(execute)
-    if check_error(execute, stderr):
-        bot.reply_to(message, f'Error: {stderr}')
-        return
-    elif len(stdout) == 0:
-        bot.reply_to(message, 'Ejecutado, puede que haya fallado o sea muy largo el resultado')
-    else:
-        bot.reply_to(message, stdout)
+    response = d.run()
+    bot.reply_to(message, response)
 
 
 @bot.message_handler(func=lambda message: message.chat.id == administrador, commands=['/empty_log'])

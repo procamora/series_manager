@@ -84,8 +84,6 @@ class ShowRss(Torrent):
         logger.debug(f'execute_command: {command}')
         execute = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         stdout, stderr = execute.communicate()
-        print(len(stderr))
-        print(stderr)
         if len(stderr) != 0:
             logger.error(f"{binary} ha fallado añadiendo el magnet: {magnet}")
 

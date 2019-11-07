@@ -195,12 +195,12 @@ class DescargaAutomaticaCli:
             if serie.vose:
                 if re.search(regex_eng, self.title_serie, re.IGNORECASE):
                     logger.info(f'DESCARGA: {entrie}')
-                    global_response += f'DESCARGA: {entrie}'
+                    global_response += f'**DESCARGA: {entrie}** \n'
                     estado = True
             else:
                 if re.search(regex_esp, self.title_serie, re.IGNORECASE):
                     logger.info(f'DESCARGA: {entrie}')
-                    global_response += f'DESCARGA: {entrie}'
+                    global_response += f'**DESCARGA: {entrie}** \n'
                     estado = True
 
             if estado:
