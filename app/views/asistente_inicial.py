@@ -9,7 +9,7 @@ from PyQt5 import QtWidgets
 from app.views.ui.asistente_inicial_ui import Ui_Dialog
 
 from app import logger
-from app.utils.settings import PATH_FILE_CONFIG, DIRECTORY_WORKING
+from app.utils.settings import PATH_FILE_CONFIG, DIRECTORY_WORKING, PATH_DATABASE
 
 
 class AsistenteInicial(QtWidgets.QDialog):
@@ -38,8 +38,15 @@ class AsistenteInicial(QtWidgets.QDialog):
         else:
             self.ui.checkBoxSync.setChecked(True)
 
-        self.ui.checkBoxValido.setChecked(True)
-        self.show_message(self.ui.checkBoxValido, 'Valido', True)
+        # Comprobamos que el directorio sea valido
+        if  Path(DIRECTORY_WORKING, '../').exists():  # comprobamos el directorio anterior a donde creamos el directorio
+            self.ui.checkBoxValido.setChecked(True)
+            #self.ui.checkBoxValido.setChecked(True)
+            self.show_message(self.ui.checkBoxValido, 'Valido', True)
+        else:
+            self.ui.checkBoxValido.setChecked(False)
+            # self.ui.checkBoxValido.setChecked(True)
+            self.show_message(self.ui.checkBoxValido, 'No Valido 1', False)
 
         self.ui.checkBoxSync.clicked.connect(self.check_sync)
         self.ui.pushButtonRuta.clicked.connect(self.search_directory)
@@ -166,7 +173,7 @@ class AsistenteInicial(QtWidgets.QDialog):
         """
         # Si no existe uno de los ficheros necesarios asistente inicial
         logger.debug(f'Analized exists: {PATH_FILE_CONFIG}')
-        if not PATH_FILE_CONFIG.exists():
+        if not PATH_FILE_CONFIG.exists() or not PATH_DATABASE.exists():
             main()  # main de la funcion
             return False
         return True

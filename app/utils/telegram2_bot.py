@@ -8,7 +8,6 @@
 import os
 import re
 import sys
-import tempfile
 from pathlib import PurePath, Path  # nueva forma de trabajar con rutas
 from typing import NoReturn, Union
 
@@ -23,13 +22,13 @@ if new_path not in sys.path:
 
 from app import logger
 from app.utils.settings import PASSWORD_CLIENT_TORRENT, CLIENT_TORRENT
-import app.utils.funciones as funciones
 from app.utils.settings import FILE_LOG_FEED
 import app.controller.Controller as Controller
 from app.utils.descarga_automatica_cli import DescargaAutomaticaCli
 from app.models.model_query import Query
 from app.models.model_credentials import Credentials
 from app.models.model_preferences import Preferences
+from app.models.model_t_grantorrent import GranTorrent
 from app.utils import descomprime_rar
 
 response_query_credentials: Query = Controller.get_credentials()
@@ -301,36 +300,24 @@ def handle_magnet(message) -> NoReturn:
         send_show_torrent(message)
 
 
-@bot.message_handler(regexp=r"^(https?://)?(www.)?(dontorrent).com\/.*")
-def handle_torrent(message) -> Union[NoReturn, None]:
+@bot.message_handler(regexp=r"^(https?://)?(www.)?(grantorrent).tv\/.*")
+def handle_grantorrent(message) -> Union[NoReturn, None]:
     # si no envio yo la url no continuo
     if message.chat.id != administrador:
         return
-    # ya no es necesario, lo implementa descargaUrlTorrent
-    # buscamos el genero
-    # regexGenero = re.search('descarga-torrent', message.text)
-    # if regexGenero:  # si hay find continua, sino retorno None el re.search
-    #    urlPeli = message.text
-    # else:
-    #    urlPeli = re.sub('(http://)?(www.)?newpct1.com/', 'http://www.newpct1.com/descarga-torrent/', message.text)
 
-    url = funciones.get_url_torrent_dontorrent_direct(message.text, message)
-    if url is not None:
-        with tempfile.NamedTemporaryFile(mode='rb', dir=preferences.path_download, suffix='.torrent',
-                                         delete=False) as fp:
-            try:
-                print(url)
-                download_file(url, fp.name)
-                file_data = open(fp.name, 'rb')
-                bot.send_document(message.chat.id, file_data)
-            except Exception as e:
-                print(e)
-                bot.reply_to(message, 'Ha ocurrido un error al descargar')
+    grantorrent: GranTorrent = GranTorrent('noesnecesario', message.text, preferences.path_download)
+    response: bool = grantorrent.download_file_torrent()
+
+    if response:
+        # Modo para enviar con el nombre segun api
+        file_data = open(str(grantorrent.path_file_torrent), 'rb')
+        bot.send_document(message.chat.id, file_data)
 
         with open('/tmp/descarga_torrent.log', "a") as f:
             f.write(f'{message.chat.id}, {message.chat.first_name}, {message.chat.username} -> {message.text}\n')
     else:
-        bot.reply_to(message, 'handle_torrent retorna None')
+        bot.reply_to(message, 'handle_grantorrent retorna None')
 
 
 @bot.message_handler(func=lambda message: message.chat.id == administrador, content_types=["text"])
