@@ -87,15 +87,17 @@ class ShowRss(Torrent):
         if len(stderr) != 0:
             logger.error(f"{binary} ha fallado añadiendo el magnet: {magnet}")
 
-    def download_file_torrent(self) -> NoReturn:
+    def download_file_torrent(self) -> bool:
         # Por herencia  se pone http:// pero los magnet no lo tienen y hay que borrarlo
         self.url_web = self.url_web[7:]
         try:
             self.magnet2torrent(self.url_web, str(self.path_download))
+            return True
         except ModuleNotFoundError:
             self.execute_command(self.client_torrent, self.url_web)
 
         logger.info("FIN")
+        return False
         # time.sleep(10)
 
     @staticmethod
