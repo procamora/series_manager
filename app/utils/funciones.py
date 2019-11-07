@@ -148,7 +148,7 @@ def remove_tildes(cadena):
     # https://stackoverflow.com/questions/517923/what-is-the-best-way-to-remove-accents-in-a-python-unicode-string
     return unidecode.unidecode(cadena)
 
-
+'''
 def download_file(url, destino, libreria='requests'):
     if libreria == 'urllib2':
         import urllib2
@@ -166,7 +166,7 @@ def download_file(url, destino, libreria='requests'):
     elif libreria == 'wget':
         import wget
         wget.download(url, destino)
-
+'''
 
 def show_message(label, texto='Texto plantilla', estado=True) -> NoReturn:
     """
@@ -180,11 +180,7 @@ def show_message(label, texto='Texto plantilla', estado=True) -> NoReturn:
         label.setStyleSheet('color: red')
 
 
-def scapes_parenthesis(texto) -> str:
-    """
-    No he probado si funciona con series como powers
-    """
-    return texto.replace('(', '\\(').replace(')', '\\)')
+
 
 
 def internet_on() -> bool:

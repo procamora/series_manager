@@ -22,6 +22,7 @@ if new_path not in sys.path:
 from app.models.model_t_torrent import Torrent
 from app.models.model_t_feedparser import FeedParser
 from app.models.model_t_feed import Feed
+from app.utils.settings import REQ_HEADERS
 from app import logger
 
 
@@ -36,11 +37,8 @@ class FeedparserTorrentLocura(FeedParser):
         category='1469' series en hd
         """
         formdata = {'categoryIDR': category, 'date': dat}
-        req_headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; WOW64; rv:35.0) Gecko/20100101 Firefox/35.0',
-                       'Content-Type': 'application/x-www-form-urlencoded'}
-
         session = requests.session()
-        login = session.post(url, data=formdata, headers=req_headers, verify=False)
+        login = session.post(url, data=formdata, headers=REQ_HEADERS, verify=False)
 
         logger.critical(login)
         sopa = BeautifulSoup(login.text, 'html.parser')

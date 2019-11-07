@@ -15,6 +15,7 @@ if new_path not in sys.path:
     sys.path.append(new_path)
 
 from app import logger
+from app.utils.settings import REQ_HEADERS
 
 from typing import List
 
@@ -86,14 +87,10 @@ def conect_tviso(username: str, password: str) -> List[str]:
                 'call': '',
                 'ref': ''}
 
-    req_headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; WOW64; rv:35.0) Gecko/20100101 Firefox/35.0',
-        'Content-Type': 'application/x-www-form-urlencoded'}
-
     session = requests.session()
-    login = session.post(urllogin, data=formdata, headers=req_headers, verify=True)  # Authenticate
+    login = session.post(urllogin, data=formdata, headers=REQ_HEADERS, verify=True)  # Authenticate
     # Accedo a la pagina donde esta el saldo total
-    series = session.get(urlafter, cookies=login.cookies, headers=req_headers, verify=True)
+    series = session.get(urlafter, cookies=login.cookies, headers=REQ_HEADERS, verify=True)
 
     compl = re.findall('<span class="event-name full-name">.*</span>', series.text)
     series = list()

@@ -11,6 +11,7 @@ from typing import NoReturn
 import requests
 
 from app import logger
+from app.utils.settings import REQ_HEADERS
 
 
 @dataclass
@@ -33,10 +34,7 @@ class Torrent(ABC, object):
 
     def _download_file(self) -> NoReturn:
         # logger.debug(f'download url: {self.url_torrent}')
-        req_headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; WOW64; rv:35.0) Gecko/20100101 Firefox/35.0',
-                       'Content-Type': 'application/x-www-form-urlencoded'}
-
-        r = requests.get(self.url_torrent, headers=req_headers, verify=False)
+        r = requests.get(self.url_torrent, headers=REQ_HEADERS, verify=False)
         logger.info(f'download file: {self.path_file_torrent}')
         with open(str(self.path_file_torrent), "wb") as code:
             code.write(r.content)

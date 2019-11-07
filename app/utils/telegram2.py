@@ -17,6 +17,7 @@ if new_path not in sys.path:
 from app import logger
 from app.models.model_query import Query
 import app.controller.Controller as Controller
+from app.utils.settings import REQ_HEADERS
 
 from typing import NoReturn, Dict
 
@@ -99,10 +100,9 @@ class Telegram:
 
     def receives_tg(self) -> NoReturn:  # no funciona de momento por la codificacion
         url = f'https://api.telegram.org/bot{self.api}/getUpdates'
-        req_headers = {'Content-Type': 'application/x-www-form-urlencoded'}
 
         session = requests.session()
-        login = session.post(url, headers=req_headers)  # Authenticate
+        login = session.post(url, headers=REQ_HEADERS)  # Authenticate
 
         logger.info(type(login.text))
         # logger.info(str(login.text.strip().decode('utf-8')))

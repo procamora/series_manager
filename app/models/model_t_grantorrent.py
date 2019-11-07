@@ -8,7 +8,7 @@ import re
 import sys
 from dataclasses import dataclass
 from pathlib import PurePath, Path  # nueva forma de trabajar con rutas
-from typing import NoReturn, Optional, List
+from typing import Optional, List
 
 import requests
 from bs4 import BeautifulSoup
@@ -20,6 +20,7 @@ new_path: str = f'{absolut_path.parent}/../../'
 if new_path not in sys.path:
     sys.path.append(new_path)
 
+from app.utils.settings import REQ_HEADERS
 from app.models.model_t_torrent import Torrent
 from app.models.model_t_feedparser import FeedParser
 from app import logger
@@ -29,17 +30,14 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 @dataclass
 class FeedparserGranTorrent(FeedParser):
-    NUMBER:int = 99 # INDICA QUE ES UNA TEMPORADA COMPLETA
+    NUMBER: int = 99  # INDICA QUE ES UNA TEMPORADA COMPLETA
 
     @staticmethod
     def parse(url: str = 'https://grantorrent.tv/series-2/') -> FeedParser:
         """
         """
-        req_headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; WOW64; rv:35.0) Gecko/20100101 Firefox/35.0',
-                       'Content-Type': 'application/x-www-form-urlencoded'}
-
         session = requests.session()
-        login = session.get(url, headers=req_headers, verify=False)
+        login = session.get(url, headers=REQ_HEADERS, verify=False)
 
         if login.status_code != 200:
             logger.critical(f"Status code get({login}) is: {login.status_code}")
@@ -77,14 +75,23 @@ class GranTorrent(Torrent):
     """
     """
 
-    def download_file_torrent(self) -> NoReturn:
+    def download_file_torrent(self) -> bool:
+        """
+        Metodo para descargar un fichero torrent, primero obtiene la url donde se encuentra
+        :return: bool indicando si se ha obtenido con existo o no
+        """
         url_torrent_serie = self.get_url_torrent()
+
+        if url_torrent_serie is None:
+            return False
+
         for i in url_torrent_serie:
             # obtengo unicamente el nombre del torrent
             self.title = i.split('/')[-1].split('.')[0]
             self.url_torrent = i
             self.path_file_torrent: Path = Path(self.path_download, f'{self.title}.torrent')
             self._download_file()
+        return True
 
     def get_url_torrent(self, bot=None, message: str = None) -> Optional[List[str]]:
         """
@@ -101,14 +108,14 @@ class GranTorrent(Torrent):
             if bot is not None and message is not None:
                 bot.reply_to(message, 'Buscando torrent en grantorrent.tv')
 
-            req_headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; WOW64; rv:35.0) Gecko/20100101 Firefox/35.0',
-                           'Content-Type': 'application/x-www-form-urlencoded'}
-
             session = requests.session()
-            login = session.get(self.url_web, headers=req_headers, verify=False)
+            login = session.get(self.url_web, headers=REQ_HEADERS, verify=False)
             sopa = BeautifulSoup(login.text, 'html.parser')
             mtable = sopa.findAll('table', {"class": "demo"})
             new_urls: list = list()
+
+            if len(mtable) == 0:  # Si es 0 falla al parseo de la web, puede que este mal la url
+                return None
 
             for tr in mtable[0].findAll('tr', {"class": "lol"}):
                 tds = tr.findAll('td')
@@ -130,6 +137,7 @@ if __name__ == '__main__':
     # url1 = 'https://grantorrent.tv/series-2/jack-ryan-temporada-2/'
     # url1 = 'https://grantorrent.tv/series-2/gotham-temporada-5/'
     url1 = 'https://grantorrent.tv/toy-story-4/'
+    url1 = 'https://grantorrent.tv/series-2/la-materiada-1/'
     t = GranTorrent('test1', url1, PurePath('/home/procamora/Documents/Gestor-Series/'))
     print(t.get_url_torrent())
     t.download_file_torrent()

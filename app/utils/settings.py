@@ -152,3 +152,6 @@ logger.debug(f'FILE_LOG_FEED_VOSE: {FILE_LOG_FEED_VOSE}')
 
 logger.debug(f'DATABASE_ID: {DATABASE_ID}')
 logger.debug(f'CLIENT_TORRENT: {CLIENT_TORRENT}')
+
+REQ_HEADERS = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; WOW64; rv:35.0) Gecko/20100101 Firefox/35.0',
+               'Content-Type': 'application/x-www-form-urlencoded'}

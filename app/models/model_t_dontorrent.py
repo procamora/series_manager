@@ -24,6 +24,7 @@ from app import logger
 from app.models.model_t_feedparser import FeedParser
 from app.models.model_t_torrent import Torrent
 from app.models.model_t_feed import Feed
+from app.utils.settings import REQ_HEADERS
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
@@ -36,11 +37,8 @@ class FeedparserDonTorrent(FeedParser):
     def parse(url: str = 'https://dontorrent.com/series/hd') -> FeedParser:
         """
         """
-        req_headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; WOW64; rv:35.0) Gecko/20100101 Firefox/35.0',
-                       'Content-Type': 'application/x-www-form-urlencoded'}
-
         session = requests.session()
-        login = session.get(url, headers=req_headers, verify=False)
+        login = session.get(url, headers=REQ_HEADERS, verify=False)
 
         if login.status_code != 200:
             logger.critical(f"Status code get({login}) is: {login.status_code}")
@@ -118,11 +116,8 @@ class DonTorrent(Torrent):
             if bot is not None and message is not None:
                 bot.reply_to(message, 'Buscando torrent en pctnew.com')
 
-            req_headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; WOW64; rv:35.0) Gecko/20100101 Firefox/35.0',
-                           'Content-Type': 'application/x-www-form-urlencoded'}
-
             session = requests.session()
-            login = session.get(self.url_web, headers=req_headers, verify=False)
+            login = session.get(self.url_web, headers=REQ_HEADERS, verify=False)
             sopa = BeautifulSoup(login.text, 'html.parser')
             mtable = sopa.findAll('table', {"class": "table table-sm table-striped text-center"})
 
@@ -144,11 +139,8 @@ class DonTorrent(Torrent):
             if bot is not None and message is not None:
                 bot.reply_to(message, 'Buscando torrent en pctnew.com')
 
-            req_headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; WOW64; rv:35.0) Gecko/20100101 Firefox/35.0',
-                           'Content-Type': 'application/x-www-form-urlencoded'}
-
             session = requests.session()
-            login = session.get(self.url_web, headers=req_headers, verify=False)
+            login = session.get(self.url_web, headers=REQ_HEADERS, verify=False)
             sopa = BeautifulSoup(login.text, 'html.parser')
             mtable = sopa.find('a',
                                {"class": "text-white bg-primary rounded-pill d-block shadow text-decoration-none p-1"})
@@ -162,7 +154,7 @@ class DonTorrent(Torrent):
 
 if __name__ == '__main__':
     url1 = 'https://dontorrent.org/pelicula/21371/Mongol'
-    #url1 = 'https://dontorrent.org/serie/63845/63846/Batwoman-1-Temporada-720p'
+    # url1 = 'https://dontorrent.org/serie/63845/63846/Batwoman-1-Temporada-720p'
     t = DonTorrent('test1', url1, PurePath('/home/procamora/Documents/Gestor-Series/'))
     print(t)
     print(t.get_url_torrent())
