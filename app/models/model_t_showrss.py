@@ -45,7 +45,7 @@ class FeedparserShowRss(FeedParser):
             title: str = str(re.sub(new_regex, '', entrie.title, re.IGNORECASE))
             season = int(re.search(FeedparserShowRss.regex, entrie.title, re.IGNORECASE).group(1))
             chapter = int(re.search(FeedparserShowRss.regex, entrie.title, re.IGNORECASE).group(2))
-            f.add(title, season, chapter, entrie.link)
+            f.add(title, season, chapter, entrie.link, entrie.title)
 
         [logger.debug(f'-> {i}') for i in f.entries]
         return f

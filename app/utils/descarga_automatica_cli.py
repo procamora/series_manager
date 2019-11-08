@@ -179,10 +179,9 @@ class DescargaAutomaticaCli:
             self.title_serie = funciones.remove_tildes(entrie.title)
             # cuando llegamos al ultimo capitulo pasamos a la siguiente serie
             # logger.info(self.titleSerie, ".........", ultimaSerie, ".FIN")
-            if self.title_serie == last_serie:
+            if entrie.original_name == last_serie:
                 # retornamos el valor que luego usaremos en ultima serie para guardarlo en el fichero
-                pass
-                # return funciones.remove_tildes(entrie.title)  # FIXME DESCOMENTAR
+                return funciones.remove_tildes(entrie.original_name)  # FIXME DESCOMENTAR
 
             regex_eng = rf'{re.escape(serie.title.lower())}'
             regex_esp = rf'{re.escape(serie.title.lower())}'
@@ -240,7 +239,7 @@ class DescargaAutomaticaCli:
                 logger.debug(f'DESCARGANDO: {serie.title}')
 
         if len(feed_parser.entries) > 0:
-            return funciones.remove_tildes(feed_parser.entries[0].title)
+            return funciones.remove_tildes(feed_parser.entries[0].original_name)
         else:
             logger.warning("feed.entries is empty")
             return None

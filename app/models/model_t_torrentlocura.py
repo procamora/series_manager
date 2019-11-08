@@ -50,7 +50,7 @@ class FeedparserTorrentLocura(FeedParser):
                 logger.critical(li.div.find('h2').text)
                 logger.critical(li.a['href'])
                 # FIXME CAMBIAR 44 Y 33 POR season Y chapter
-                f.add(li.div.find('h2').text, 44, 33, li.a['href'])
+                f.add(li.div.find('h2').text, 44, 33, li.a['href'], li.div.find('h2').text)
                 # f.add(li.a['title'], li.a['href'])
                 # f.add(serie.text, int(chapters[-1]), url)
 

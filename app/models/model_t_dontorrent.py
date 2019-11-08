@@ -64,7 +64,7 @@ class FeedparserDonTorrent(FeedParser):
                         # obtenemos todos los episodios y mandamos unicammente el ultimo
                         season = re.findall(r'\d+', str(capitulo.text))
                         # FIXME CAMBIAR 88 POR EL chapter CORRESPONDIENTE
-                        f.add(serie.text, int(season[-1]), 88, url)
+                        f.add(serie.text, int(season[-1]), 88, url, serie.text)
 
         [logger.debug(f'-> {i}') for i in f.entries]
         return f

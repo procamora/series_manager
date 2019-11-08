@@ -246,7 +246,7 @@ def send_show_torrent(message) -> Union[NoReturn, None]:
                     [AC3 (5\.1-DTS )?5\.1-Castellano-AC3 5\.1( |\-)Ingles\+Subs\]|\[Español Castellano\]|\
                     [wWw.EliteTorrent.IO\]|\[HDTV\]|\.WEB.x264-XLF\[rarbg\]'
             # print(regex)
-            if len(name_serie) > 0:
+            if re.match(regex, name_serie) and len(name_serie) > 0:
                 name_serie = re.sub(regex, '', name_serie)
                 # print(name_serie)
                 response += f'{name_serie}\n'

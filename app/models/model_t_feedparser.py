@@ -16,8 +16,9 @@ class FeedParser(ABC, object):
     def __post_init__(self) -> NoReturn:
         pass
 
-    def add(self, title: str, season: int, chapter: int, link: str) -> NoReturn:
+    def add(self, title: str, season: int, chapter: int, link: str, original_name: str) -> NoReturn:
         f = Feed(title.strip(), season, chapter, link)
+        f.original_name = original_name
         self.entries.append(f)
 
     @staticmethod

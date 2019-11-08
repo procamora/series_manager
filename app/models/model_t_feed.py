@@ -23,6 +23,7 @@ class Feed:
     chapter: int  # Capitulo
     link: str
     epi: str = str()  # formato de temporada y sesion TxS
+    original_name: str = str()
 
     def __post_init__(self) -> NoReturn:
 
