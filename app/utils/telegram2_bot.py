@@ -242,11 +242,12 @@ def send_show_torrent(message) -> Union[NoReturn, None]:
             # Partimos por el \n puesto anteriormente y la ultima columna tiene el nombre
             name_serie = (split_lines.split('\n')[-1]).strip()
             regex = r'\[ES-EN\]|\[AC3 5.1 (Español )?Castellano\]|\[HDTV 720p?\]| - Temporada \d+( COMPLETA)? |' \
-                    r'\[www.descargas2020.org\]|\[www.pctnew.org\]|\.www.DESCARGASMIX.com.mkv|\
-                    [AC3 (5\.1-DTS )?5\.1-Castellano-AC3 5\.1( |\-)Ingles\+Subs\]|\[Español Castellano\]|\
-                    [wWw.EliteTorrent.IO\]|\[HDTV\]|\.WEB.x264-XLF\[rarbg\]'
-            # print(regex)
-            if re.match(regex, name_serie) and len(name_serie) > 0:
+                    r'\[www.descargas2020.org\]|\[www.pctnew.org\]|\.www.DESCARGASMIX.com.mkv|' \
+                    r'\[AC3 (5\.1\-DTS )?5\.1-Castellano-AC3 5\.1( |\-)Ingles\+Subs\]|\[Español Castellano\]|' \
+                    r'\[wWw.EliteTorrent.IO\]|\[HDTV\]|\.WEB.x264-XLF\[rarbg\]'
+            print(name_serie)
+            print(regex)
+            if len(name_serie) > 0:
                 name_serie = re.sub(regex, '', name_serie)
                 # print(name_serie)
                 response += f'{name_serie}\n'
