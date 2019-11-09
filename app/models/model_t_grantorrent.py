@@ -64,7 +64,8 @@ class FeedparserGranTorrent(FeedParser):
 
             title = regex_response.group(1)
             season = int(re.search(regex, name).group(4))
-            f.add(title, season, chapter, url, name)
+            name_correct: str = name.replace('×', 'x')  # Sustituir por la letra correcta
+            f.add(title, season, chapter, url, name_correct)
 
         [logger.debug(f'-> {i}') for i in f.entries]
         return f

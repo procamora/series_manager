@@ -45,7 +45,7 @@ from app.models.model_t_feedparser import FeedParser
 from app.models.model_t_feed import Feed
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-SERIE_DEBUG = "MR Robot"
+SERIE_DEBUG = "--The Good Place"
 
 # global global_response
 global_response: str = str()
@@ -178,10 +178,10 @@ class DescargaAutomaticaCli:
         for entrie in feed_parser.entries:
             self.title_serie = funciones.remove_tildes(entrie.title)
             # cuando llegamos al ultimo capitulo pasamos a la siguiente serie
-            # logger.info(self.titleSerie, ".........", ultimaSerie, ".FIN")
+            # logger.info(f'@@@@@@@{entrie.original_name}###########{last_serie}$$$$FIN')
             if entrie.original_name == last_serie:
                 # retornamos el valor que luego usaremos en ultima serie para guardarlo en el fichero
-                return funciones.remove_tildes(entrie.original_name)  # FIXME DESCOMENTAR
+                return funciones.remove_tildes(feed_parser.entries[0].original_name)  # FIXME DESCOMENTAR
 
             regex_eng = rf'{re.escape(serie.title.lower())}'
             regex_esp = rf'{re.escape(serie.title.lower())}'
