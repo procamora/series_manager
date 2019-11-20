@@ -9,6 +9,7 @@ import json
 import os
 import re
 import sys
+from http import HTTPStatus
 from pathlib import PurePath, Path  # nueva forma de trabajar con rutas
 from typing import NoReturn, Union
 
@@ -136,8 +137,11 @@ def send_log(message) -> NoReturn:
 @bot.message_handler(func=lambda message: message.chat.id == administrador, commands=['/ip'])
 def send_public_ip(message) -> NoReturn:
     response_url: requests.models.Response = requests.get('https://api.ipify.org/?format=json')
-    my_ip: str = json.loads(response_url.text)['ip']
-    bot.reply_to(message, my_ip)
+    if response_url.status_code == HTTPStatus.OK:
+        my_ip: str = json.loads(response_url.text)['ip']
+        bot.reply_to(message, my_ip)
+    else:
+        bot.reply_to(message, f'Error: {response_url.text}')
     return  # solo esta puesto para que no falle la inspeccion de codigo
 
 
