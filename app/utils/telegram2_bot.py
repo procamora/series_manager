@@ -5,6 +5,7 @@
 # https://bitbucket.org/master_groosha/telegram-proxy-bot/src/07a6b57372603acae7bdb78f771be132d063b899/proxy_bot.py?at=master&fileviewer=file-view-default
 # https://github.com/eternnoir/pyTelegramBotAPI/blob/master/telebot/types.py
 
+import json
 import os
 import re
 import sys
@@ -62,6 +63,7 @@ dicc_botones = {
     'sys': '/reboot_system',
     'ts': '/reboot_transmission',
     'exit': '/exit',
+    'ip': '/ip',
 }
 
 
@@ -128,6 +130,14 @@ def send_log(message) -> NoReturn:
     FILE_LOG_FEED.write_text('')
 
     bot.reply_to(message, 'Log vaciado')
+    return  # solo esta puesto para que no falle la inspeccion de codigo
+
+
+@bot.message_handler(func=lambda message: message.chat.id == administrador, commands=['/ip'])
+def send_public_ip(message) -> NoReturn:
+    response_url: requests.models.Response = requests.get('https://api.ipify.org/?format=json')
+    my_ip: str = json.loads(response_url.text)['ip']
+    bot.reply_to(message, my_ip)
     return  # solo esta puesto para que no falle la inspeccion de codigo
 
 
@@ -340,6 +350,8 @@ def my_text(message) -> NoReturn:
             send_sys(message)
         elif message.text == dicc_botones['exit']:
             send_exit(message)
+        elif message.text == dicc_botones['ip']:
+            send_public_ip(message)
     else:
         bot.send_message(message.chat.id, "Comando desconocido")
     return  # solo esta puesto para que no falle la inspeccion de codigo
