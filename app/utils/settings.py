@@ -86,7 +86,7 @@ absolut_path: PurePath = PurePath(os.path.realpath(__file__))  # Ruta absoluta d
 PATH_FILE_CONFIG: Path = Path(absolut_path.parent, "../../", FILE_CONFIG)
 logger.debug(PATH_FILE_CONFIG)
 
-config: configparser.ConfigParser = configparser.ConfigParser()
+config: configparser.ConfigParser = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation())
 
 if Path(PATH_FILE_CONFIG).exists():
     config.read(PATH_FILE_CONFIG)
@@ -132,6 +132,7 @@ else:
 
 # CLIENT TORRENT
 CLIENT_TORRENT: Text = configurable.get('CLIENT_TORRENT')
+print(CLIENT_TORRENT)
 
 # BASE DE DATOS
 DATABASE_ID: int = configurable.getint("DATABASE_ID")
