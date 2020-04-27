@@ -5,11 +5,11 @@ import logging
 import os
 import platform
 from pathlib import Path, PurePath  # nueva forma de trabajar con rutas
-from typing import NoReturn
+from typing import NoReturn, Text
 
 import colorlog  # https://medium.com/@galea/python-logging-example-with-color-formatting-file-handlers-6ee21d363184
 
-sample_config = """
+sample_config: Text = """
 # Fichero de configuracion del gestor de series
 [BASICS]
 NAME_DATABASE = Series.db
@@ -32,16 +32,20 @@ PORT_CLIENT_TORRENT = 9091
 USER_CLIENT_TORRENT = pi
 PASS_CLIENT_TORRENT = raspberry
 CLIENT_TORRENT = transmission-remote ${IP_CLIENT_TORRENT}:${PORT_CLIENT_TORRENT} --auth=${USER_CLIENT_TORRENT}:${PASS_CLIENT_TORRENT}
+
+[DEBUG]
+ADMIN = 111111
+BOT_TOKEN = 1069111113:AAHOk9K5TAAAAAAAAAAIY1OgA_LNpAAAAA
 """
 
-FILE_CONFIG = 'settings.cfg'
+FILE_CONFIG: Text = 'settings.cfg'
 
 
 def get_logger(verbose: bool, name: str = 'Series') -> logging:
-    log_format = '%(levelname)s - %(module)s - %(message)s'
+    log_format: Text = '%(levelname)s - %(module)s - %(message)s'
 
-    bold_seq = '\033[1m'
-    colorlog_format = (
+    bold_seq: Text = '\033[1m'
+    colorlog_format: Text = (
         f'{bold_seq} '
         '%(log_color)s '
         f'{log_format}'
@@ -72,17 +76,17 @@ def write_config(new_config: configparser.ConfigParser) -> NoReturn:
         new_config.write(configfile)
 
 
-MODE_DEBUG: bool = True
-logger = get_logger(MODE_DEBUG, 'series')
+MODE_DEBUG: bool = False
+logger: logging = get_logger(MODE_DEBUG, 'series')
 
-absolut_path = PurePath(os.path.realpath(__file__))  # Ruta absoluta del fichero
+absolut_path: PurePath = PurePath(os.path.realpath(__file__))  # Ruta absoluta del fichero
 # print(absolut_path.parent)# ruta adsoluta del directorio donde esta el fichero
 # retroceder 2 niveles para la raiz del proyecto
 # PATH_FILE_CONFIG: Path = Path(f'{absolut_path.parent}/../../{FILE_CONFIG}')
 PATH_FILE_CONFIG: Path = Path(absolut_path.parent, "../../", FILE_CONFIG)
-print(PATH_FILE_CONFIG)
+logger.debug(PATH_FILE_CONFIG)
 
-config = configparser.ConfigParser()
+config: configparser.ConfigParser = configparser.ConfigParser()
 
 if Path(PATH_FILE_CONFIG).exists():
     config.read(PATH_FILE_CONFIG)
@@ -93,20 +97,20 @@ else:
 basics = config["BASICS"]
 configurable = config["CONFIGURABLE"]
 
-SYSTEM: str = platform.system()
+SYSTEM: Text = platform.system()
 
 # opcion: Path = Path('{}/../{}'.format(os.path.dirname(os.path.realpath(__file__)), config['DEFAULTS']['SYNC_GDRIVE']))
 
 # Inicializacion
 DIRECTORY_WORKING: Path
 DIRECTORY_LOCAL: Path = Path(absolut_path.parent, '../')
-print(absolut_path.parent)
-print(DIRECTORY_LOCAL)
+logger.debug(absolut_path.parent)
+logger.debug(DIRECTORY_LOCAL)
 
 # directorio personalizado
 if not configurable.getboolean('WORKDIR_DEFAULT'):
-    dir_drive = configurable.get('WORKDIR')  # lineas_fich[1].replace('\n', '')
-    DIRECTORY_WORKING = Path(dir_drive, basics.get("NAME_WORKDIR"))
+    dir_drive: Text = configurable.get('WORKDIR')  # lineas_fich[1].replace('\n', '')
+    DIRECTORY_WORKING: Path = Path(dir_drive, basics.get("NAME_WORKDIR"))
     if SYSTEM == "Windows":
         # tengo que eliminar /modulos para que coga ../ y no este directorio
         # para cuando lo ejecuto con el exe
@@ -118,7 +122,7 @@ if not configurable.getboolean('WORKDIR_DEFAULT'):
 # directorio por defecto
 else:
     if SYSTEM == "Windows":
-        DIRECTORY_WORKING = Path(os.environ["LOCALAPPDATA"], basics.get("NAME_WORKDIR"))
+        DIRECTORY_WORKING: Path = Path(os.environ["LOCALAPPDATA"], basics.get("NAME_WORKDIR"))
         # para cuando lo ejecuto con el exe
         # if DIRECTORY_LOCAL.split('/')[-1] == 'library.zip':
         if str(DIRECTORY_LOCAL.name) == 'library.zip':  # fixme funciona bien??
@@ -127,7 +131,7 @@ else:
         DIRECTORY_WORKING = Path(os.environ["HOME"], basics.get("NAME_WORKDIR"))
 
 # CLIENT TORRENT
-CLIENT_TORRENT = configurable.get('CLIENT_TORRENT')
+CLIENT_TORRENT: Text = configurable.get('CLIENT_TORRENT')
 
 # BASE DE DATOS
 DATABASE_ID: int = configurable.getint("DATABASE_ID")
@@ -143,6 +147,9 @@ if not directory_logs.exists():  # Si no existe directorio se crea junto con los
     FILE_LOG_DOWNLOADS.write_text("")
     FILE_LOG_FEED.write_text("")
     FILE_LOG_FEED_VOSE.write_text("")
+
+BOT_DEBUG: bool = bool(int(config["DEBUG"].get('BOT_DEBUG')))
+BOT_TOK_DEBUG: Text = config["DEBUG"].get('BOT_TOKEN')
 
 logger.debug(f'DIRECTORY_LOCAL: {DIRECTORY_LOCAL}')
 logger.debug(f'DIRECTORY_WORKING: {DIRECTORY_WORKING}')
