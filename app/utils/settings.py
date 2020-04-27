@@ -27,11 +27,14 @@ WORKDIR_DEFAULT = True
 # No se usa por defecto
 WORKDIR = /tmp/
 # Cliente torrent que se usara como comando para añadir enlaces magnet
-CLIENT_TORRENT = transmission-remote 127.0.0.1:9091 --auth=pi:raspberry --add
+IP_CLIENT_TORRENT = 127.0.0.1
+PORT_CLIENT_TORRENT = 9091
+USER_CLIENT_TORRENT = pi
 PASS_CLIENT_TORRENT = raspberry
+CLIENT_TORRENT = transmission-remote ${IP_CLIENT_TORRENT}:${PORT_CLIENT_TORRENT} --auth=${USER_CLIENT_TORRENT}:${PASS_CLIENT_TORRENT}
 """
 
-FILE_CONFIG = 'settings.ini'
+FILE_CONFIG = 'settings.cfg'
 
 
 def get_logger(verbose: bool, name: str = 'Series') -> logging:
@@ -125,7 +128,6 @@ else:
 
 # CLIENT TORRENT
 CLIENT_TORRENT = configurable.get('CLIENT_TORRENT')
-PASSWORD_CLIENT_TORRENT = configurable.get('PASS_CLIENT_TORRENT')
 
 # BASE DE DATOS
 DATABASE_ID: int = configurable.getint("DATABASE_ID")

@@ -1,5 +1,6 @@
 #PROPIOS
-settings.ini
+settings.cfg
+settings.cfg
 build/
 dist/
 app/SQL/*.sql

@@ -23,7 +23,7 @@ if new_path not in sys.path:
     sys.path.append(new_path)
 
 from app import logger
-from app.utils.settings import PASSWORD_CLIENT_TORRENT, CLIENT_TORRENT
+from app.utils.settings import CLIENT_TORRENT
 from app.utils.settings import FILE_LOG_FEED
 import app.controller.Controller as Controller
 from app.utils.descarga_automatica_cli import DescargaAutomaticaCli
@@ -241,8 +241,7 @@ def send_info(message) -> Union[NoReturn, None]:
 
 @bot.message_handler(func=lambda message: message.chat.id == administrador, commands=['show_torrent'])
 def send_show_torrent(message) -> Union[NoReturn, None]:
-    command = f'transmission-remote 127.0.0.1:9091 --auth=pi:{PASSWORD_CLIENT_TORRENT} -l | ' \
-              f'egrep -v "Finished|Stopped|Seeding|ID|Sum:"'
+    command = f'{CLIENT_TORRENT} -l | egrep -v "Finished|Stopped|Seeding|ID|Sum:"'
     stdout, stderr, execute = Controller.execute_command(command)
 
     response: str = str()
@@ -307,7 +306,7 @@ def handle_cmd(message) -> NoReturn:
 @bot.message_handler(func=lambda message: message.chat.id == administrador, regexp=r"^magnet:\?xt=urn.*")
 def handle_magnet(message) -> NoReturn:
     bot.reply_to(message, 'Ejecutado add torrent magnet')
-    command = f'{CLIENT_TORRENT} "{message.text}"'
+    command = f'{CLIENT_TORRENT} --add "{message.text}"'
     # command = f'transmission-remote 127.0.0.1:9091 --auth=pi:{pass_transmission} --add "{message.text}"'
     stdout, stderr, execute = Controller.execute_command(command)
     logger.debug(command)

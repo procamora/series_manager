@@ -26,6 +26,8 @@ def format_text(param_text: bytes) -> Optional[str]:
 
 
 def execute_command(command: str) -> Tuple[str, str, subprocess.Popen]:
+    # FIXME CAMBIAR Popen por run
+    # https://es.stackoverflow.com/questions/272843/diferencia-entre-subprocess-run-y-subprocess-popen
     execute = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = execute.communicate()
     return format_text(stdout), format_text(stderr), execute

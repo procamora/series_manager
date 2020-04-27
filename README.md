@@ -19,6 +19,8 @@ README
 + [ ] En el update del capitulo descargado poner también update de siguiendo y activa
 + [ ] Hacer ventana para añadir credenciales
 + [ ] Dao modelos persistencia (https://github.com/fedecarg/webpy-mvc/blob/master/src/app/models/user.py)
++ [ ] Cambiar subprocess Popen por run que es el nuvo estandar
+
 # Errores a corregir
 + [ ] Repasar todas las funciones de funciones y sustituir donde se pueda name_db por ruta_db
 + [ ] lista activa QSqlDatabasePrivate::addDatabase: duplicate connection name 'qt_sql_default_connection', old connection removed.
