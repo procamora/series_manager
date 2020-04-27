@@ -33,9 +33,14 @@ USER_CLIENT_TORRENT = pi
 PASS_CLIENT_TORRENT = raspberry
 CLIENT_TORRENT = transmission-remote ${IP_CLIENT_TORRENT}:${PORT_CLIENT_TORRENT} --auth=${USER_CLIENT_TORRENT}:${PASS_CLIENT_TORRENT}
 
-[DEBUG]
-ADMIN = 111111
+[BOT]
 BOT_TOKEN = 1069111113:AAHOk9K5TAAAAAAAAAAIY1OgA_LNpAAAAA
+ADMIN = 1111111
+
+[DEBUG]
+BOT_TOKEN = 1069111113:AAHOk9K5TAAAAAAAAAAIY1OgA_LNpAAAAA
+ADMIN = 1111111
+BOT_DEBUG = 0
 """
 
 FILE_CONFIG: Text = 'settings.cfg'
@@ -132,7 +137,6 @@ else:
 
 # CLIENT TORRENT
 CLIENT_TORRENT: Text = configurable.get('CLIENT_TORRENT')
-print(CLIENT_TORRENT)
 
 # BASE DE DATOS
 DATABASE_ID: int = configurable.getint("DATABASE_ID")
@@ -148,6 +152,10 @@ if not directory_logs.exists():  # Si no existe directorio se crea junto con los
     FILE_LOG_DOWNLOADS.write_text("")
     FILE_LOG_FEED.write_text("")
     FILE_LOG_FEED_VOSE.write_text("")
+
+# BOT
+BOT_TOK: Text = config["BOT"].get('BOT_TOKEN')
+BOT_ADMIN: int = int(config["BOT"].get('ADMIN'))
 
 BOT_DEBUG: bool = bool(int(config["DEBUG"].get('BOT_DEBUG')))
 BOT_TOK_DEBUG: Text = config["DEBUG"].get('BOT_TOKEN')

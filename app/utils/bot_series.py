@@ -56,26 +56,16 @@ if new_path not in sys.path:
     sys.path.append(new_path)
 
 from app import logger
-from app.utils.settings import CLIENT_TORRENT, BOT_DEBUG, BOT_TOK_DEBUG
+from app.utils.settings import CLIENT_TORRENT, BOT_DEBUG, BOT_TOK_DEBUG, BOT_TOK, BOT_ADMIN
 from app.utils.settings import FILE_LOG_FEED
 import app.controller.Controller as Controller
 from app.utils.descarga_automatica_cli import DescargaAutomaticaCli
 from app.models.model_query import Query
-from app.models.model_credentials import Credentials
 from app.models.model_preferences import Preferences
 from app.models.model_t_grantorrent import GranTorrent
 from app.utils import descomprime_rar
 
-response_query_credentials: Query = Controller.get_credentials()
 response_query_preferences: Query = Controller.get_preferences_id()
-
-credentials: Credentials
-if not response_query_credentials.is_empty():
-    credentials = response_query_credentials.response[0]
-else:
-    logger.critical("No se han obtenido las credenciales")
-    sys.exit(1)
-
 preferences: Preferences
 if not response_query_preferences.is_empty():
     preferences = response_query_preferences.response[0]
@@ -83,13 +73,12 @@ else:
     logger.critical("No se han obtenido las preferencias")
     sys.exit(1)
 
-owner_bot: int = 33063767
-users_permitted: List[int] = [33063767, 40522670]
+users_permitted: List[int] = [BOT_ADMIN]
 
 if BOT_DEBUG:
     bot: TeleBot = TeleBot(BOT_TOK_DEBUG)
 else:
-    bot = TeleBot(credentials.api_telegram)
+    bot = TeleBot(BOT_TOK)
 
 my_commands: Tuple[Text, ...] = (
     '/cron',  # 0
@@ -170,7 +159,7 @@ def send_exit(message: types.Message) -> NoReturn:
     return
 
 
-@bot.message_handler(func=lambda message: message.chat.id == owner_bot, commands=[my_commands[0][1:]])
+@bot.message_handler(func=lambda message: message.chat.id == BOT_ADMIN, commands=[my_commands[0][1:]])
 def send_cgs(message: types.Message) -> NoReturn:
     bot.reply_to(message, 'run con descarga_cli', reply_markup=get_markup_cmd())
 
@@ -180,14 +169,14 @@ def send_cgs(message: types.Message) -> NoReturn:
     return
 
 
-@bot.message_handler(func=lambda message: message.chat.id == owner_bot, commands=[my_commands[1][1:]])
+@bot.message_handler(func=lambda message: message.chat.id == BOT_ADMIN, commands=[my_commands[1][1:]])
 def send_log(message: types.Message) -> NoReturn:
     FILE_LOG_FEED.write_text('')
     bot.reply_to(message, 'clean logs', reply_markup=get_markup_cmd())
     return  # solo esta puesto para que no falle la inspeccion de codigo
 
 
-@bot.message_handler(func=lambda message: message.chat.id == owner_bot, commands=[my_commands[2][1:]])
+@bot.message_handler(func=lambda message: message.chat.id == BOT_ADMIN, commands=[my_commands[2][1:]])
 def send_mount(message: types.Message) -> NoReturn:
     command: Text = 'sudo mount -a'
     stdout, stderr, execute = Controller.execute_command(command)
@@ -201,7 +190,7 @@ def send_mount(message: types.Message) -> NoReturn:
         bot.reply_to(message, stdout, reply_markup=get_markup_cmd())
 
 
-@bot.message_handler(func=lambda message: message.chat.id == owner_bot, commands=[my_commands[3][1:]])
+@bot.message_handler(func=lambda message: message.chat.id == BOT_ADMIN, commands=[my_commands[3][1:]])
 def send_descomprime(message: types.Message) -> NoReturn:
     bot.reply_to(message, 'execute unrar', reply_markup=get_markup_cmd())
 
@@ -221,7 +210,7 @@ def send_descomprime(message: types.Message) -> NoReturn:
         bot.reply_to(message, stdout, reply_markup=get_markup_cmd())
 
 
-@bot.message_handler(func=lambda message: message.chat.id == owner_bot, commands=[my_commands[4][1:]])
+@bot.message_handler(func=lambda message: message.chat.id == BOT_ADMIN, commands=[my_commands[4][1:]])
 def send_sys(message: types.Message) -> NoReturn:
     bot.reply_to(message, 'rebooting system...', reply_markup=get_markup_cmd())
 
@@ -234,7 +223,7 @@ def send_sys(message: types.Message) -> NoReturn:
         return
 
 
-@bot.message_handler(func=lambda message: message.chat.id == owner_bot, commands=[my_commands[5][1:]])
+@bot.message_handler(func=lambda message: message.chat.id == BOT_ADMIN, commands=[my_commands[5][1:]])
 def send_ts(message: types.Message) -> NoReturn:
     command: Text = 'sudo systemctl restart transmission-daemon.service'
     stdout, stderr, execute = Controller.execute_command(command)
@@ -247,7 +236,7 @@ def send_ts(message: types.Message) -> NoReturn:
         bot.reply_to(message, stdout, reply_markup=get_markup_cmd())
 
 
-@bot.message_handler(func=lambda message: message.chat.id == owner_bot, commands=[my_commands[6][1:]])
+@bot.message_handler(func=lambda message: message.chat.id == BOT_ADMIN, commands=[my_commands[6][1:]])
 def send_public_ip(message: types.Message) -> NoReturn:
     response_url: requests.Response = requests.get('https://api.ipify.org/?format=json')
     if response_url.status_code == HTTPStatus.OK:
@@ -258,7 +247,7 @@ def send_public_ip(message: types.Message) -> NoReturn:
     return  # solo esta puesto para que no falle la inspeccion de codigo
 
 
-@bot.message_handler(func=lambda message: message.chat.id == owner_bot, commands=[my_commands[7][1:]])
+@bot.message_handler(func=lambda message: message.chat.id == BOT_ADMIN, commands=[my_commands[7][1:]])
 def send_info(message: types.Message) -> NoReturn:
     # uptime, cpu, ram, disk, speed download/upload
     mem: Text = """free -m | awk 'NR==2 { printf "Total: %sMB, Used: %sMB, Free: %sMB",$2,$3,$4; }'"""
@@ -279,7 +268,7 @@ def send_info(message: types.Message) -> NoReturn:
     bot.reply_to(message, response, reply_markup=get_markup_cmd())
 
 
-@bot.message_handler(func=lambda message: message.chat.id == owner_bot, commands=[my_commands[8][1:]])
+@bot.message_handler(func=lambda message: message.chat.id == BOT_ADMIN, commands=[my_commands[8][1:]])
 def send_df(message: types.Message) -> NoReturn:
     command: Text = 'df -h'
     stdout, stderr, execute = Controller.execute_command(command)
@@ -293,7 +282,7 @@ def send_df(message: types.Message) -> NoReturn:
         bot.reply_to(message, stdout, reply_markup=get_markup_cmd())
 
 
-@bot.message_handler(func=lambda message: message.chat.id == owner_bot, commands=[my_commands[9][1:]])
+@bot.message_handler(func=lambda message: message.chat.id == BOT_ADMIN, commands=[my_commands[9][1:]])
 def send_show_torrent(message: types.Message) -> NoReturn:
     command: Text = f'{CLIENT_TORRENT} -l | egrep -v "Finished|Stopped|Seeding|ID|Sum:"'
     stdout, stderr, execute = Controller.execute_command(command)
@@ -324,7 +313,7 @@ def send_show_torrent(message: types.Message) -> NoReturn:
         bot.reply_to(message, 'No active torrents at this time.', reply_markup=get_markup_cmd())
 
 
-@bot.message_handler(func=lambda message: message.chat.id == owner_bot, regexp=r"[Cc]md: .*")
+@bot.message_handler(func=lambda message: message.chat.id == BOT_ADMIN, regexp=r"[Cc]md: .*")
 def handle_cmd(message: types.Message) -> NoReturn:
     command_dangerous: List[Text] = [':(){ :|: & };:', 'sudo rm -rf /']
 
@@ -343,7 +332,7 @@ def handle_cmd(message: types.Message) -> NoReturn:
         bot.reply_to(message, 'command cmd not implement', reply_markup=get_markup_cmd())
 
 
-@bot.message_handler(func=lambda message: message.chat.id == owner_bot, regexp=r"^magnet:\?xt=urn.*")
+@bot.message_handler(func=lambda message: message.chat.id == BOT_ADMIN, regexp=r"^magnet:\?xt=urn.*")
 def handle_magnet(message: types.Message) -> NoReturn:
     bot.reply_to(message, 'execute add magnet torrent', reply_markup=get_markup_cmd())
     command: Text = f'{CLIENT_TORRENT} --add "{message.text}"'
@@ -362,7 +351,7 @@ def handle_magnet(message: types.Message) -> NoReturn:
 @bot.message_handler(regexp=r"^(https?://)?(www.)?(grantorrent).tv\/.*")
 def handle_grantorrent(message: types.Message) -> NoReturn:
     # si no envio yo la url no continuo
-    if message.chat.id != owner_bot:
+    if message.chat.id != BOT_ADMIN:
         return
 
     grantorrent: GranTorrent = GranTorrent('noesnecesario', message.text, preferences.path_download)
@@ -379,7 +368,7 @@ def handle_grantorrent(message: types.Message) -> NoReturn:
         bot.reply_to(message, 'handle_grantorrent return None', reply_markup=get_markup_cmd())
 
 
-@bot.message_handler(func=lambda message: message.chat.id == owner_bot, content_types=["photo"])
+@bot.message_handler(func=lambda message: message.chat.id == BOT_ADMIN, content_types=["photo"])
 def my_photo(message: types.Message) -> NoReturn:
     if message.reply_to_message:
         bot.send_photo(message.chat.id, list(message.photo)[-1].file_id, reply_markup=get_markup_cmd())
@@ -388,7 +377,7 @@ def my_photo(message: types.Message) -> NoReturn:
     return  # solo esta puesto para que no falle la inspeccion de codigo
 
 
-@bot.message_handler(func=lambda message: message.chat.id == owner_bot, content_types=["voice"])
+@bot.message_handler(func=lambda message: message.chat.id == BOT_ADMIN, content_types=["voice"])
 def my_voice(message: types.Message) -> NoReturn:
     if message.reply_to_message:
         bot.send_voice(message.chat.id, message.voice.file_id, duration=message.voice.duration,
@@ -404,7 +393,7 @@ def my_document(message: types.Message) -> NoReturn:
         file_info: types.File = bot.get_file(message.document.file_id)
         # bot.send_message(message.chat.id, f'https://api.telegram.org/file/bot{TOKEN}/{file_info.file_path}')
         file: requests.Response = requests.get(
-            f'https://api.telegram.org/file/bot{credentials.api_telegram}/{file_info.file_path}')
+            f'https://api.telegram.org/file/bot{bot.token}/{file_info.file_path}')
         torrent_file: Path = Path(preferences.path_download, f'{message.document.file_id}.torrent')
         torrent_file.write_bytes(file.content)
         # with open(f'/home/pi/Downloads/{message.document.file_id}.torrent', "wb") as code:
@@ -435,7 +424,7 @@ def escape_string(text: Text) -> Text:
 def main() -> NoReturn:
     try:
         import urllib
-        bot.send_message(owner_bot, 'Starting bot', reply_markup=get_markup_cmd(), disable_notification=True)
+        bot.send_message(BOT_ADMIN, 'Starting bot', reply_markup=get_markup_cmd(), disable_notification=True)
         logger.info('Starting bot')
     except (apihelper.ApiException, requests.exceptions.ReadTimeout) as e:
         logger.critical(f'Error in init bot: {e}')
