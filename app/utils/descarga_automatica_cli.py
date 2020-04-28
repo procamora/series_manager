@@ -17,13 +17,13 @@ import time
 from abc import abstractmethod
 from pathlib import Path  # nueva forma de trabajar con rutas
 from pathlib import PurePath  # nueva forma de trabajar con rutas
-from typing import List, NoReturn, Dict, Optional, AnyStr
+from typing import List, NoReturn, Dict, Optional, AnyStr, Text
 
 import urllib3
 
 # Confirmamos que tenemos en el path la ruta de la aplicacion, para poder lanzarlo desde cualquier ruta
 absolut_path: PurePath = PurePath(os.path.realpath(__file__))  # Ruta absoluta del fichero
-new_path: str = f'{absolut_path.parent}/../../'
+new_path: Text = f'{absolut_path.parent}/../../'
 if new_path not in sys.path:
     sys.path.append(new_path)
 
@@ -39,16 +39,16 @@ from app.models.model_notifications import Notifications
 from app.models.model_serie import Serie
 from app.models.model_preferences import Preferences
 from app.models.model_t_torrent import Torrent
-from app.models.model_t_grantorrent import FeedparserGranTorrent, GranTorrent
+from app.models.model_t_descargas2020 import FeedparserDescargas2020, Descargas2020
 from app.models.model_t_showrss import FeedparserShowRss, ShowRss
 from app.models.model_t_feedparser import FeedParser
 from app.models.model_t_feed import Feed
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-SERIE_DEBUG = "--The Good Place"
+SERIE_DEBUG: Text = "--The Good Place"
 
 # global global_response
-global_response: str = str()
+global_response: Text = str()
 
 
 # https://gist.github.com/kaotika/e8ca5c340ec94f599fb2
@@ -64,53 +64,53 @@ class DescargaAutomaticaCli:
 
             self.notifications: List[Notifications] = self.show_notifications()  # variable publica
 
-            self.series_download_notification: str = str()
-            self.day_updated: str = str()
+            self.series_download_notification: Text = str()
+            self.day_updated: Text = str()
             preferences: Query = Controller.get_database_configuration()
             self.preferences: Preferences = preferences.response[0]
             # urlNew = self.conf['UrlFeedNewpct']
-            url_show: str = self.preferences.url_feed_vose
+            url_show: Text = self.preferences.url_feed_vose
 
             # Diccionario con las series y capitulos para actualizar la bd el capitulo descargado
-            self.chapter_download: Dict[str, str] = dict()
-            self.query_update: str = str()
-            self.last_serie_esp: str = str()
-            self.last_serie_eng: str = str()
-            self.title_serie: str = str()
+            self.chapter_download: Dict[Text, Text] = dict()
+            self.query_update: Text = str()
+            self.last_serie_esp: Text = str()
+            self.last_serie_eng: Text = str()
+            self.title_serie: Text = str()
 
-            self.feed_esp: FeedParser = FeedparserGranTorrent.parse()
+            self.feed_esp: FeedParser = FeedparserDescargas2020.parse()
             self.feed_eng: FeedParser = FeedparserShowRss.parse(url_show)
 
             response_query: Query = Controller.get_series_follow()
             self.query_series: List[Serie] = response_query.response
 
     def run(self) -> AnyStr:
-        serie_actual_esp: str = str()
-        serie_actual_eng: str = str()
+        serie_actual_esp: Text = str()
+        serie_actual_eng: Text = str()
         # SerieActualTemp = str()
         global global_response
 
         if FILE_LOG_FEED.exists():
-            self.last_serie_esp: str = FILE_LOG_FEED.read_text()  # FIXME REVISAR
+            self.last_serie_esp: Text = FILE_LOG_FEED.read_text()  # FIXME REVISAR
         else:
             FILE_LOG_FEED.write_text('')
-            self.last_serie_esp: str = ''
+            self.last_serie_esp: Text = ''
 
         if FILE_LOG_FEED_VOSE.exists():
-            self.last_serie_eng: str = FILE_LOG_FEED_VOSE.read_text()  # FIXME REVISAR
+            self.last_serie_eng: Text = FILE_LOG_FEED_VOSE.read_text()  # FIXME REVISAR
         else:
             FILE_LOG_FEED_VOSE.write_text('')
-            self.last_serie_eng: str = ''
+            self.last_serie_eng: Text = ''
 
         for serie in self.query_series:
             try:
                 logger.info(f'Revisa: {funciones.remove_tildes(serie.title)}')
                 global_response += f'Revisa: {funciones.remove_tildes(serie.title)}\n'
-                serie_actual_temp: str = self.parser_feed(serie)
+                serie_actual_temp: Text = self.parser_feed(serie)
                 if serie.vose:
-                    serie_actual_eng: str = serie_actual_temp
+                    serie_actual_eng: Text = serie_actual_temp
                 else:
-                    serie_actual_esp: str = serie_actual_temp
+                    serie_actual_esp: Text = serie_actual_temp
 
                 ############################################
                 ############################################
@@ -137,7 +137,7 @@ class DescargaAutomaticaCli:
 
         # capitulos que descargo
         for serie in self.chapter_download.items():
-            query: str = f'UPDATE Series SET Capitulo_Descargado={str(serie[1])} WHERE Nombre LIKE "{serie[0]}";\n'
+            query: Text = f'UPDATE Series SET Capitulo_Descargado={str(serie[1])} WHERE Nombre LIKE "{serie[0]}";\n'
             self.query_update += query
 
         # actualiza el ultimo capitulo que he descargado
@@ -152,7 +152,7 @@ class DescargaAutomaticaCli:
 
         return global_response
 
-    def parser_feed(self, serie: Serie) -> Optional[str]:
+    def parser_feed(self, serie: Serie) -> Optional[Text]:
         """
         Metodo que comprueba para la serie proporcionada si se encuentra en el feed de nuevos capitulos publicados
         :param serie:
@@ -163,10 +163,10 @@ class DescargaAutomaticaCli:
         global global_response
 
         if serie.vose:
-            last_serie: str = self.last_serie_eng
+            last_serie: Text = self.last_serie_eng
             feed_parser = self.feed_eng
         else:
-            last_serie: str = self.last_serie_esp
+            last_serie: Text = self.last_serie_esp
             feed_parser = self.feed_esp
 
         if not self.preferences.path_download.exists():
@@ -216,7 +216,7 @@ class DescargaAutomaticaCli:
                     torrents = ShowRss(title_serie, entrie.link, self.preferences.path_download,
                                        client_torrent=CLIENT_TORRENT)
                 else:
-                    torrents = GranTorrent(title_serie, entrie.link, self.preferences.path_download)
+                    torrents: Descargas2020 = Descargas2020(title_serie, entrie.link, self.preferences.path_download)
 
                 FILE_LOG_DOWNLOADS.write_text(f'{time.strftime("%Y%m%d")} {title_serie}\n')
                 self.series_download_notification += f'{entrie.title} {entrie.epi}\n'
@@ -231,7 +231,7 @@ class DescargaAutomaticaCli:
                 # Diccionario con todos los capitulos descargados, para actualizar la bd con los capitulos por
                 # donde voy regex para coger el capitulo unicamente
                 # chapter 99 implica que es una temporada completa
-                if entrie.chapter != FeedparserGranTorrent.NUMBER:
+                if entrie.chapter != FeedparserDescargas2020.NUMBER:
                     self.day_updated += f'\nUPDATE series SET Dia="{funciones.calculate_day_week()}" ' \
                                         f'WHERE Nombre LIKE "{serie.title}";'
                     self.chapter_download[serie.title] = str(entrie.chapter)
@@ -245,7 +245,7 @@ class DescargaAutomaticaCli:
             return None
 
     @abstractmethod
-    def extra_action(self, serie: str) -> NoReturn:
+    def extra_action(self, serie: Text) -> NoReturn:
         """
         Metodo que no hace nada en esta clase pero que en herencia es usado para usar el entorno ggrafico que QT
         :return:
@@ -254,7 +254,7 @@ class DescargaAutomaticaCli:
     def get_series(self) -> List[Serie]:
         return self.query_series
 
-    def get_actual_serie(self) -> str:
+    def get_actual_serie(self) -> Text:
         return self.title_serie
 
     def show_notifications(self) -> List[Notifications]:

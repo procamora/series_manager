@@ -6,7 +6,7 @@ import re
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from pathlib import PurePath, Path  # nueva forma de trabajar con rutas
-from typing import NoReturn
+from typing import NoReturn, Text
 
 import requests
 
@@ -16,13 +16,13 @@ from app.utils.settings import REQ_HEADERS
 
 @dataclass
 class Torrent(ABC, object):
-    title: str
-    url_web: str
+    title: Text
+    url_web: Text
     path_download: PurePath
     path_file_torrent: PurePath = PurePath()
-    url_torrent: str = str()
+    url_torrent: Text = str()
 
-    def __post_init__(self) -> NoReturn:
+    def __post_init__(self: Torrent) -> NoReturn:
         """
         https://docs.python.org/3/library/dataclasses.html#post-init-processing
         :return:
@@ -32,13 +32,16 @@ class Torrent(ABC, object):
             self.url_web = f'http://{self.url_web}'
         self.path_file_torrent: Path = Path(self.path_download, f'{self.title}.torrent')
 
-    def _download_file(self) -> NoReturn:
+    def _download_file(self: Torrent) -> NoReturn:
         # logger.debug(f'download url: {self.url_torrent}')
-        r = requests.get(self.url_torrent, headers=REQ_HEADERS, verify=False)
+        if not isinstance(self.url_torrent, str):
+            logger.critical("url is not valid")
+            return
+        r: requests.Response = requests.get(self.url_torrent, headers=REQ_HEADERS, verify=False)
         logger.info(f'download file: {self.path_file_torrent}')
         with open(str(self.path_file_torrent), "wb") as code:
             code.write(r.content)
 
     @abstractmethod
-    def download_file_torrent(self) -> NoReturn:
+    def download_file_torrent(self: Torrent) -> NoReturn:
         pass

@@ -7,7 +7,7 @@ import os
 import sys
 from dataclasses import dataclass
 from pathlib import PurePath  # nueva forma de trabajar con rutas
-from typing import NoReturn
+from typing import NoReturn, Text
 
 # Confirmamos que tenemos en el path la ruta de la aplicacion, para poder lanzarlo desde cualquier ruta
 absolut_path: PurePath = PurePath(os.path.realpath(__file__))  # Ruta absoluta del fichero
@@ -18,14 +18,14 @@ if new_path not in sys.path:
 
 @dataclass
 class Feed:
-    title: str
+    title: Text
     season: int  # Temporada
     chapter: int  # Capitulo
-    link: str
-    epi: str = str()  # formato de temporada y sesion TxS
-    original_name: str = str()
+    link: Text
+    epi: Text = str()  # formato de temporada y sesion TxS
+    original_name: Text = str()
 
-    def __post_init__(self) -> NoReturn:
+    def __post_init__(self: Feed) -> NoReturn:
 
         if (len(str(self.chapter))) > 1:
             self.epi = f"{self.season}x{self.chapter}"
