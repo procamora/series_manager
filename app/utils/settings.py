@@ -13,7 +13,7 @@ sample_config: Text = """
 # Fichero de configuracion del gestor de series
 [BASICS]
 NAME_DATABASE = Series.db
-NAME_WORKDIR = Gestor-Series
+NAME_WORKDIR = series_manager
 FILE_LOG_DOWNLOADS = descargas.log
 FILE_LOG_FEED = feedNewpct.log
 FILE_LOG_FEED_VOSE = feedShowrss.log
@@ -76,7 +76,7 @@ def write_config(new_config: configparser.ConfigParser) -> NoReturn:
     :param new_config:
     :return:
     """
-    with open(FILE_CONFIG, 'w') as configfile:
+    with open(PATH_FILE_CONFIG, 'w') as configfile:
         print("escribo en settings")
         new_config.write(configfile)
 

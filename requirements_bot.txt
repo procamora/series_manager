@@ -1,15 +1,12 @@
 mechanize
 cx_Freeze
 wget
-PyQt5
 beautifulsoup4
 feedparser
 imdbpie==4.0.2
 requests
-#mechanize
 pushbullet.py
 mailer
-#pyqt5
 rarfile
 pyTelegramBotAPI
 unidecode
