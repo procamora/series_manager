@@ -11,7 +11,7 @@ pushbullet.py
 mailer
 #pyqt5
 rarfile
-pyTelegramBotAPI
+pyTelegramBotAPI==3.7.3
 unidecode
 telethon
 colorlog
