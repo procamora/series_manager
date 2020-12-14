@@ -8,7 +8,7 @@ requests
 pushbullet.py
 mailer
 rarfile
-pyTelegramBotAPI
+pyTelegramBotAPI==3.7.3  # 3.7.4 doesn't work
 unidecode
 telethon
 colorlog
