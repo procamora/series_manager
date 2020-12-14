@@ -18,6 +18,8 @@ from app import logger
 from app.models.model_query import Query
 import app.controller.Controller as Controller
 from app.utils.settings import REQ_HEADERS
+from app.models.model_t_notification import Notification
+
 
 from typing import NoReturn, Dict
 
@@ -25,7 +27,7 @@ from typing import NoReturn, Dict
 requests.packages.urllib3.disable_warnings()
 
 
-class Telegram:
+class Telegram(Notification):
     def __init__(self, chat_id: str) -> NoReturn:
         response_query: Query = Controller.get_credentials()
 
