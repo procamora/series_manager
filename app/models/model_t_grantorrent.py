@@ -8,24 +8,24 @@ import re
 import sys
 from dataclasses import dataclass
 from pathlib import PurePath, Path  # nueva forma de trabajar con rutas
-from typing import Optional, List
+from typing import Optional, List, Text
 
 import requests
+import urllib3
 from bs4 import BeautifulSoup
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 # Confirmamos que tenemos en el path la ruta de la aplicacion, para poder lanzarlo desde cualquier ruta
 absolut_path: PurePath = PurePath(os.path.realpath(__file__))  # Ruta absoluta del fichero
-new_path: str = f'{absolut_path.parent}/../../'
+new_path: Text = f'{absolut_path.parent}/../../'
 if new_path not in sys.path:
     sys.path.append(new_path)
 
-from app.utils.settings import REQ_HEADERS
-from app.models.model_t_torrent import Torrent
 from app.models.model_t_feedparser import FeedParser
+from app.models.model_t_torrent import Torrent
+from app.utils.settings import REQ_HEADERS
 from app import logger
 
-requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+urllib3.disable_warnings()
 
 
 @dataclass

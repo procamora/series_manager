@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 from __future__ import annotations
 
 import re
@@ -7,6 +8,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from pathlib import PurePath, Path  # nueva forma de trabajar con rutas
 from typing import NoReturn, Text
+from datetime import datetime
 
 import requests
 
@@ -39,7 +41,10 @@ class Torrent(ABC, object):
             return
         r: requests.Response = requests.get(self.url_torrent, headers=REQ_HEADERS, verify=False)
         logger.info(f'download file: {self.path_file_torrent}')
-        with open(str(self.path_file_torrent), "wb") as code:
+        now = datetime.now()  # current date and time
+        uniq: Text = now.strftime("%Y%d%m_%H%M%S_%f")
+        uniq_path = Path(self.path_file_torrent.parent, f'{uniq}_{str(self.path_file_torrent.name).replace(" ", "_")}')
+        with open(str(uniq_path), "wb") as code:
             code.write(r.content)
 
     @abstractmethod

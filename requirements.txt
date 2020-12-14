@@ -11,7 +11,7 @@ pushbullet.py
 mailer
 #pyqt5
 rarfile
-pyTelegramBotAPI==3.7.3
+pyTelegramBotAPI==3.7.3  # 3.7.4 doesn't work
 unidecode
 telethon
 colorlog

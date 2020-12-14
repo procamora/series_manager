@@ -6,7 +6,7 @@ from __future__ import annotations
 import os
 import re
 import sys
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import PurePath  # nueva forma de trabajar con rutas
 from typing import NoReturn, Optional, List, Text, Dict
 
@@ -20,69 +20,77 @@ new_path: Text = f'{absolut_path.parent}/../../'
 if new_path not in sys.path:
     sys.path.append(new_path)
 
-from app.models.model_t_torrent import Torrent
 from app.models.model_t_feedparser import FeedParser
+from app.models.model_t_torrent import Torrent
 from app.models.model_t_feed import Feed
 from app.utils.settings import REQ_HEADERS
 from app import logger
 
 urllib3.disable_warnings()
 
-DOMAIN: Text = "descargas2020"
-URL: Text = f'{DOMAIN}.org'
-
-
-class FeedparserDescargas2020(FeedParser):
-    def __init__(self: FeedparserDescargas2020) -> NoReturn:
-        self.entries: List[Feed] = list()
-
-    @staticmethod
-    def parse(url: Text = f'https://{URL}/ultimas-descargas/', category: Text = '1469',
-              dat: Text = 'Hoy') -> FeedparserDescargas2020:
-        """
-        category='1469' series en hd
-        """
-        formdata: Dict[Text] = {'categoryIDR': category, 'date': dat}
-        session: requests.session = requests.session()
-        login: session.post = session.post(url, data=formdata, headers=REQ_HEADERS, verify=False)
-
-        # logger.critical(login)
-        sopa: BeautifulSoup = BeautifulSoup(login.text, 'html.parser')
-        # sopa = BeautifulSoup(fichero, 'html.parser')
-        result: BeautifulSoup.element.ResultSet = sopa.findAll('ul', {"class": "noticias-series"})
-
-        f: FeedparserDescargas2020 = FeedparserDescargas2020()
-        ul: BeautifulSoup.element.Tag
-        li: BeautifulSoup.element.Tag
-        for ul in result:
-            for li in ul.findAll('li'):
-                # logger.critical(li.div.find('h2').text)
-                # logger.critical(li.a['href'])
-                # FIXME CAMBIAR 44 Y 33 POR season Y chapter
-                f.add(li.div.find('h2').text, 44, 33, li.a['href'], li.div.find('h2').text)
-                # f.add(li.a['title'], li.a['href'])
-                # f.add(serie.text, int(chapters[-1]), url)
-
-        logger.debug(f)
-
-        # for i in f.entries:
-        #    print(i.title)
-        #    print(i.cap)
-        #    print()
-
-        return f
+DOMAIN: Text = "pctmix"
+URL: Text = f'{DOMAIN}.com'
 
 
 @dataclass
-class Descargas2020(Torrent):
+class FeedparserPctmix(FeedParser):
+    entries: List[Feed] = field(default_factory=list)
+    # FIXME ahora mismo no lo uso porque no veo series que salgan con la temporada completa
+    # cuando salgan detectarlo y mofificar el number
+    NUMBER: int = 99  # INDICA QUE ES UNA TEMPORADA COMPLETA
+
+    @staticmethod
+    def parse(url: Text = f'https://{URL}/ultimas-descargas/') -> FeedparserPctmix:
+        session: requests.session = requests.session()
+        all_html: session.post = session.get(url, headers=REQ_HEADERS, verify=False)
+
+        sopa: BeautifulSoup = BeautifulSoup(all_html.text, 'html.parser')
+        result: BeautifulSoup.element.ResultSet = sopa.findAll('ul')
+
+        feed: FeedparserPctmix = FeedparserPctmix()
+        ul: BeautifulSoup.element.Tag
+        for ul in result:
+            if not ul.findAll('img'):
+                continue  # skip ul other actions
+            # foreach all (movies, tv shows, etc)
+            li: BeautifulSoup.element.Tag
+            for li in ul.findAll('li'):
+                # filter quality 720p
+                if re.search(r'720p', li.div.span.text, re.IGNORECASE):
+                    link: Text = f"{URL}{li.a['href']}"
+                    original_name: Text = li.div.find('a').text.strip()
+                    # check if 1 chapter or more
+                    if re.search(r'Capitulos ', original_name, re.IGNORECASE):
+                        chapter: int = int(re.findall(r'\d+', original_name)[-1])
+                        title: Text = re.sub(r'- Temp.*', '', original_name).strip()
+                    elif re.search(r'Capitulo ', original_name, re.IGNORECASE):
+                        chapter: int = int(re.search(r'Capitulo (\d+)', original_name, re.IGNORECASE).group(1))
+                        title: Text = re.sub(r'Temp\. \d+ Capitulo \d+', '', original_name).strip()
+                    else:
+                        continue  # skip if not detect capitulo
+
+                    season: int = int(re.search(r'Temp. (\d+)', original_name, re.IGNORECASE).group(1))
+                    feed.add(title, season, chapter, link, original_name)
+
+            return feed
+
+    def __str__(self) -> Text:
+        response: Text = str()
+        for i in self.entries:
+            response += f'{i.title} -> {i.epi}\n'
+        return response
+
+
+@dataclass
+class Pctmix(Torrent):
     """
     """
 
-    def download_file_torrent(self: Descargas2020) -> NoReturn:
+    def download_file_torrent(self: Pctmix) -> NoReturn:
         self.url_torrent = self.get_url_torrent()
         self._download_file()
 
-    def get_url_torrent(self: Descargas2020, bot=None, message: Text = None) -> Optional[Text]:
+    def get_url_torrent(self: Pctmix, bot=None, message: Text = None) -> Optional[Text]:
         """
         Funcion que obtiene la url torrent del la dirreccion que recibe,hay que tener en cuenta que la url que recibe es
         la del feed y que no es la pagina que contiene el torrent, pero como todas tienen la misma forma se modifica la
@@ -114,6 +122,8 @@ class Descargas2020(Torrent):
 
         elif re.search(regex_recursion, self.url_web):
             return self.get_url_torrent(re.sub(regex_recursion, DOMAIN, self.url_web), message)
+        else:
+            print("ups")
 
     @staticmethod
     def descarga_url_torrent_aux(html_page: Text) -> Optional[Text]:
@@ -147,11 +157,12 @@ class Descargas2020(Torrent):
 
 
 if __name__ == '__main__':
-    url1 = 'https://descargas2020.org/descargar/serie-en-hd/the-wall/temporada-1/capitulo-07/descargas2020-org'
-    t = Descargas2020(title='test1', url_web=url1, path_download=PurePath('/home/procamora/Documents/Gestor-Series/'))
+    url1 = 'https://pctmix.com/descargar/cine-alta-definicion-hd/the-boy-la-maldicion-de-brahms/bluray-microhd/'
+    t = Pctmix(title='test1', url_web=url1, path_download=PurePath('/home/procamora/Documents/Gestor-Series/'))
     print(t.get_url_torrent())
     # t.download_file_torrent()
     # print(t)
 
-    f = FeedparserDescargas2020()
-    # print(f.parse())
+    f1 = FeedparserPctmix()
+    # f1.parse()
+    print(f1.parse())

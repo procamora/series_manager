@@ -33,13 +33,13 @@ from app.utils import funciones
 from app.utils.mail2 import ML2
 from app.utils.pushbullet2 import PB2
 from app.utils.settings import FILE_LOG_FEED, FILE_LOG_FEED_VOSE, FILE_LOG_DOWNLOADS, CLIENT_TORRENT
-from app.utils.telegram2 import Telegram
+from app.utils.telegram2 import Telegram, Notification
 from app.models.model_query import Query
 from app.models.model_notifications import Notifications
 from app.models.model_serie import Serie
 from app.models.model_preferences import Preferences
 from app.models.model_t_torrent import Torrent
-from app.models.model_t_descargas2020 import FeedparserDescargas2020, Descargas2020
+from app.models.model_t_pctmix import FeedparserPctmix, Pctmix
 from app.models.model_t_showrss import FeedparserShowRss, ShowRss
 from app.models.model_t_feedparser import FeedParser
 from app.models.model_t_feed import Feed
@@ -78,7 +78,7 @@ class DescargaAutomaticaCli:
             self.last_serie_eng: Text = str()
             self.title_serie: Text = str()
 
-            self.feed_esp: FeedParser = FeedparserDescargas2020.parse()
+            self.feed_esp: FeedParser = FeedparserPctmix.parse()
             self.feed_eng: FeedParser = FeedparserShowRss.parse(url_show)
 
             response_query: Query = Controller.get_series_follow()
@@ -216,7 +216,7 @@ class DescargaAutomaticaCli:
                     torrents = ShowRss(title_serie, entrie.link, self.preferences.path_download,
                                        client_torrent=CLIENT_TORRENT)
                 else:
-                    torrents: Descargas2020 = Descargas2020(title_serie, entrie.link, self.preferences.path_download)
+                    torrents: Pctmix = Pctmix(title_serie, entrie.link, self.preferences.path_download)
 
                 FILE_LOG_DOWNLOADS.write_text(f'{time.strftime("%Y%m%d")} {title_serie}\n')
                 self.series_download_notification += f'{entrie.title} {entrie.epi}\n'
@@ -231,7 +231,7 @@ class DescargaAutomaticaCli:
                 # Diccionario con todos los capitulos descargados, para actualizar la bd con los capitulos por
                 # donde voy regex para coger el capitulo unicamente
                 # chapter 99 implica que es una temporada completa
-                if entrie.chapter != FeedparserDescargas2020.NUMBER:
+                if entrie.chapter != FeedparserPctmix.NUMBER:
                     self.day_updated += f'\nUPDATE series SET Dia="{funciones.calculate_day_week()}" ' \
                                         f'WHERE Nombre LIKE "{serie.title}";'
                     self.chapter_download[serie.title] = str(entrie.chapter)
