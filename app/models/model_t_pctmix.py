@@ -84,17 +84,16 @@ class FeedparserPctmix(FeedParser):
 
 @dataclass
 class Pctmix(Torrent):
-    """
-    """
 
     def download_file_torrent(self: Pctmix, random_name: bool = False) -> Optional[bool]:
         self.url_torrent = self.get_url_torrent()
         if self.url_torrent is None:
             return False
 
-        now = datetime.now()  # current date and time
-        uniq: Text = now.strftime("%Y%d%m_%H%M%S_%f")
-        self.path_file_torrent = Path(self.path_file_torrent.parent, f'{uniq}_{str(self.path_file_torrent.name)}')
+        if random_name:
+            now = datetime.now()  # current date and time
+            uniq: Text = now.strftime("%Y%d%m_%H%M%S_%f")
+            self.path_file_torrent = Path(self.path_file_torrent.parent, f'{uniq}_{str(self.path_file_torrent.name)}')
 
         # fixme pendiente hde hacer algo estigo grantorrent para obtener una lista de torrents
         self._download_file()

@@ -370,7 +370,7 @@ def handle_pctmix(message: types.Message) -> NoReturn:
         file_data = pctmix.path_file_torrent.open('rb')
         bot.send_document(message.chat.id, file_data)
 
-        with Path('/tmp/descarga_torrent.log').open('a') as f:
+        with Path('/tmp/downloads_torrents.log').open('a') as f:
             f.write(f'{message.chat.id}, {message.chat.first_name}, {message.chat.username} -> {message.text}\n')
     else:
         bot.reply_to(message, 'handle_pctmix return None', reply_markup=get_markup_cmd())
