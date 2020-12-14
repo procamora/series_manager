@@ -223,7 +223,7 @@ class DescargaAutomaticaCli:
 
                 logger.debug(f'{torrents}')
                 # Descargamos el/los torrents de la serie
-                d = threading.Thread(target=torrents.download_file_torrent, name=f'Thread-{serie.title}')
+                d = threading.Thread(target=torrents.download_file_torrent, args=(True,), name=f'Thread-{serie.title}')
                 d.setDaemon(True)
                 d.start()
                 d.join()

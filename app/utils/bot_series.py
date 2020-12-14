@@ -45,6 +45,7 @@ import sys
 from http import HTTPStatus
 from pathlib import PurePath, Path  # nueva forma de trabajar con rutas
 from typing import NoReturn, List, Tuple, Text, AnyStr
+from datetime import datetime
 
 import requests
 from telebot import TeleBot, types, apihelper
@@ -62,7 +63,7 @@ import app.controller.Controller as Controller
 from app.utils.descarga_automatica_cli import DescargaAutomaticaCli
 from app.models.model_query import Query
 from app.models.model_preferences import Preferences
-from app.models.model_t_grantorrent import GranTorrent
+from app.models.model_t_pctmix import Pctmix
 from app.utils import descomprime_rar
 
 response_query_preferences: Query = Controller.get_preferences_id()
@@ -116,7 +117,8 @@ def check_error(codigo: subprocess.Popen, stderr: Text) -> bool:
 
 def download_file(url: Text, destino: Text) -> NoReturn:
     r: requests.Response = requests.get(url)
-    with open(destino, "wb") as code:
+
+    with Path(destino).open("wb") as code:
         code.write(r.content)
 
 
@@ -348,24 +350,30 @@ def handle_magnet(message: types.Message) -> NoReturn:
         send_show_torrent(message)
 
 
-@bot.message_handler(regexp=r"^(https?://)?(www.)?(grantorrent).tv\/.*")
-def handle_grantorrent(message: types.Message) -> NoReturn:
+@bot.message_handler(regexp=r"^(https?://)?(www.)?(pctmix).com\/.*")
+def handle_pctmix(message: types.Message) -> NoReturn:
     # si no envio yo la url no continuo
     if message.chat.id != BOT_ADMIN:
         return
 
-    grantorrent: GranTorrent = GranTorrent('noesnecesario', message.text, preferences.path_download)
-    response: bool = grantorrent.download_file_torrent()
+    now = datetime.now()  # current date and time
+    uniq: Text = now.strftime("%Y%d%m_%H%M%S_%f")
+    pctmix: Pctmix = Pctmix(uniq, message.text, preferences.path_download)
+    # now = datetime.now()  # current date and time
+    # uniq: Text = now.strftime("%Y%d%m_%H%M%S_%f")
+    # pctmix.path_file_torrent = Path(pctmix.path_file_torrent.parent, f'{uniq}_{str(pctmix.path_file_torrent.name)}')
+    # print(pctmix.path_file_torrent)
+    response: bool = pctmix.download_file_torrent()
 
     if response:
         # Modo para enviar con el nombre segun api
-        file_data = open(str(grantorrent.path_file_torrent), 'rb')
+        file_data = pctmix.path_file_torrent.open('rb')
         bot.send_document(message.chat.id, file_data)
 
-        with open('/tmp/descarga_torrent.log', "a") as f:
+        with Path('/tmp/descarga_torrent.log').open('a') as f:
             f.write(f'{message.chat.id}, {message.chat.first_name}, {message.chat.username} -> {message.text}\n')
     else:
-        bot.reply_to(message, 'handle_grantorrent return None', reply_markup=get_markup_cmd())
+        bot.reply_to(message, 'handle_pctmix return None', reply_markup=get_markup_cmd())
 
 
 @bot.message_handler(func=lambda message: message.chat.id == BOT_ADMIN, content_types=["photo"])

@@ -39,29 +39,6 @@ def create_directory_work() -> NoReturn:
         #    template_file_conf()
 
 
-'''
-def template_file_conf() -> NoReturn:
-    """
-    Si hay una configuracion en la la carpeta del programa la mueve a la carpeta
-    de configuracion, sino la hay comprueba si existe el fichero, si existe y esta
-    vacio o no existe lo pone a 1
-    """
-
-    fichero_conf = f'{DIRECTORY_LOCAL}/{SYNC_SQLITE.split("/")[-1]}'
-    if os.path.exists(SYNC_SQLITE):
-        logger.debug(f'{SYNC_SQLITE} & {fichero_conf}')
-        os.rename(SYNC_SQLITE, fichero_conf)
-    else:
-        if os.path.exists(fichero_conf):
-            if os.stat(fichero_conf).st_size == 0:
-                with open(fichero_conf, 'w') as f:
-                    f.write("1")
-        else:
-            with open(fichero_conf, 'w') as f:
-                f.write("1")
-'''
-
-
 def template_database() -> NoReturn:
     """
     Funcion encargada de checkear el correcto estado de la base de datos, si no existe la base de datos o esta vacia le
@@ -147,27 +124,6 @@ def remove_tildes(cadena):
     # return ''.join((c for c in unicodedata.normalize('NFD', str(cadena)) if unicodedata.category(c) != 'Mn'))
     # https://stackoverflow.com/questions/517923/what-is-the-best-way-to-remove-accents-in-a-python-unicode-string
     return unidecode.unidecode(cadena)
-
-
-'''
-def download_file(url, destino, libreria='requests'):
-    if libreria == 'urllib2':
-        import urllib2
-        f = urllib2.urlopen(url)
-        data = f.read()
-        with open(destino, "wb") as code:
-            code.write(data)
-
-    elif libreria == 'requests':
-        r = requests.get(url, verify=False)
-        logger.debug(f'Descargo el fichero: {destino}')
-        with open(destino, "wb") as code:
-            code.write(r.content)
-
-    elif libreria == 'wget':
-        import wget
-        wget.download(url, destino)
-'''
 
 
 def show_message(label, texto='Texto plantilla', estado=True) -> NoReturn:

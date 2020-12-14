@@ -7,15 +7,16 @@ import os
 import re
 import sys
 from dataclasses import dataclass, field
-from pathlib import PurePath  # nueva forma de trabajar con rutas
-from typing import NoReturn, Optional, List, Text, Dict
+from pathlib import Path  # nueva forma de trabajar con rutas
+from typing import Optional, List, Text
+from datetime import datetime
 
 import requests
 import urllib3
 from bs4 import BeautifulSoup
 
 # Confirmamos que tenemos en el path la ruta de la aplicacion, para poder lanzarlo desde cualquier ruta
-absolut_path: PurePath = PurePath(os.path.realpath(__file__))  # Ruta absoluta del fichero
+absolut_path: Path = Path(os.path.realpath(__file__))  # Ruta absoluta del fichero
 new_path: Text = f'{absolut_path.parent}/../../'
 if new_path not in sys.path:
     sys.path.append(new_path)
@@ -86,9 +87,18 @@ class Pctmix(Torrent):
     """
     """
 
-    def download_file_torrent(self: Pctmix) -> NoReturn:
+    def download_file_torrent(self: Pctmix, random_name: bool = False) -> Optional[bool]:
         self.url_torrent = self.get_url_torrent()
+        if self.url_torrent is None:
+            return False
+
+        now = datetime.now()  # current date and time
+        uniq: Text = now.strftime("%Y%d%m_%H%M%S_%f")
+        self.path_file_torrent = Path(self.path_file_torrent.parent, f'{uniq}_{str(self.path_file_torrent.name)}')
+
+        # fixme pendiente hde hacer algo estigo grantorrent para obtener una lista de torrents
         self._download_file()
+        return True
 
     def get_url_torrent(self: Pctmix, bot=None, message: Text = None) -> Optional[Text]:
         """
@@ -158,7 +168,7 @@ class Pctmix(Torrent):
 
 if __name__ == '__main__':
     url1 = 'https://pctmix.com/descargar/cine-alta-definicion-hd/the-boy-la-maldicion-de-brahms/bluray-microhd/'
-    t = Pctmix(title='test1', url_web=url1, path_download=PurePath('/home/procamora/Documents/Gestor-Series/'))
+    t = Pctmix(title='test1', url_web=url1, path_download=Path('/home/procamora/Documents/Gestor-Series/'))
     print(t.get_url_torrent())
     # t.download_file_torrent()
     # print(t)
