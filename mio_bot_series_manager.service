@@ -4,8 +4,8 @@ After=multi-user.target
 
 [Service]
 Type=idle
-ExecStart=/usr/bin/python3 /home/pi/series_manager/app/utils/bot_series.py >> /home/pi/series_manager/bot.log 2>&1
-User=pi
+ExecStart=/usr/bin/python3 /home/procamora/series_manager/app/utils/bot_series.py >> /home/procamora/series_manager/bot.log 2>&1
+User=procamora
 
 [Install]
 WantedBy=multi-user.target

@@ -30,3 +30,11 @@ exe:
 
 bin:
 	pyinstaller Series_linux.spec
+
+systemd:
+	@sudo cp mio_bot_series_manager.service /lib/systemd/system/
+	@sudo chmod 644 /lib/systemd/system/mio_bot_series_manager.service
+	@sudo systemctl daemon-reload
+	@sudo systemctl enable mio_bot_series_manager.service
+	@sudo systemctl start mio_bot_series_manager.service
+
