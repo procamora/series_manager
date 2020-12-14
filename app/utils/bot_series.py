@@ -168,6 +168,7 @@ def send_cgs(message: types.Message) -> NoReturn:
     d: DescargaAutomaticaCli = DescargaAutomaticaCli()
     response: AnyStr = d.run()
     bot.reply_to(message, response, reply_markup=get_markup_cmd())
+    bot.reply_to(message, "finish descarga_cli", reply_markup=get_markup_cmd())
     return
 
 

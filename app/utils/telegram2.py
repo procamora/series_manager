@@ -5,8 +5,10 @@ import json
 import os
 import sys
 from pathlib import PurePath  # nueva forma de trabajar con rutas
+from typing import NoReturn, Dict
 
 import requests
+import urllib3
 
 # Confirmamos que tenemos en el path la ruta de la aplicacion, para poder lanzarlo desde cualquier ruta
 absolut_path: PurePath = PurePath(os.path.realpath(__file__))  # Ruta absoluta del fichero
@@ -17,24 +19,19 @@ if new_path not in sys.path:
 from app import logger
 from app.models.model_query import Query
 import app.controller.Controller as Controller
-from app.utils.settings import REQ_HEADERS
+from app.utils.settings import REQ_HEADERS, BOT_DEBUG, BOT_TOK_DEBUG, BOT_TOK
 from app.models.model_t_notification import Notification
 
-
-from typing import NoReturn, Dict
-
 # Esto hace que no salga la advertencia por fallo al verificar el certificado
-requests.packages.urllib3.disable_warnings()
+urllib3.disable_warnings()
 
 
 class Telegram(Notification):
     def __init__(self, chat_id: str) -> NoReturn:
-        response_query: Query = Controller.get_credentials()
-
-        if not response_query.is_empty():
-            self.api = response_query.response[0].api_telegram
+        if BOT_DEBUG:
+            self.api = BOT_TOK_DEBUG
         else:
-            return
+            self.api = BOT_TOK
 
         self.url = 'https://api.telegram.org/bot{0}/{1}'
         self.chat_id = chat_id
@@ -60,9 +57,14 @@ class Telegram(Notification):
             if 'connect-timeout' in params:
                 connect_timeout = params['connect-timeout'] + 10
 
+        print(method)
+        print(request_url)
+        print(params)
+        print(files)
         result = requests.request(method, request_url, params=params, files=files, timeout=(connect_timeout,
                                                                                             read_timeout))
         logger.debug(result)
+        logger.debug(result.text)
         return json.loads(result.text)['ok']
 
     @staticmethod
@@ -72,17 +74,15 @@ class Telegram(Notification):
             "<class 'str'>": 'sendMessage',
             "<class '_io.BufferedReader'>": "sendDocument"
         }
-        """
-        if data_type == 'document':
-            return r'sendDocument'
-        if data_type == 'sticker':
-            return r'sendSticker"""
+
         # logger.debug(dic[data_type])
         return dic[data_type]
 
     def send_tg(self, texto: str = 'ola k ase') -> Dict[str, str]:  # funciona en python 3
-        payload = {'chat_id': self.chat_id,
-                   'text': texto}
+        payload = {
+            'chat_id': self.chat_id,
+            'text': texto
+        }
 
         method_url = self.get_method_type(texto)
 

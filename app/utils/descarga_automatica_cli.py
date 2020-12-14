@@ -33,7 +33,7 @@ from app.utils import funciones
 from app.utils.mail2 import ML2
 from app.utils.pushbullet2 import PB2
 from app.utils.settings import FILE_LOG_FEED, FILE_LOG_FEED_VOSE, FILE_LOG_DOWNLOADS, CLIENT_TORRENT
-from app.utils.telegram2 import Telegram, Notification
+from app.utils.telegram2 import Telegram
 from app.models.model_query import Query
 from app.models.model_notifications import Notifications
 from app.models.model_serie import Serie
@@ -190,19 +190,19 @@ class DescargaAutomaticaCli:
                 logger.warning(f"{regex_esp} - {self.title_serie}")
                 logger.warning(entrie.link)
 
-            estado: bool = False
+            state: bool = False
             if serie.vose:
                 if re.search(regex_eng, self.title_serie, re.IGNORECASE):
                     logger.info(f'DESCARGA: {entrie}')
                     global_response += f'**DESCARGA: {entrie}** \n'
-                    estado = True
+                    state = True
             else:
                 if re.search(regex_esp, self.title_serie, re.IGNORECASE):
                     logger.info(f'DESCARGA: {entrie}')
                     global_response += f'**DESCARGA: {entrie}** \n'
-                    estado = True
+                    state = True
 
-            if estado:
+            if state:
                 title_serie = self.title_serie  # conversion necesaria para usar como str
                 try:  # arreglar problema codificacion de algunas series
                     logger.info(title_serie)
