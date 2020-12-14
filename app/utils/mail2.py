@@ -2,11 +2,12 @@
 # -*- coding: utf-8 -*-
 import mailer
 
+from app.models.model_t_notification import Notification
 
 # http://stackoverflow.com/questions/10147455/trying-to-send-email-gmail-as-mail-provider-using-python
 
 
-class ML2:
+class ML2(Notification):
 
     def __init__(self, user, passwd):
         self.message = mailer.Message()

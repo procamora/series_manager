@@ -81,7 +81,7 @@ def write_config(new_config: configparser.ConfigParser) -> NoReturn:
         new_config.write(configfile)
 
 
-MODE_DEBUG: bool = False
+MODE_DEBUG: bool = True
 logger: logging = get_logger(MODE_DEBUG, 'series')
 
 absolut_path: PurePath = PurePath(os.path.realpath(__file__))  # Ruta absoluta del fichero

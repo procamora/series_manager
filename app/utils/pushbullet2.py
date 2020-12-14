@@ -3,12 +3,13 @@
 from pushbullet import Pushbullet
 
 from app import logger
+from app.models.model_t_notification import Notification
 
 
 # https://github.com/randomchars/pushbullet.py
 
 
-class PB2:
+class PB2(Notification):
     def __init__(self, api):
         self.pb = Pushbullet(api)
 
