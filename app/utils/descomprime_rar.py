@@ -74,4 +74,4 @@ def main(directory: Text):
 
 
 if __name__ == '__main__':
-    main('/home/procamora/Documents/kk/*/*.rar')
+    main('/media/HDD/torrents/*/*.rar')
