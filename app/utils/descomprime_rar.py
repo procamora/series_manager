@@ -54,9 +54,9 @@ def extract_all_parts(file_rar: Path) -> NoReturn:
         os.remove(i)
 
 
-def main(ruta):
+def main(directory: Text):
     tg: Telegram = Telegram('33063767')
-    for i in glob.glob(ruta):
+    for i in glob.glob(directory):
         if not re.search(r'part1.rar', i):  # skip those parts that are not part1.rar
             continue
 
