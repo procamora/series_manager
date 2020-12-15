@@ -91,7 +91,7 @@ sudo apt-get install python3-pip python3-pyqt5 python3-pyqt5.qtsql pyqt5-dev-too
 **Fedora**:
 
 ```bash
-sudo dnf install python3-pip python3-PyQt5 PyQt5-devel rb_libtorrent-python3
+sudo dnf install python3-pip python3-PyQt5 rb_libtorrent-python3 gcc redhat-rpm-config python3-devel
 ```
 
 
