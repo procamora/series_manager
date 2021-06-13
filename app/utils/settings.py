@@ -148,7 +148,7 @@ FILE_LOG_DOWNLOADS: Path = Path(directory_logs, basics['FILE_LOG_DOWNLOADS'])
 FILE_LOG_FEED: Path = Path(directory_logs, basics['FILE_LOG_FEED'])
 FILE_LOG_FEED_VOSE: Path = Path(directory_logs, basics['FILE_LOG_FEED_VOSE'])
 if not directory_logs.exists():  # Si no existe directorio se crea junto con los ficheros
-    Path.mkdir(directory_logs)
+    Path.mkdir(directory_logs, parents=True)
     FILE_LOG_DOWNLOADS.write_text("")
     FILE_LOG_FEED.write_text("")
     FILE_LOG_FEED_VOSE.write_text("")
