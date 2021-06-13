@@ -29,8 +29,8 @@ class Torrent(ABC, object):
         :return:
         """
         if not re.match(r"^(https?://).*", self.url_web):
-            # print('add http to url')
-            self.url_web = f'http://{self.url_web}'
+            #logger.warning('add http to url')
+            self.url_web = f'https://{self.url_web}'
         self.path_file_torrent: Path = Path(self.path_download, f'{self.title}.torrent')
 
     def _download_file(self: Torrent) -> NoReturn:

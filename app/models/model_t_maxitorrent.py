@@ -85,11 +85,6 @@ class FeedparserMaxitorrent(FeedParser):
 @dataclass
 class Maxitorrent(Torrent):
 
-    def __post_init__(self):
-        if not re.search(r'/torrent/', self.url_web, re.IGNORECASE):
-            self.url_web = re.sub(r'descargar/', 'descargar/torrent/', self.url_web)
-        logger.debug(self.url_web)
-
     def download_file_torrent(self: Maxitorrent, random_name: bool = False) -> Optional[bool]:
         self.url_torrent = self.get_url_torrent()
         if self.url_torrent is None:
@@ -115,6 +110,9 @@ class Maxitorrent(Torrent):
 
         :return str: Nos devuelve el string con la url del torrent
         """
+        if not re.search(r'/torrent/', self.url_web, re.IGNORECASE):
+            self.url_web = re.sub(r'descargar/', 'descargar/torrent/', self.url_web)
+            # logger.debug(self.url_web)
         regex_recursion: Text = f"({DOMAIN})"
 
         if re.search(f"{DOMAIN}", self.url_web):
@@ -175,7 +173,7 @@ class Maxitorrent(Torrent):
 
 
 if __name__ == '__main__':
-    url1 = 'https://maxitorrent.com/descargar/cine-alta-definicion-hd/possessor/bluray-microhd/'
+    url1 = 'maxitorrent.com/descargar/cine-alta-definicion-hd/possessor/bluray-microhd/'
     t = Maxitorrent(title='test1', url_web=url1, path_download=Path('./'))
     print(t.get_url_torrent())
     # t.download_file_torrent()
